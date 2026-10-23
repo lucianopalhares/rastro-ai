@@ -1,0 +1,27 @@
+
+services:
+  api:
+    build:
+      context: ./rastro-ai
+      dockerfile: Dockerfile.dev
+    command: npm run start:dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      CORS_ORIGIN: '*'
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - '3039:3000'
+    volumes:
+      - ./rastro-ai:/app
+      - /app/node_modules
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "fetch('http://127.0.0.1:3000/api/v1/health').then((response) =>
+          process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

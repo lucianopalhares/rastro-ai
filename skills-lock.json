@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "jevgrep": {
+      "source": "dzhng/jevgrep",
+      "sourceType": "github",
+      "skillPath": "skills/jevgrep/SKILL.md",
+      "computedHash": "35186c0e5c2df305f7df3e1506256a7f1dbec15f95d206536e0cd181c936c3b5"
+    }
+  }
+}
