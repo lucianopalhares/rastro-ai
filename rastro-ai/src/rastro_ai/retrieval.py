@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from .document_indexing.application.use_cases.answer_question import (
+    Answer,
+    AnswerQuestionUseCase,
+)
 from .document_indexing.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
 from .document_indexing.domain.entities import DocumentChunk, RetrievedChunk
 from .document_indexing.infrastructure.retrieval.in_memory_vector_store import (
@@ -12,6 +16,7 @@ from .document_indexing.infrastructure.retrieval.in_memory_vector_store import (
 
 _vector_store = InMemoryVectorStore()
 _retrieve_chunks = RetrieveChunksUseCase(_vector_store)
+_answer_question = AnswerQuestionUseCase(_retrieve_chunks)
 
 
 # /**
@@ -32,3 +37,13 @@ def retrieve_chunks(project_id: str, query: str, *, limit: int = 5) -> tuple[Ret
     """Retorna resultados ordenados pela similaridade vetorial determinística."""
 
     return _retrieve_chunks.execute(project_id, query, limit=limit)
+
+
+# /**
+#  * Responde uma pergunta com os trechos recuperados e suas citações.
+#  * Histórico: v1 — expõe a resposta extrativa sem evidência inventada.
+#  */
+def answer_question(project_id: str, question: str, *, limit: int = 5) -> Answer:
+    """Retorna evidências citáveis ou informa que não há suporte documental."""
+
+    return _answer_question.execute(project_id, question, limit=limit)

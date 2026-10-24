@@ -1,11 +1,11 @@
 # Estado das aplicações do Rastro AI
 
-- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para `007-respostas-com-citacoes`.
+- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para `008-evaluation-baseline`.
 - API (`rastro-api`): a tarefa `004` está `verified`; a API recebe `.md` e `.txt` não vazios, armazena localmente, associa ao projeto/documento e retorna `status: pending`.
 - Frontend (`rastro-front`): nenhuma capacidade desta sequência foi aplicada ainda.
-- IA (`rastro-ai`): extração/chunking e retrieval lexical determinístico em memória estão verificados; respostas e evaluation dependem das etapas seguintes.
+- IA (`rastro-ai`): extração/chunking, retrieval lexical determinístico e respostas extrativas com citações estão verificados; evaluation é a próxima etapa.
 - Invariantes atuais: o upload não inicia extração nem indexação; o armazenamento local e o processamento assíncrono permanecem limitados ao escopo atual.
-- Próxima capacidade: `007-respostas-com-citacoes`, dependente do retrieval verificado.
+- Próxima capacidade: `008-evaluation-baseline`, dependente das respostas com citações verificadas.
 
 ## Implementações registradas
 
@@ -17,6 +17,7 @@
 | `004` | `upload-minimo-de-arquivos` | `api` | `verified` |
 | `005` | `extracao-e-chunking` | `ia` | `verified` |
 | `006` | `retrieval-vetorial-minimo` | `ia` | `verified` |
+| `007` | `respostas-com-citacoes` | `ia` | `verified` |
 
 ## Padrão de validação para novas versões
 

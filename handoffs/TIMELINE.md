@@ -351,3 +351,22 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: ciclo da implementação 006 encerrado com retrieval filtrado por projeto verificado.
 - Verificação: 11 testes, `compileall` e hook estrutural passaram.
 - Pasta: `handoffs/006-retrieval-vetorial-minimo/` | Próxima ação: iniciar 007.
+
+## 007 — Respostas com citações
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: transformar chunks recuperados em resposta com fonte ou ausência explícita de evidência.
+- Impactos: resposta extrativa determinística, sem LLM, rede, embeddings ou custo adicional de geração.
+- Resolve: contrato de resposta/citação, fachada pública, isolamento por projeto e testes do comportamento.
+- Pasta: `handoffs/007-respostas-com-citacoes/`.
+
+## 007 — Finalização verificada
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: concluir a resposta extrativa com citações e ausência explícita de evidência.
+- Impactos: `CURRENT.md` avança para `008`; API, frontend, worker, LLM e evaluation permanecem fora da 007.
+- Resolve: critério da etapa confirmado com testes, compilação, smoke integrado e jornada de uso documentada.
+- Verificação: hook estrito válido, 14 testes, `compileall` e smoke integrado aprovados.
+- Pasta: `handoffs/007-respostas-com-citacoes/` | Próxima ação: iniciar `008-evaluation-baseline`.
