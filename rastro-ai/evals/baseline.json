@@ -1,0 +1,15 @@
+{
+  "dataset_version": "v1",
+  "implementation": "extractive-lexical-v1",
+  "model": null,
+  "prompt": null,
+  "graph": null,
+  "case_count": 20,
+  "passed_cases": 20,
+  "metrics": {
+    "source_recall": 1.0,
+    "citation_precision": 1.0,
+    "safe_abstention": 1.0,
+    "project_isolation": 1.0
+  }
+}

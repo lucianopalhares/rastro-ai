@@ -32,7 +32,7 @@ Na raiz desta aplicação (`rastro-ai/`), execute:
 python3 -m unittest discover -s tests -v
 ```
 
-Resultado esperado: 11 testes aprovados.
+Resultado esperado: 18 testes aprovados.
 
 Para verificar a compilação:
 
@@ -42,4 +42,8 @@ python3 -m compileall -q src tests
 
 Para validar manualmente o caso de uso, importe `IndexDocumentUseCase`, injete `Utf8FileTextExtractor` e execute `execute(document_id, path)`. A resposta é uma tupla de `DocumentChunk` com `document_id`, `index`, `content`, `start_offset` e `end_offset`.
 
-O próximo passo é criar o baseline de evaluation; geração por LLM, validação de citações geradas e persistência vetorial permanecem evoluções futuras.
+O baseline determinístico de evaluation está versionado em `evals/`; geração por LLM, validação de citações geradas e persistência vetorial permanecem evoluções futuras.
+
+## Evaluation
+
+O diretório `evals/` contém 20 casos versionados e um baseline determinístico para retrieval, respostas, citações, ausência de evidência e isolamento por projeto. Execute `PYTHONPATH=src python3 -m evals.evaluate` para comparar o fluxo atual com `evals/baseline.json`; métricas semânticas por DeepEval, LLM-as-judge, API e observabilidade permanecem fora desta etapa.

@@ -18,11 +18,11 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 3 | `005-extracao-e-chunking` | `ia` | `verified` | `004` | texto extraído e chunks reproduzíveis gerados |
 | 4 | `006-retrieval-vetorial-minimo` | `ia` | `verified` | `005` | consulta retorna chunks filtrados pelo projeto |
 | 5 | `007-respostas-com-citacoes` | `ia` | `verified` | `006` | pergunta responde com fonte ou ausência de evidência |
-| 6 | `008-evaluation-baseline` | `ia` | `proposed` | `007` | dataset mínimo e baseline versionado executados |
+| 6 | `008-evaluation-baseline` | `ia` | `verified` | `007` | dataset mínimo e baseline versionado executados |
 | 7 | `009-observabilidade-e-custo` | `ia` | `proposed` | `007` | trace registra execução, latência, tokens e custo |
 | 8 | `010-autorizacao-tools-e-mcp` | `api`/`ia` | `proposed` | `008` e `009` | acesso por projeto e tools de leitura autorizadas |
 
 ## Estado ativo
 
-- Implementação ativa: `008-evaluation-baseline`.
-- Próxima capacidade: medir respostas, retrieval e citações com dataset e baseline reproduzíveis.
+- Implementação ativa: `009-observabilidade-e-custo`.
+- Próxima capacidade: registrar execução, latência, tokens e custo em traces.

@@ -370,3 +370,33 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: critério da etapa confirmado com testes, compilação, smoke integrado e jornada de uso documentada.
 - Verificação: hook estrito válido, 14 testes, `compileall` e smoke integrado aprovados.
 - Pasta: `handoffs/007-respostas-com-citacoes/` | Próxima ação: iniciar `008-evaluation-baseline`.
+
+## 008 — Evaluation baseline proposta
+
+- Data/hora: 2026-10-24 -03:00 | Status: `proposed`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: criar dataset e referência reproduzível antes de evoluir retrieval ou geração.
+- Impactos: avaliação determinística local; runtime permanece inalterado e DeepEval fica fora do escopo.
+- Resolve: ausência de medição versionada para fontes, citações, ausência de evidência e isolamento.
+- Verificação: prevista para `v1`, com 20 casos e métricas reproduzíveis.
+- Pasta: `handoffs/008-evaluation-baseline/`.
+
+## 008 — Evaluation baseline aplicada
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: versionar 20 casos e medir o fluxo determinístico antes de novas evoluções.
+- Impactos: adiciona evaluation local sem alterar runtime, modelo, rede ou custo de inferência.
+- Resolve: ausência de baseline para fontes, citações, ausência de evidência e isolamento.
+- Verificação: 18 testes, 20/20 casos, quatro métricas em `1.0`, compilação e hook estrito passaram.
+- Pasta: `handoffs/008-evaluation-baseline/` | Próxima ação: finalizar explicitamente a tarefa 008.
+
+## 008 — Evaluation baseline verificada
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: confirmar o baseline após execução completa da suíte, runner e validações estruturais.
+- Impactos: implementação encerrada e `CURRENT.md` avançado para `009`; runtime permanece sem alteração.
+- Resolve: critério da etapa 008 confirmado com dataset e métricas determinísticas reproduzíveis.
+- Verificação: 18 testes, 20/20 casos, quatro métricas em `1.0`, compilação, diff limpo e hook estrito.
+- Pasta: `handoffs/008-evaluation-baseline/`.
