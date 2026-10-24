@@ -270,3 +270,43 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: ciclo de implementação do upload mínimo; armazenamento local e indexação permanecem nas etapas seguintes.
 - Verificação: `201` para `.md`, `400` para `.pdf`, 2 suítes/7 testes, build Nest e build Docker passaram.
 - Pasta: `handoffs/004-upload-minimo-de-arquivos/`.
+
+## 004 — Fixture versionado para simulação de upload
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: API `rastro-api` (fixture de teste manual).
+- Por que foi feita: disponibilizar conteúdo reutilizável para simular uploads futuros.
+- Impactos: adiciona `rastro-api/test/fixtures/upload/meeting.md`; não altera o código da API.
+- Resolve: ausência de arquivo estável para o smoke test multipart.
+- Verificação: conteúdo não vazio confirmado; comando curl registrado no handoff `v2`.
+- Pasta: `handoffs/004-upload-minimo-de-arquivos/v2/`
+
+## 004 — Fixture em formato de transcrição de reunião
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: API `rastro-api` (fixture de teste manual).
+- Por que foi feita: simular uma reunião curta com falas naturais entre participantes.
+- Impactos: atualiza `rastro-api/test/fixtures/upload/meeting.md`; não altera o código da API.
+- Resolve: conteúdo excessivamente estruturado para o cenário de transcrição.
+- Verificação: arquivo não vazio e falas de três participantes conferidas; smoke HTTP permanece manual.
+- Pasta: `handoffs/004-upload-minimo-de-arquivos/v3/`
+
+## 004 — Upload do fixture verificado
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`
+- Aplicação afetada: API `rastro-api` e fixture versionado.
+- Por que foi feita: confirmar o upload real da transcrição de reunião pelo endpoint multipart.
+- Impactos: nenhum código novo; o fixture foi aceito e associado ao projeto `project-1`.
+- Resolve: validação manual pendente do arquivo reutilizável.
+- Verificação: `HTTP/1.1 201 Created`, `status: pending`, conteúdo preservado e `source.storageKey` terminado em `.md`.
+- Pasta: `handoffs/004-upload-minimo-de-arquivos/v4/`
+
+## 004 — Finalização da implementação
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`
+- Aplicação afetada: API `rastro-api` e fixture versionado.
+- Por que foi feita: concluir a implementação após confirmação do upload, testes e build.
+- Impactos: `CURRENT.md` avança para `005`; alterações não relacionadas permanecem fora do commit.
+- Resolve: ciclo da implementação `004` encerrado com evidência de aplicação e verificação.
+- Verificação: hook válido, smoke HTTP `201`, 2 suítes/7 testes e build NestJS aprovados.
+- Pasta: `handoffs/004-upload-minimo-de-arquivos/`.
