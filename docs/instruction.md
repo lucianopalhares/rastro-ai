@@ -308,6 +308,12 @@ Remover um fragmento específico diretamente no arquivo real. O comentário no m
 
 Todo handoff que alterar o comportamento da IA deve incluir, quando aplicável, teste unitário ou de contrato, caso de DeepEval, atualização de dataset, smoke test, alteração esperada no trace do Langfuse e impacto esperado em custo e latência.
 
+Além dessa lista, cada `vN/README.md` de uma implementação nova ou de uma nova rodada deve conter a seção `## Cobertura por comportamento` antes de `## Instruções de validação`. A seção deve relacionar cada comportamento alterado com sua evidência, distinguindo teste unitário/contrato, teste de integração ou smoke/manual real e resultado esperado. Quando uma validação integrada ou real não se aplicar, o README deve declarar o motivo e o limite explicitamente.
+
+Antes dessas seções, cada `vN/README.md` também deve conter `## Jornada da aplicação nesta versão` e `## Como usar e validar a aplicação nesta versão`. A jornada deve explicar o propósito da tarefa, o que a pessoa conseguia fazer antes, o que passa a conseguir fazer agora, o resultado percebido, o que ainda falta e a próxima evolução. As instruções devem ensinar o uso pelo caminho real disponível: incluir `curl` completo para requests, passos de tela para frontend e, quando nenhuma integração existir, declarar essa limitação e oferecer a validação executável disponível.
+
+Antes de registrar `applied` ou `verified`, o agente deve conferir que todos os comportamentos alterados têm evidência correspondente e executar o hook com `REQUIRE_BEHAVIOR_COVERAGE=1`. O hook sem essa variável continua validando somente a estrutura histórica já existente, preservando a compatibilidade dos handoffs anteriores.
+
 ## Conflitos
 
 Se houver conflito entre este documento, `AGENTS.md` e um documento de planejamento:

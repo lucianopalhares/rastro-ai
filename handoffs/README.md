@@ -18,4 +18,8 @@
 | `005` | `extracao-e-chunking` | `ia` | `verified` |
 | `006` | `retrieval-vetorial-minimo` | `ia` | `verified` |
 
+## Padrão de validação para novas versões
+
+Cada novo `vN/README.md` deve incluir `## Jornada da aplicação nesta versão`, `## Como usar e validar a aplicação nesta versão` e `## Cobertura por comportamento` antes de `## Instruções de validação`. Registre o propósito, a evolução para a pessoa usuária, o request completo ou os passos de frontend quando existirem e, caso a integração ainda não exista, a limitação e a validação executável disponível; handoffs históricos permanecem válidos sem retroatividade.
+
 Este resumo representa o estado funcional conhecido das aplicações e da raiz após a conclusão da tarefa `004`.

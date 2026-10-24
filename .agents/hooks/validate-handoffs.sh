@@ -4,6 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 AGENTS_FILE="$ROOT_DIR/AGENTS.md"
+REQUIRE_BEHAVIOR_COVERAGE="${REQUIRE_BEHAVIOR_COVERAGE:-0}"
 
 fail() {
   printf 'handoff validation failed: %s\n' "$1" >&2
@@ -45,6 +46,27 @@ for relative_file in "${handoff_files[@]}"; do
   file_name="$(basename "$file_path")"
   [[ "$file_name" != *.handoff.md ]] || fail "$relative_file usa um sufixo que não pertence ao arquivo original"
   [[ -s "$file_path" ]] || fail "$relative_file está vazio"
+
+  if [[ "$REQUIRE_BEHAVIOR_COVERAGE" == "1" && "$relative_file" == handoffs/*/v[0-9]*/README.md ]]; then
+    grep -q '^## Cobertura por comportamento$' "$file_path" \
+      || fail "$relative_file não possui a seção ## Cobertura por comportamento"
+    grep -q '^## Jornada da aplicação nesta versão$' "$file_path" \
+      || fail "$relative_file não possui a seção ## Jornada da aplicação nesta versão"
+    grep -q '^## Como usar e validar a aplicação nesta versão$' "$file_path" \
+      || fail "$relative_file não possui a seção ## Como usar e validar a aplicação nesta versão"
+    grep -q '^## Instruções de validação$' "$file_path" \
+      || fail "$relative_file não possui a seção ## Instruções de validação"
+    awk '/^## Jornada da aplicação nesta versão$/{journey=NR} /^## Como usar e validar a aplicação nesta versão$/{usage=NR} /^## Cobertura por comportamento$/{coverage=NR} /^## Instruções de validação$/{validation=NR} END { exit !(journey && usage && coverage && validation && journey < usage && usage < coverage && coverage < validation) }' "$file_path" \
+      || fail "$relative_file deve ordenar Jornada, Como usar, Cobertura e Instruções de validação"
+    grep -Eiq 'antes|agora|propósito|próxima evolução|ainda falta|limita' "$file_path" \
+      || fail "$relative_file não explica a evolução da jornada da aplicação"
+    grep -Eiq 'curl|frontend|tela|não há|indisponível|python3|smoke' "$file_path" \
+      || fail "$relative_file não explica como usar a aplicação ou declara a integração indisponível"
+    grep -Eiq 'unitári|contrato' "$file_path" \
+      || fail "$relative_file não registra evidência unitária ou contratual"
+    grep -Eiq 'integração|smoke|manual|não se aplica|fora do escopo' "$file_path" \
+      || fail "$relative_file não registra validação integrada, smoke/manual ou justificativa de não aplicação"
+  fi
 done
 
 printf 'handoffs válidos: %s arquivo(s)\n' "${#handoff_files[@]}"

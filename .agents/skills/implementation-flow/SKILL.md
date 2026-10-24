@@ -60,6 +60,8 @@ Use o próximo número disponível, com três dígitos, e um título em `kebab-c
 Os handoffs desta skill são registros compactos. O código, configuração, testes e documentação permanecem e são alterados diretamente nas aplicações reais. O README da implementação, `CURRENT.md` e os timelines são arquivos de controle.
 
 - `vN/README.md`: resumo, arquivos reais alterados, operações, comentários de versão, verificações e a seção obrigatória `## Instruções de validação`;
+- `vN/README.md`: para novas versões, também deve conter `## Cobertura por comportamento`, antes da validação, relacionando cada comportamento alterado a testes unitários/contratos, integração ou smoke/manual real e resultado esperado;
+- `vN/README.md`: para novas versões, também deve conter `## Jornada da aplicação nesta versão` e `## Como usar e validar a aplicação nesta versão`, antes da cobertura, explicando a evolução para uma pessoa usuária e o caminho real de uso;
 - Além da seção de validação, cada `vN/README.md` deve conter, nesta ordem, `## O que foi feito` e `## O que muda na aplicação` antes dela;
 - `vN/TIMELINE.md`: histórico append-only da rodada; antes da entrega, as entradas inteiras devem estar em ordem cronológica sem alteração de conteúdo.
 
@@ -159,6 +161,10 @@ O README de cada versão deve registrar:
 
 O README de cada versão deve conter obrigatoriamente a seção `## Instruções de validação`, com cada comando, URL, ação manual ou teste necessário, além do resultado esperado para confirmar o comportamento alterado. Para toda requisição HTTP, o registro deve incluir um comando completo copiável, como `curl`, com método, URL, headers, payload ou campos multipart, arquivo de entrada e resposta esperada.
 
+Antes dessa seção, o README deve conter `## Cobertura por comportamento`. Para cada comportamento alterado, registre a evidência unitária ou contratual e, quando aplicável, a evidência integrada, smoke ou manual real. Se a integração real não existir no escopo, registre explicitamente essa ausência, o motivo e o limite da validação.
+
+Antes da cobertura, o README deve conter `## Jornada da aplicação nesta versão` e `## Como usar e validar a aplicação nesta versão`. A jornada deve conectar a versão ao propósito da aplicação e descrever antes, agora, resultado percebido, limitações e próxima evolução. As instruções devem conter o procedimento real para a pessoa usar a capacidade: request completo quando houver API, passos de tela quando houver frontend e uma declaração explícita de indisponibilidade quando a integração ainda não existir.
+
 As seções `## O que foi feito` e `## O que muda na aplicação` também são obrigatórias e devem aparecer antes da seção de validação, nessa ordem. Quando não houver mudança de runtime, a segunda seção deve declarar isso explicitamente.
 
 Antes de entregar, confira os dois timelines e realinhe apenas a posição das entradas inteiras para a ordem cronológica correta. Não edite o texto, status, data ou conteúdo das entradas históricas durante esse realinhamento.
@@ -233,7 +239,7 @@ Quando o usuário disser para finalizar, concluir ou encerrar:
 13. registre na timeline da implementação o identificador do commit, a mensagem e a verificação executada;
 14. a próxima mudança deve respeitar a etapa apontada por `CURRENT.md`.
 
-Antes de concluir, execute o checklist: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, confirmar que o status tem evidência, executar hook e testes aplicáveis, conferir a lista explícita do commit e verificar se `CURRENT.md` avançou somente quando permitido.
+Antes de concluir, execute o checklist: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, confirmar que cada comportamento alterado possui evidência unitária/contratual e integração ou smoke/manual real quando aplicável, executar `REQUIRE_BEHAVIOR_COVERAGE=1 .agents/hooks/validate-handoffs.sh` com os quatro arquivos da implementação e os testes aplicáveis, conferir a lista explícita do commit e verificar se `CURRENT.md` avançou somente quando permitido.
 
 Se houver versão sem status final, pendência de aplicação, divergência não resolvida ou arquivo da própria tarefa que não possa ser identificado com segurança, não gere o commit automático. Alterações não relacionadas devem apenas ser deixadas fora do índice. Registre o bloqueio e mantenha a implementação ativa até que o responsável resolva a pendência.
 
