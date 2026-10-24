@@ -15,7 +15,7 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | --- | --- | --- | --- | --- | --- |
 | 1 | `003-consolidar-ciclo-de-vida-documentos` | `api` | `verified` | `002` | contrato, projeto, estados e transições cobertos por testes |
 | 2 | `004-upload-minimo-de-arquivos` | `api` | `verified` | `003` | `.md` e `.txt` recebidos, armazenados e associados; smoke HTTP `201` com estado `pending` |
-| 3 | `005-extracao-e-chunking` | `ia` | `proposed` | `004` | texto extraído e chunks reproduzíveis gerados |
+| 3 | `005-extracao-e-chunking` | `ia` | `verified` | `004` | texto extraído e chunks reproduzíveis gerados |
 | 4 | `006-retrieval-vetorial-minimo` | `ia` | `proposed` | `005` | consulta retorna chunks filtrados pelo projeto |
 | 5 | `007-respostas-com-citacoes` | `ia` | `proposed` | `006` | pergunta responde com fonte ou ausência de evidência |
 | 6 | `008-evaluation-baseline` | `ia` | `proposed` | `007` | dataset mínimo e baseline versionado executados |

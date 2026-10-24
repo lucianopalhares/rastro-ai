@@ -311,3 +311,23 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Verificação: hook válido, smoke HTTP `201`, 2 suítes/7 testes e build NestJS aprovados.
 - Pasta: `handoffs/004-upload-minimo-de-arquivos/`.
 - Commit: `71f41be` — `Finalizar upload mínimo de arquivos`.
+
+## 005 — Extração e chunking
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: criar a primeira capacidade executável de extração UTF-8 e divisão determinística após o upload verificado.
+- Impactos: adiciona pacote Python, configuração mínima e cinco testes; embeddings, fila e vector store permanecem futuros.
+- Resolve: ausência de texto normalizado, chunks, offsets e contrato testável para indexação.
+- Verificação: `python3 -m unittest discover -s tests -v` passou com 5 testes; hook estrutural será executado antes da entrega.
+- Pasta: `handoffs/005-extracao-e-chunking/`.
+
+## 005 — Verificação e finalização
+
+- Data/hora: 2026-10-24 18:28 -03:00 | Status: `verified`
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: concluir o ciclo após validação da implementação de extração e chunking.
+- Impactos: `CURRENT.md` avança para `006`; nenhuma alteração de runtime foi feita nesta finalização.
+- Resolve: implementação 005 verificada com testes, compilação e hook estrutural.
+- Verificação: 7 testes unitários passaram, `compileall` passou e 8 arquivos de handoff foram validados.
+- Pasta: `handoffs/005-extracao-e-chunking/`.
