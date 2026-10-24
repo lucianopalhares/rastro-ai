@@ -83,7 +83,7 @@ O histórico resumido de todas as implementações deve ser mantido em `handoffs
 
 `handoffs/CURRENT.md` contém somente o número inicial, com três dígitos, da implementação ativa. Por exemplo, `001` identifica a pasta `handoffs/001-exemplo-validacao-citacoes/`. Apenas essa pasta pode receber novos arquivos durante uma tarefa. Cada nova implementação deve ser isolada, sem copiar ou alterar os handoffs anteriores. Os dois timelines são append-only: o `handoffs/TIMELINE.md` recebe o resumo global e o `TIMELINE.md` dentro da implementação recebe o registro detalhado da versão criada ou atualizada.
 
-`handoffs/SEQUENCE.md` mantém a ordem central das tarefas de cada iniciativa. A IA deve registrar a sequência completa antes de detalhar a primeira tarefa. `CURRENT.md` só pode apontar para a primeira etapa ainda não finalizada.
+`handoffs/SEQUENCE.md` mantém a ordem central, o status, as dependências e os critérios de avanço das tarefas de cada iniciativa. A IA deve registrar a sequência completa antes de detalhar a primeira tarefa. Ao aplicar, verificar ou reverter uma tarefa, a linha correspondente em `SEQUENCE.md` deve ser atualizada no mesmo ciclo de finalização. `CURRENT.md` só pode apontar para a primeira etapa ainda não finalizada.
 
 Uma implementação pode referenciar outra pelo número quando houver dependência ou evolução, mas não deve copiar os arquivos da implementação anterior. Os status permitidos são `proposed`, `approved`, `applied`, `verified` e `rolled-back`.
 
@@ -225,7 +225,7 @@ O handoff deve informar se a alteração exige execução do dataset completo no
 15. Confirmar que implementações anteriores e alterações não relacionadas permaneceram intactas.
 16. Adicionar uma entrada compacta, de no máximo 8 linhas, ao final de `handoffs/TIMELINE.md` e uma entrada detalhada ao final do timeline da implementação.
 17. Conferir e, se necessário, realinhar somente a posição das entradas inteiras dos dois timelines em ordem cronológica, sem alterar seu texto ou conteúdo.
-18. Registrar o status atual no README compacto da implementação.
+18. Registrar o status atual no README compacto da implementação e atualizar a linha correspondente em `handoffs/SEQUENCE.md`, quando a implementação fizer parte de uma sequência.
 19. Executar o checklist de finalização: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, validar o status contra as evidências, executar o hook estrutural e os testes aplicáveis, conferir a lista explícita de commit e confirmar o avanço ou a permanência de `CURRENT.md`.
 20. Atualizar `handoffs/TIMELINE.md` com o resumo da implementação.
 
@@ -243,8 +243,9 @@ Ao receber esse comando, o agente deve:
 2. conferir a ordem de aplicação, os arquivos envolvidos, os testes e as limitações registradas;
 3. exigir confirmação explícita da aplicação para usar o status `applied`, ou evidências de testes para usar `verified`;
 4. atualizar o README da implementação e acrescentar uma nova entrada ao `TIMELINE.md` da implementação e ao `handoffs/TIMELINE.md`;
-5. se houver uma próxima etapa em `handoffs/SEQUENCE.md`, atualizar `handoffs/CURRENT.md` somente quando a tarefa atual estiver `applied` ou `verified`;
-6. manter a tarefa ativa e não avançar caso a aplicação esteja parcial, divergente ou sem confirmação suficiente.
+5. atualizar a linha da implementação em `handoffs/SEQUENCE.md` para o mesmo status registrado no README (`applied`, `verified` ou `rolled-back`), preservando ordem, dependências e critérios;
+6. se houver uma próxima etapa em `handoffs/SEQUENCE.md`, atualizar `handoffs/CURRENT.md` somente quando a tarefa atual estiver `applied` ou `verified`;
+7. manter a tarefa ativa e não avançar caso a aplicação esteja parcial, divergente ou sem confirmação suficiente.
 
 Não finalize uma tarefa apenas porque o handoff foi criado ou aprovado. A frase exata acima é o gatilho para a finalização e a mudança de etapa.
 

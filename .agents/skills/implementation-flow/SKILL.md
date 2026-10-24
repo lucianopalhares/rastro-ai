@@ -31,7 +31,7 @@ Antes de agir, leia:
 3. `/home/dev/dev/ia/rastro-ai/handoffs/CURRENT.md`;
 4. o `README.md` da implementação apontada por `CURRENT.md`, quando existir.
 
-Também leia `handoffs/SEQUENCE.md` quando existir. Ele é a fonte da ordem entre tarefas, mas não é fonte do código.
+Também leia `handoffs/SEQUENCE.md` quando existir. Ele é a fonte da ordem, do status, das dependências e dos critérios de avanço entre tarefas, mas não é fonte do código.
 
 Ao reconstruir a memória da tarefa, trate o código real e os testes como fonte da verdade comportamental; use READMEs para intenção e decisões, `CURRENT.md` e `SEQUENCE.md` para estado e ordem e timelines para histórico. Compare as fontes e classifique cada item como `confirmado`, `parcial`, `divergente`, `ausente`, `histórico` ou `pendente`. Não use índice, grafo ou memória gerada como substituto das fontes originais.
 
@@ -217,15 +217,16 @@ Quando o usuário disser para finalizar, concluir ou encerrar:
 2. registre testes e evaluation executados, se houver;
 3. registre limitações e próximos passos nos registros, quando necessários;
 4. atualize o README para `verified`, `applied` ou `rolled-back`, conforme evidência;
-5. acrescente uma entrada compacta de conclusão, com no máximo 8 linhas, ao final da timeline;
-6. não altere a pasta finalizada depois disso;
-7. se existir uma próxima etapa em `SEQUENCE.md`, atualize `CURRENT.md` para ela somente após a etapa estar `applied` ou `verified`;
-8. confirme que todas as versões existentes da implementação foram conferidas e estão com status final (`applied` ou `verified`);
-9. monte uma lista explícita dos arquivos da tarefa a partir dos handoffs, da aplicação real e dos controles da implementação; alterações não relacionadas devem ficar fora da lista e não impedem o commit;
-10. adicione somente a lista explícita, usando `git add -f` apenas quando um handoff da própria tarefa estiver ignorado, e gere o commit automático se todas as condições da tarefa forem atendidas, usando mensagem e corpo em pt-BR;
-11. monte o resumo do commit a partir do `TIMELINE.md` da implementação e do `README.md` consolidado, cobrindo todas as versões;
-12. registre na timeline da implementação o identificador do commit, a mensagem e a verificação executada;
-13. a próxima mudança deve respeitar a etapa apontada por `CURRENT.md`.
+5. atualize a linha da implementação em `handoffs/SEQUENCE.md` para o mesmo status do README, sem alterar sua ordem, dependências ou critérios;
+6. acrescente uma entrada compacta de conclusão, com no máximo 8 linhas, ao final da timeline;
+7. não altere a pasta finalizada depois disso;
+8. se existir uma próxima etapa em `SEQUENCE.md`, atualize `CURRENT.md` para ela somente após a etapa estar `applied` ou `verified`;
+9. confirme que todas as versões existentes da implementação foram conferidas e estão com status final (`applied` ou `verified`);
+10. monte uma lista explícita dos arquivos da tarefa a partir dos handoffs, da aplicação real e dos controles da implementação; alterações não relacionadas devem ficar fora da lista e não impedem o commit;
+11. adicione somente a lista explícita, usando `git add -f` apenas quando um handoff da própria tarefa estiver ignorado, e gere o commit automático se todas as condições da tarefa forem atendidas, usando mensagem e corpo em pt-BR;
+12. monte o resumo do commit a partir do `TIMELINE.md` da implementação e do `README.md` consolidado, cobrindo todas as versões;
+13. registre na timeline da implementação o identificador do commit, a mensagem e a verificação executada;
+14. a próxima mudança deve respeitar a etapa apontada por `CURRENT.md`.
 
 Antes de concluir, execute o checklist: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, confirmar que o status tem evidência, executar hook e testes aplicáveis, conferir a lista explícita do commit e verificar se `CURRENT.md` avançou somente quando permitido.
 
