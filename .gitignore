@@ -5,6 +5,7 @@
 **/dist/
 **/coverage/
 *.tsbuildinfo
+/rastro-api/storage/
 
 # Local environment files
 .env
@@ -30,6 +31,9 @@ pnpm-debug.log*
 /handoffs
 
 /docs
+!/docs/
+/docs/*
+!/docs/sdd-minimo.md
 
 /.agents
 

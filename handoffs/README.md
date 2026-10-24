@@ -1,6 +1,12 @@
 # Handoffs de implementação
 
+As regras oficiais estão em [`../docs/instruction.md`](../docs/instruction.md). Este arquivo resume o formato dos registros; em caso de diferença, a política oficial prevalece.
+
 Esta pasta contém registros das alterações aplicadas diretamente no Rastro AI.
+
+## Memória dos handoffs
+
+Os handoffs formam uma memória em camadas: código real e testes descrevem o comportamento atual; READMEs descrevem intenção, decisões, escopo e pendências; `CURRENT.md` e `SEQUENCE.md` descrevem estado e ordem; timelines descrevem histórico. Em caso de conflito, o código e os testes vencem para o comportamento atual, e o conflito deve ser registrado como pendência.
 
 ## Organização
 
@@ -53,6 +59,8 @@ Os arquivos de cada versão são somente registros. A fonte de verdade são as a
 
 Toda implementação deve conter também um `README.md` próprio, curto e com no máximo 8 linhas de conteúdo. Ele funciona como cartão de contexto; os detalhes técnicos ficam no README e no timeline da versão.
 
+O cartão de contexto deve preservar, quando aplicável, estado atual, decisões permanentes, invariantes, aprendizados ou riscos e próxima ação. A versão deve registrar contexto encontrado, itens já aplicados, decisões tomadas, o que não deve ser repetido e riscos conhecidos.
+
 As regras detalhadas de handoff descritas abaixo aplicam-se às alterações do projeto em geral. Alterações em `.agents/`, `docs/` e `AGENTS.md` podem ser feitas diretamente quando solicitadas e não precisam ser copiadas para esta pasta. O `README.md` da implementação, `CURRENT.md` e `TIMELINE.md` seguem seus formatos compactos de controle.
 
 Consulte [`CURRENT.md`](./CURRENT.md) para identificar a implementação ativa. O arquivo contém somente o número inicial da pasta ativa, com três dígitos. Uma implementação nova começa sempre em uma pasta nova e não deve alterar ou copiar os arquivos de implementações anteriores.
@@ -100,6 +108,14 @@ Não edite entradas antigas. Não altere pastas de implementações finalizadas.
 
 Use somente estes status: `proposed`, `approved`, `applied`, `verified` e `rolled-back`. Alterações de status devem gerar uma nova entrada compacta ao final da `TIMELINE.md` e atualizar o status do README da implementação, sem ultrapassar 8 linhas.
 
+O ciclo normal é `proposed` → `applied` → `verified`. Use `approved` somente para aprovação formal antes da aplicação e `rolled-back` para uma aplicação revertida.
+
+### Classificação de esforço
+
+- `small`: mudança isolada, sem dependências entre etapas e com verificação simples; registra objetivo, arquivos, motivo, impacto e validação sem criar sequência adicional.
+- `normal`: capacidade única com implementação numerada e `v1`.
+- `large`: várias etapas, aplicações ou dependências; exige `SEQUENCE.md` e controle por `CURRENT.md`.
+
 Formato da timeline e do README de cada implementação. Cada campo após o título deve ser um item de lista Markdown iniciado por `- `:
 
 ```markdown
@@ -131,6 +147,7 @@ Use este formato no README da aplicação ou no cabeçalho do handoff:
 - Motivo: por que a alteração é necessária
 - Impacto: o que muda no comportamento
 - Pré-requisitos: alterações que devem ser aplicadas antes
+- Linhas afetadas: linhas após a aplicação, sempre junto da âncora estrutural
 
 ### Ponto estrutural
 
@@ -143,7 +160,7 @@ função, classe, método, import, chave de configuração ou seção
 
 - O que este código faz: explicação objetiva do comportamento do arquivo e dos blocos relevantes.
 - Por que inserir, substituir ou remover: justificativa técnica.
-- Comentários no código: usar JSDoc `/** ... */` em pt-BR acima de toda classe, interface, método, função, contrato ou bloco afetado; explicar a finalidade, o motivo e manter histórico acumulado por versão (`v1`, `v2` etc.).
+- Comentários no código: usar JSDoc `/** ... */` em pt-BR acima de toda classe, interface, método, função, contrato ou bloco novo, alterado ou removido; explicar finalidade, motivo, principais decisões, comportamento protegido ou alterado e manter histórico acumulado por versão (`v1`, `v2` etc.). Elementos puramente mecânicos podem ser explicados somente no README.
 - O que permanece inalterado: limites do trecho aplicado.
 
 ### Aplicação e verificação
@@ -178,3 +195,12 @@ Um handoff está completo quando outra pessoa consegue aplicá-lo sem consultar 
 - por que a mudança existe;
 - quais testes executar;
 - quais alterações permanecem fora do escopo.
+
+### Checklist de finalização
+
+- [ ] arquivos reais e arquivos do handoff conferidos;
+- [ ] pendências e divergências resolvidas ou registradas;
+- [ ] status compatível com confirmação ou evidência;
+- [ ] hook estrutural e testes aplicáveis executados;
+- [ ] lista explícita de commit conferida;
+- [ ] `CURRENT.md` avançado somente após `applied` ou `verified`.

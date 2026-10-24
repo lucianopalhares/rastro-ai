@@ -12,6 +12,26 @@ O fluxo explícito de início e finalização de implementações está definido
 
 Discussões sobre escopo não geram arquivos. Antes de criar ou atualizar um handoff, o agente deve resumir o plano e aguardar autorização explícita; frases ambíguas devem permanecer em modo de discussão.
 
+## Hierarquia das regras
+
+Este arquivo é a política oficial do fluxo de implementações. `AGENTS.md` contém regras gerais do projeto, `handoffs/README.md` descreve o formato dos registros e `.agents/skills/implementation-flow/SKILL.md` descreve o procedimento operacional. Em caso de repetição ou conflito, esta política prevalece.
+
+O SDD mínimo integrado ao fluxo está documentado em [`docs/sdd-minimo.md`](./sdd-minimo.md). Ele é uma referência complementar para intenção e critérios de aceite, não uma fonte paralela de estado ou comportamento.
+
+## Política de memória e fontes de verdade
+
+O fluxo usa os arquivos existentes como uma memória em camadas, sem tratar todos os registros como equivalentes:
+
+1. Código real e testes são a fonte da verdade sobre o comportamento atual.
+2. O `README.md` da implementação e o `vN/README.md` são a fonte da verdade sobre objetivo, decisões, escopo, impacto, pendências e contexto de continuidade.
+3. `CURRENT.md` e `SEQUENCE.md` são a fonte da verdade sobre tarefa ativa, ordem e dependências.
+4. Os `TIMELINE.md` são a fonte histórica da evolução e não comprovam, sozinhos, que um comportamento ainda existe.
+5. Índices, grafos ou memórias geradas servem para localizar informações e nunca substituem as fontes originais.
+
+Ao iniciar ou continuar uma tarefa, leia `CURRENT.md`, o README da implementação, a última versão, o timeline relevante e, obrigatoriamente, o código e os testes reais. Compare a memória com o estado atual e classifique cada item como `confirmado`, `parcial`, `divergente`, `ausente`, `histórico` ou `pendente`.
+
+Em caso de conflito, o código e os testes vencem para o comportamento atual; o README mais recente orienta intenção e decisões; o timeline preserva o histórico. Conflitos não resolvidos devem ser registrados como pendência e não podem ser tratados como aplicação concluída.
+
 Os documentos de planejamento ficam em `docs/fases/` e devem ser usados apenas como referência:
 
 ```text
@@ -55,6 +75,8 @@ O conteúdo de cada implementação deve ser mínimo e auditável. O agente apli
 
 Cada implementação deve possuir um `README.md` próprio com no máximo 8 linhas. Após o título, cada campo deve ser um item Markdown iniciado por `- `. Ele é o resumo curto e consolidado da tarefa atual: deve apresentar o objetivo, o estado, a evolução de todas as versões existentes (`v1`, `v2`, `vN`), com no máximo uma frase para resumir o que cada versão fez ou resolveu, além das pendências e da próxima ação. Não é um relatório técnico; detalhes ficam nos handoffs e no `TIMELINE.md` da implementação. Ao criar cada nova versão, atualize o mesmo README sem copiar detalhes técnicos.
 
+O README consolidado deve preservar, quando aplicável, cinco itens de memória: estado atual, decisões permanentes, invariantes, aprendizados ou riscos e próxima ação. Esses itens devem ser curtos e derivados do código, dos testes e das versões verificadas.
+
 As regras detalhadas de handoff aplicam-se às alterações do projeto em geral. Alterações em `.agents/`, `docs/` ou `AGENTS.md` podem ser feitas diretamente quando solicitadas e não precisam ser representadas dentro de `handoffs/`.
 
 O histórico resumido de todas as implementações deve ser mantido em `handoffs/TIMELINE.md`. Cada entrada deve ter no máximo 8 linhas, com título numerado e, nas linhas seguintes, cada campo iniciado por `- `: data/hora, status, aplicação afetada, por que foi feita, impactos, o que resolve e a pasta relacionada. Antes de entregar, realinhe as entradas inteiras em ordem cronológica sem alterar texto, status ou conteúdo histórico. Além dele, cada implementação deve manter `handoffs/NNN-titulo/TIMELINE.md`, em modo append-only, com o histórico detalhado de cada versão (`v1`, `v2`, `vN`).
@@ -64,6 +86,8 @@ O histórico resumido de todas as implementações deve ser mantido em `handoffs
 `handoffs/SEQUENCE.md` mantém a ordem central das tarefas de cada iniciativa. A IA deve registrar a sequência completa antes de detalhar a primeira tarefa. `CURRENT.md` só pode apontar para a primeira etapa ainda não finalizada.
 
 Uma implementação pode referenciar outra pelo número quando houver dependência ou evolução, mas não deve copiar os arquivos da implementação anterior. Os status permitidos são `proposed`, `approved`, `applied`, `verified` e `rolled-back`.
+
+O ciclo normal é `proposed` → `applied` → `verified`. Use `approved` somente quando houver aprovação formal antes da aplicação. Use `rolled-back` somente para uma aplicação revertida, registrando o motivo e a verificação da reversão.
 
 `approved`, `applied` e `verified` exigem confirmação ou evidência correspondente. `applied` exige confirmação explícita de que as alterações diretas foram aplicadas. `verified` exige os comandos executados e seus resultados. Aplicação parcial mantém a tarefa ativa e deve registrar arquivos concluídos e pendências; não permite avançar.
 
@@ -75,11 +99,23 @@ Para gerar uma nova versão, o agente deve: (1) ler o README da tarefa, o `TIMEL
 
 O README de cada versão deve registrar `versão`, `versão-base`, data, status, arquivos conferidos, itens já aplicados, divergências, pendências, ordem de aplicação e critério de verificação. Se o arquivo real já contiver o trecho, não gerar novamente. Se a âncora ou o contexto tiver mudado, reconstruir o handoff a partir do arquivo real, podendo trocar `insert` por `replace`; não aplicar cegamente uma instrução histórica.
 
+Cada versão deve registrar também, quando houver continuidade, o contexto encontrado, o que já estava aplicado, decisões tomadas, o que não deve ser repetido, riscos conhecidos e a próxima ação. A versão anterior orienta a reconciliação, mas nunca substitui a leitura do código real.
+
 ## Divisão de solicitações grandes
 
 Uma solicitação ampla deve ser dividida em duas ou mais implementações numeradas quando afetar muitos arquivos, mais de uma aplicação, etapas dependentes ou validações diferentes. O objetivo é que cada handoff seja pequeno o suficiente para o desenvolvedor entender, aplicar e verificar sem reconstruir todo o contexto da solicitação original.
 
 Cada implementação deve representar uma capacidade ou etapa única, com poucos arquivos relacionados, critério de conclusão próprio e ordem de aplicação explícita. Divida por mudança aplicável e verificável, e não simplesmente por arquivo.
+
+### Classificação por tamanho
+
+Antes de criar registros, classifique a mudança:
+
+- `small`: alteração isolada, sem dependências entre etapas e com verificação simples; registra objetivo, arquivos, motivo, impacto e validação sem criar sequência adicional.
+- `normal`: capacidade única com implementação numerada e `v1`.
+- `large`: várias aplicações, contratos, dependências ou validações independentes; exige `SEQUENCE.md` e avanço controlado por `CURRENT.md`.
+
+A classificação `small` não elimina a rastreabilidade; apenas evita burocracia quando não existe dependência real entre etapas.
 
 Quando houver uma sequência, registre em cada README compacto a iniciativa relacionada, as dependências, a ordem, a próxima etapa e o critério de conclusão. Não copie handoffs anteriores: uma etapa pode referenciar outra pelo número e assumir sua aplicação, mantendo cada pasta isolada e o histórico preservado. `CURRENT.md` deve apontar apenas para a etapa ativa.
 
@@ -108,6 +144,8 @@ O usuário não precisa criar a pasta. O agente cria o próximo número disponí
 Cada alteração deve ser aplicada diretamente no arquivo real e registrada no README da versão. Antes de cada classe, interface, método, função, contrato ou bloco removido novo ou alterado, inserir comentário JSDoc em pt-BR no formato `/** ... */`, explicando o que o elemento faz e por que existe. Depois da descrição, manter um histórico acumulado com `v1`, `v2` etc. e a mudança de cada versão. Para uma linha isolada, colocar o comentário acima do método ou bloco ao qual ela pertence. Em formatos sem comentários, registrar a exceção no README da versão.
 
 ## Aplicações reais e responsabilidades
+
+O JSDoc deve incluir também as principais decisões internas e o comportamento protegido ou alterado. Imports simples, propriedades óbvias e linhas puramente mecânicas sem decisão comportamental podem ser explicados somente no README da versão.
 
 Os caminhos reais das aplicações neste repositório são:
 
@@ -187,9 +225,9 @@ O handoff deve informar se a alteração exige execução do dataset completo no
 15. Confirmar que implementações anteriores e alterações não relacionadas permaneceram intactas.
 16. Adicionar uma entrada compacta, de no máximo 8 linhas, ao final de `handoffs/TIMELINE.md` e uma entrada detalhada ao final do timeline da implementação.
 17. Conferir e, se necessário, realinhar somente a posição das entradas inteiras dos dois timelines em ordem cronológica, sem alterar seu texto ou conteúdo.
-17. Registrar o status atual no README compacto da implementação.
-
-13. Atualizar `handoffs/TIMELINE.md` com o resumo da implementação.
+18. Registrar o status atual no README compacto da implementação.
+19. Executar o checklist de finalização: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, validar o status contra as evidências, executar o hook estrutural e os testes aplicáveis, conferir a lista explícita de commit e confirmar o avanço ou a permanência de `CURRENT.md`.
+20. Atualizar `handoffs/TIMELINE.md` com o resumo da implementação.
 
 ## Como finalizar uma tarefa
 

@@ -1,5 +1,7 @@
 # Instruções do projeto Rastro AI
 
+As regras detalhadas do fluxo de implementações estão em [`docs/instruction.md`](docs/instruction.md), que é a fonte oficial. Este arquivo define regras gerais e não deve duplicar ou contradizer a política detalhada.
+
 Leia `docs/instruction.md` antes de qualquer tarefa. Use `docs/fases/` somente como referência de arquitetura e escopo.
 
 ## Regra principal
@@ -15,6 +17,10 @@ Exceções: quando solicitado pelo usuário, a IA pode editar diretamente `.agen
 ## Descoberta no repositório
 
 Para perguntas sobre como, onde ou por que um comportamento funciona, use `jg` primeiro; para nomes exatos, strings ou arquivos, use `rg`/busca de arquivos.
+
+## Memória e reconciliação
+
+O código real e os testes são a fonte da verdade sobre o comportamento atual. Os READMEs registram intenção, decisões, escopo, pendências e continuidade; `CURRENT.md` e `SEQUENCE.md` registram estado e ordem; os timelines registram histórico. Ao continuar uma tarefa, compare essas fontes com o código real e classifique divergências antes de agir. Memórias, índices ou grafos gerados servem apenas para localizar informações.
 
 ## Aplicações reais
 
@@ -70,6 +76,8 @@ Gere somente a diferença necessária para o estado real encontrado e aplique-a 
 
 Cada implementação deve conter seu próprio `README.md` e `TIMELINE.md`. Cada versão deve conter somente seu próprio `README.md` e `TIMELINE.md`. Ao criar ou atualizar uma versão, acrescente no timeline a versão, data/hora, status, arquivos reais conferidos, mudanças aplicadas, problema resolvido, pendências e verificação. Não crie arquivos de código dentro de `handoffs/`.
 
+O README consolidado deve manter, quando aplicável, o estado atual, decisões permanentes, invariantes, aprendizados ou riscos e a próxima ação. O README da versão deve registrar o contexto encontrado, itens já aplicados, decisões tomadas, o que não deve ser repetido e riscos conhecidos.
+
 O `README.md` da implementação é um resumo consolidado e curto da tarefa atual, não um relatório técnico separado: deve explicar o objetivo, o estado e a evolução por todas as versões existentes (`v1`, `v2`, `vN`), usando no máximo uma frase resumida para informar o que cada versão fez ou resolveu, além das pendências e da próxima ação. Por isso, ao criar uma nova versão, atualize o mesmo README sem copiar detalhes técnicos dos handoffs.
 
 ## Início, continuidade e ordem
@@ -90,6 +98,8 @@ Para uma solicitação grande:
 3. ative somente a primeira tarefa;
 4. detalhe inicialmente apenas a implementação da tarefa ativa e aplique o código diretamente na aplicação real.
 
+Classifique as demais solicitações como `small`, `normal` ou `large`: mudanças `small` são isoladas e usam registro mínimo; `normal` usa uma implementação com `v1`; `large` exige sequência, dependências e avanço controlado por `CURRENT.md`.
+
 Não pule tarefas. A próxima só pode ser ativada após `skill finalizar tarefa <numero>` e status `applied` ou `verified`. Se o usuário pedir uma tarefa posterior antes disso, informe a tarefa bloqueadora e mantenha `CURRENT.md` inalterado.
 
 Uma implementação nova não copia nem altera implementações anteriores. Correções históricas criam uma nova implementação.
@@ -97,6 +107,8 @@ Uma implementação nova não copia nem altera implementações anteriores. Corr
 ## Verificação e status
 
 Status permitidos: `proposed`, `approved`, `applied`, `verified` e `rolled-back`.
+
+O ciclo normal é `proposed` → `applied` → `verified`; `approved` é opcional e representa aprovação formal antes da aplicação.
 
 - `approved`: confirmação do responsável;
 - `applied`: confirmação explícita de aplicação dos trechos;
@@ -109,7 +121,11 @@ Uma tarefa pode ter sido aplicada parcialmente antes do turno atual, inclusive c
 
 Antes de entregar, confira se o README da versão contém arquivo original, aplicação, operação, âncoras, explicação, impacto, dependências e verificação, e se as alterações estão presentes na aplicação real.
 
+A finalização deve confirmar arquivos reais e handoffs, pendências e divergências, evidências do status, hook estrutural, testes aplicáveis, lista explícita de commit e avanço permitido de `CURRENT.md`.
+
 Confirme também que o `TIMELINE.md` da implementação foi atualizado no final, sem alterar entradas anteriores. O timeline da implementação registra a evolução detalhada entre versões; o `handoffs/TIMELINE.md` mantém somente o resumo global. Se a ordem estiver errada, mova as entradas inteiras para a posição cronológica correta, sem reescrevê-las.
+
+O JSDoc continua obrigatório para classes, interfaces, métodos, funções, contratos e blocos novos, alterados ou removidos, incluindo finalidade, motivo, principais decisões, comportamento protegido ou alterado e histórico por versão. Elementos puramente mecânicos podem ser explicados no README da versão.
 
 Na finalização, gere o commit automático usando uma lista explícita dos arquivos da própria tarefa, obtida dos handoffs, da aplicação real e dos controles da implementação. Alterações não relacionadas devem permanecer fora do commit e não bloqueiam sua criação; nunca use `git add .` ou `git add -A`. Como `handoffs/` pode estar ignorado por configuração histórica, use `git add -f` somente nos handoffs pertencentes à tarefa. Bloqueie o commit apenas quando houver pendência, versão sem status final, divergência não resolvida ou arquivo da própria tarefa que não possa ser identificado com segurança.
 

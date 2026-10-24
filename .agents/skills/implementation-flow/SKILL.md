@@ -5,6 +5,8 @@ description: "Administra implementações isoladas do Rastro AI, aplicando mudan
 
 # Implementation Flow
 
+A política oficial está em `docs/instruction.md`. Esta skill executa o procedimento descrito nessa política e não deve criar regra paralela quando houver repetição ou conflito.
+
 Esta skill só pode ser usada quando a mensagem do usuário contiver explicitamente uma destas formas:
 
 - `skill iniciar tarefa ...`;
@@ -30,6 +32,8 @@ Antes de agir, leia:
 4. o `README.md` da implementação apontada por `CURRENT.md`, quando existir.
 
 Também leia `handoffs/SEQUENCE.md` quando existir. Ele é a fonte da ordem entre tarefas, mas não é fonte do código.
+
+Ao reconstruir a memória da tarefa, trate o código real e os testes como fonte da verdade comportamental; use READMEs para intenção e decisões, `CURRENT.md` e `SEQUENCE.md` para estado e ordem e timelines para histórico. Compare as fontes e classifique cada item como `confirmado`, `parcial`, `divergente`, `ausente`, `histórico` ou `pendente`. Não use índice, grafo ou memória gerada como substituto das fontes originais.
 
 Não use os registros de versões anteriores como fonte do código atual. Leia e altere o código somente nas aplicações reais do projeto; use os README e timelines apenas para identificar o histórico e o estado da tarefa.
 
@@ -92,6 +96,8 @@ Antes de criar handoffs, avalie se a solicitação deve virar uma sequência de 
 
 Cada implementação deve conter uma única capacidade ou etapa aplicável, poucos arquivos relacionados, critério de conclusão próprio e ordem explícita. Divida por resultado verificável, não apenas por arquivo. Uma implementação posterior pode declarar dependência de outra pelo número, mas não pode copiar seus handoffs nem alterar sua pasta.
 
+Classifique antes de registrar a mudança: `small` para alteração isolada sem dependências e com validação simples; `normal` para uma capacidade única com `v1`; `large` para múltiplas etapas, aplicações ou dependências, exigindo `SEQUENCE.md`. Tarefas `small` continuam registrando arquivos, motivo, impacto e validação, mas não criam sequência desnecessária.
+
 No README de cada etapa, registre, quando aplicável, a iniciativa relacionada, dependências, posição na ordem, próxima etapa e critério de conclusão. `CURRENT.md` aponta somente para a etapa ativa; ao terminar uma etapa, a próxima pode ser ativada preservando o histórico anterior.
 
 Quando a solicitação gerar várias etapas, primeiro defina a sequência completa, as dependências, os pré-requisitos e os critérios de conclusão. Ative somente a primeira etapa e aplique apenas essa etapa na aplicação real. As demais podem ser registradas como planejadas, mas não devem ser aplicadas ou ativadas antecipadamente.
@@ -135,10 +141,13 @@ Só altere arquivos que ainda sejam necessários no estado real. Preserve trecho
 O README de cada versão deve registrar:
 
 - caminho absoluto do arquivo original;
+- contexto encontrado, itens já aplicados, decisões tomadas, o que não deve ser repetido e riscos conhecidos, quando houver continuidade;
 - número de linha como referência auxiliar;
+- linhas afetadas após a aplicação, sempre junto da âncora estrutural;
 - função, classe, método, import, chave ou seção;
 - operação: `insert`, `replace` ou `remove`;
 - comentário JSDoc em pt-BR, no formato `/** ... */`, acima de toda classe, interface, método, função, contrato ou bloco alterado; o comentário deve explicar o que o elemento faz, por que existe e manter histórico acumulado com `v1`, `v2` etc. para cada mudança;
+- principais decisões internas e comportamento protegido ou alterado;
 - o que o trecho faz;
 - por que deve ser inserido, substituído ou removido;
 - comportamento alterado;
@@ -152,6 +161,8 @@ Antes de entregar, confira os dois timelines e realinhe apenas a posição das e
 Os arquivos de saída do handoff são somente `README.md` e `TIMELINE.md`; o caminho real do arquivo alterado deve aparecer no README.
 
 O número de linha nunca é suficiente sozinho. Use o ponto estrutural e o comentário versionado no arquivo real para que a mudança permaneça identificável.
+
+O README deve registrar as linhas afetadas após a aplicação junto da âncora estrutural; a linha é referência verificável, não substitui a explicação do trecho.
 
 ## Ordem entre aplicações
 
@@ -174,6 +185,8 @@ Use somente:
 - `applied`: alterações foram aplicadas aos arquivos originais;
 - `verified`: testes e verificações passaram;
 - `rolled-back`: aplicação foi revertida.
+
+O ciclo normal é `proposed` → `applied` → `verified`. `approved` é opcional e representa aprovação formal antes da aplicação; `rolled-back` representa uma aplicação revertida com motivo e verificação registrados.
 
 `approved`, `applied` e `verified` exigem confirmação ou evidência. `applied` exige confirmação explícita da aplicação. `verified` exige comandos e resultados registrados. Aplicação parcial mantém a tarefa ativa e impede o avanço.
 
@@ -213,6 +226,8 @@ Quando o usuário disser para finalizar, concluir ou encerrar:
 11. monte o resumo do commit a partir do `TIMELINE.md` da implementação e do `README.md` consolidado, cobrindo todas as versões;
 12. registre na timeline da implementação o identificador do commit, a mensagem e a verificação executada;
 13. a próxima mudança deve respeitar a etapa apontada por `CURRENT.md`.
+
+Antes de concluir, execute o checklist: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, confirmar que o status tem evidência, executar hook e testes aplicáveis, conferir a lista explícita do commit e verificar se `CURRENT.md` avançou somente quando permitido.
 
 Se houver versão sem status final, pendência de aplicação, divergência não resolvida ou arquivo da própria tarefa que não possa ser identificado com segurança, não gere o commit automático. Alterações não relacionadas devem apenas ser deixadas fora do índice. Registre o bloqueio e mantenha a implementação ativa até que o responsável resolva a pendência.
 
