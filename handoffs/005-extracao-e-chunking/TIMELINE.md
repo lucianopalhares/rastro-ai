@@ -18,3 +18,4 @@
 - Pendências: integração com worker, embeddings, vector store, evaluation e observabilidade permanecem nas próximas etapas.
 - Verificação: 7 testes unitários passaram, `compileall` passou e o hook validou 8 arquivos.
 - Próxima etapa: `006-retrieval-vetorial-minimo`.
+- Commit: `a214430` — `Finalizar extração e chunking`.
