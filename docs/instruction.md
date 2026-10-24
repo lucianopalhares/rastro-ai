@@ -69,6 +69,8 @@ Use o próximo número disponível e um título curto em `kebab-case`. Toda impl
 
 O nome da pasta segue `NNN-titulo-em-kebab-case`. Cada versão contém somente `README.md` e `TIMELINE.md`. Caminho original, operação, âncoras, motivo, impacto, dependências, arquivos alterados e verificações ficam no `README.md` da versão; o código permanece nos arquivos reais da aplicação. Todo `vN/README.md` deve conter a seção `## Instruções de validação`, com comandos, URLs, ações manuais ou testes e o resultado esperado de cada item. Toda requisição deve vir com comando completo copiável, incluindo método, URL, headers, payload/campos, arquivo e resposta HTTP esperada.
 
+Além da seção de validação, todo `vN/README.md` deve conter, nesta ordem, as seções `## O que foi feito` e `## O que muda na aplicação` antes de `## Instruções de validação`. A primeira resume as operações aplicadas e o problema resolvido; a segunda explica comportamento novo ou preservado, impactos, limites, riscos e itens fora do escopo. Se a rodada for somente documental ou estrutural, registre explicitamente que não houve mudança de runtime.
+
 Os arquivos de handoff são somente registros. Toda análise, continuação ou nova alteração deve usar os arquivos reais do escopo correspondente como fonte de verdade; versões anteriores servem apenas como histórico e lista de itens a reconciliar.
 
 O conteúdo de cada implementação deve ser mínimo e auditável. O agente aplica diretamente somente os arquivos realmente necessários e registra esses caminhos nos documentos da versão.
@@ -97,7 +99,11 @@ Uma tarefa pode receber várias rodadas antes de ser finalizada. A primeira roda
 
 Para gerar uma nova versão, o agente deve: (1) ler o README da tarefa, o `TIMELINE.md` da tarefa e o README da última versão; (2) reler os arquivos reais nas aplicações; (3) comparar o estado real com a versão anterior; (4) marcar o que foi aplicado, parcial, divergente ou ausente; (5) aplicar diretamente somente a diferença necessária, com comentário versionado acima de cada classe, método, função, contrato ou bloco afetado; (6) atualizar o README e o timeline sem apagar registros anteriores; e (7) atualizar a seção `## Instruções de validação` com a forma reproduzível de validar a rodada.
 
+Ao gerar a nova versão, o agente também deve preencher `## O que foi feito` com operações e problema resolvido e `## O que muda na aplicação` com comportamento, impacto, limites, riscos e itens fora do escopo.
+
 O README de cada versão deve registrar `versão`, `versão-base`, data, status, arquivos conferidos, itens já aplicados, divergências, pendências, ordem de aplicação e critério de verificação. Se o arquivo real já contiver o trecho, não gerar novamente. Se a âncora ou o contexto tiver mudado, reconstruir o handoff a partir do arquivo real, podendo trocar `insert` por `replace`; não aplicar cegamente uma instrução histórica.
+
+As seções `## O que foi feito` e `## O que muda na aplicação` são obrigatórias mesmo sem mudança de runtime; nesse caso, registre a ausência de alteração comportamental e o impacto documental ou estrutural.
 
 Cada versão deve registrar também, quando houver continuidade, o contexto encontrado, o que já estava aplicado, decisões tomadas, o que não deve ser repetido, riscos conhecidos e a próxima ação. A versão anterior orienta a reconciliação, mas nunca substitui a leitura do código real.
 

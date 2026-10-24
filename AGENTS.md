@@ -62,6 +62,8 @@ Cada versão contém somente `README.md` e `TIMELINE.md`. Não copie código, co
 
 Sempre que criar ou atualizar o `vN/README.md`, inclua a seção `## Instruções de validação` com os comandos, URLs, ações manuais ou testes necessários para validar a alteração e o resultado esperado de cada verificação. Quando houver requisição HTTP, inclua o comando completo copiável — por exemplo `curl` — com método, URL, headers, payload ou campos multipart e arquivo de entrada.
 
+Além da seção de validação, inclua, nesta ordem, as seções `## O que foi feito` e `## O que muda na aplicação` antes dela. Registre na primeira as operações aplicadas e o problema resolvido; na segunda, o comportamento novo ou preservado, impactos, limites, riscos e itens fora do escopo. Quando não houver mudança de runtime, declare isso explicitamente.
+
 O `README.md` da versão deve registrar os caminhos reais, operações, âncoras, motivo, impacto, dependências, arquivos alterados e verificações. O código permanece exclusivamente na aplicação real.
 
 Antes de cada classe, interface, método, função, contrato ou bloco removido novo ou alterado, use um comentário JSDoc em pt-BR no formato `/** ... */`. O comentário deve explicar o que o elemento faz e por que existe, seguido de um histórico acumulado por versão (`v1`, `v2` etc.) descrevendo cada mudança daquela versão. Para alteração de linha isolada, coloque o comentário acima do método ou bloco ao qual a linha pertence. Em formatos sem comentários, registre a exceção no README da versão.
@@ -77,6 +79,8 @@ Gere somente a diferença necessária para o estado real encontrado e aplique-a 
 Cada implementação deve conter seu próprio `README.md` e `TIMELINE.md`. Cada versão deve conter somente seu próprio `README.md` e `TIMELINE.md`. Ao criar ou atualizar uma versão, acrescente no timeline a versão, data/hora, status, arquivos reais conferidos, mudanças aplicadas, problema resolvido, pendências e verificação. Não crie arquivos de código dentro de `handoffs/`.
 
 O README consolidado deve manter, quando aplicável, o estado atual, decisões permanentes, invariantes, aprendizados ou riscos e a próxima ação. O README da versão deve registrar o contexto encontrado, itens já aplicados, decisões tomadas, o que não deve ser repetido e riscos conhecidos.
+
+O README da versão também deve conter as seções obrigatórias `## O que foi feito`, `## O que muda na aplicação` e `## Instruções de validação`.
 
 O `README.md` da implementação é um resumo consolidado e curto da tarefa atual, não um relatório técnico separado: deve explicar o objetivo, o estado e a evolução por todas as versões existentes (`v1`, `v2`, `vN`), usando no máximo uma frase resumida para informar o que cada versão fez ou resolveu, além das pendências e da próxima ação. Por isso, ao criar uma nova versão, atualize o mesmo README sem copiar detalhes técnicos dos handoffs.
 
@@ -120,6 +124,8 @@ Antes de continuar uma tarefa, compare as âncoras com o código real. Se houver
 Uma tarefa pode ter sido aplicada parcialmente antes do turno atual, inclusive com alterações diferentes ou trechos já presentes no arquivo original. Portanto, antes de criar, recriar ou ajustar um handoff, releia novamente a pasta real da aplicação e o arquivo original; compare o estado encontrado com a proposta, preserve o que já foi aplicado e reconstrua somente o trecho necessário. Se o arquivo já existir, não aplique um `insert` histórico cegamente: reavalie a operação e as âncoras, usando `replace` quando apropriado. Handoffs anteriores são apenas histórico e nunca substituem essa releitura.
 
 Antes de entregar, confira se o README da versão contém arquivo original, aplicação, operação, âncoras, explicação, impacto, dependências e verificação, e se as alterações estão presentes na aplicação real.
+
+Confira também se as três seções obrigatórias estão presentes na ordem definida.
 
 A finalização deve confirmar arquivos reais e handoffs, pendências e divergências, evidências do status, hook estrutural, testes aplicáveis, lista explícita de commit e avanço permitido de `CURRENT.md`.
 

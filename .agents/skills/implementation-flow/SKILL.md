@@ -60,6 +60,7 @@ Use o próximo número disponível, com três dígitos, e um título em `kebab-c
 Os handoffs desta skill são registros compactos. O código, configuração, testes e documentação permanecem e são alterados diretamente nas aplicações reais. O README da implementação, `CURRENT.md` e os timelines são arquivos de controle.
 
 - `vN/README.md`: resumo, arquivos reais alterados, operações, comentários de versão, verificações e a seção obrigatória `## Instruções de validação`;
+- Além da seção de validação, cada `vN/README.md` deve conter, nesta ordem, `## O que foi feito` e `## O que muda na aplicação` antes dela;
 - `vN/TIMELINE.md`: histórico append-only da rodada; antes da entrega, as entradas inteiras devem estar em ordem cronológica sem alteração de conteúdo.
 
 ## Decidir entre continuar e iniciar
@@ -140,6 +141,8 @@ Só altere arquivos que ainda sejam necessários no estado real. Preserve trecho
 
 O README de cada versão deve registrar:
 
+- a seção `## O que foi feito`, com operações aplicadas, âncoras, problema resolvido e resultado da rodada;
+- a seção `## O que muda na aplicação`, com comportamento novo ou preservado, impactos, limites, riscos e itens fora do escopo; quando não houver mudança de runtime, declarar isso explicitamente;
 - caminho absoluto do arquivo original;
 - contexto encontrado, itens já aplicados, decisões tomadas, o que não deve ser repetido e riscos conhecidos, quando houver continuidade;
 - número de linha como referência auxiliar;
@@ -155,6 +158,8 @@ O README de cada versão deve registrar:
 - testes, evaluation e verificações.
 
 O README de cada versão deve conter obrigatoriamente a seção `## Instruções de validação`, com cada comando, URL, ação manual ou teste necessário, além do resultado esperado para confirmar o comportamento alterado. Para toda requisição HTTP, o registro deve incluir um comando completo copiável, como `curl`, com método, URL, headers, payload ou campos multipart, arquivo de entrada e resposta esperada.
+
+As seções `## O que foi feito` e `## O que muda na aplicação` também são obrigatórias e devem aparecer antes da seção de validação, nessa ordem. Quando não houver mudança de runtime, a segunda seção deve declarar isso explicitamente.
 
 Antes de entregar, confira os dois timelines e realinhe apenas a posição das entradas inteiras para a ordem cronológica correta. Não edite o texto, status, data ou conteúdo das entradas históricas durante esse realinhamento.
 
