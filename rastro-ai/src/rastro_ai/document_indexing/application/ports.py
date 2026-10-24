@@ -6,6 +6,18 @@ from typing import Protocol, Sequence
 from ..domain.entities import DocumentChunk, RetrievedChunk
 
 
+# /**
+#  * Define a geração de vetores usada pela indexação e pela consulta semântica.
+#  * Existe para permitir trocar o modelo local por outro provedor sem acoplar o domínio.
+#  * Histórico: v1 — cria o contrato para embeddings persistidos no pgvector.
+#  */
+class EmbeddingProvider(Protocol):
+    """Converte texto em um vetor de dimensão estável."""
+
+    def embed(self, text: str) -> tuple[float, ...]:
+        """Retorna o embedding normalizado do texto informado."""
+
+
 class TextExtractor(Protocol):
     """Contrato para adaptadores que extraem texto de uma origem."""
 

@@ -7,6 +7,10 @@ name = "rastro-ai"
 version = "0.1.0"
 description = "Document extraction and indexing primitives for Rastro AI"
 requires-python = ">=3.11"
+dependencies = [
+    "psycopg[binary]>=3.2,<4",
+    "sentence-transformers>=3.0,<6",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

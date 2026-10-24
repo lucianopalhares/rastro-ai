@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from os import environ
 
 from .document_indexing.application.use_cases.answer_question import (
     Answer,
@@ -13,8 +14,29 @@ from .document_indexing.domain.entities import DocumentChunk, RetrievedChunk
 from .document_indexing.infrastructure.retrieval.in_memory_vector_store import (
     InMemoryVectorStore,
 )
+from .document_indexing.infrastructure.embeddings import SentenceTransformerEmbeddingProvider
+from .document_indexing.infrastructure.retrieval.postgres_vector_store import PostgresVectorStore
 
-_vector_store = InMemoryVectorStore()
+# /**
+#  * Seleciona o store persistente quando configurado e mantém memória como fallback local.
+#  * Existe para preservar testes e desenvolvimento sem banco, sem esconder a configuração de produção.
+#  * Histórico: v1 — adiciona `VECTOR_STORE_BACKEND=postgres` com embeddings locais.
+#  */
+def _build_vector_store():
+    """Cria o backend de retrieval conforme a configuração do processo."""
+
+    if environ.get("VECTOR_STORE_BACKEND", "memory").casefold() == "postgres":
+        model_name = environ.get(
+            "EMBEDDING_MODEL",
+            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        )
+        return PostgresVectorStore.from_environment(
+            SentenceTransformerEmbeddingProvider(model_name)
+        )
+    return InMemoryVectorStore()
+
+
+_vector_store = _build_vector_store()
 _retrieve_chunks = RetrieveChunksUseCase(_vector_store)
 _answer_question = AnswerQuestionUseCase(_retrieve_chunks)
 

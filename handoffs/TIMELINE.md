@@ -400,3 +400,22 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: critério da etapa 008 confirmado com dataset e métricas determinísticas reproduzíveis.
 - Verificação: 18 testes, 20/20 casos, quatro métricas em `1.0`, compilação, diff limpo e hook estrito.
 - Pasta: `handoffs/008-evaluation-baseline/`.
+
+## 011 — Persistência vetorial com pgvector
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: raiz e IA (`docker-compose.yml`, schema e `rastro-ai`)
+- Por que foi feito: substituir o índice lexical efêmero por persistência vetorial compatível com Supabase.
+- Impactos: adiciona PostgreSQL/pgvector com volume, embeddings locais e backend semântico configurável.
+- Resolve: upsert, consulta cosine, isolamento por projeto e testes do adapter; upload automático permanece fora do escopo.
+- Pasta: `handoffs/011-persistencia-vetorial-pgvector/`
+
+## 011 — Persistência vetorial com pgvector verificada
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`
+- Aplicação afetada: raiz e IA (`docker-compose.yml`, schema e `rastro-ai`)
+- Por que foi feito: confirmar o backend persistente com banco e adapter reais, além da suíte local.
+- Impactos: implementação encerrada; `CURRENT.md` avança para `009`, mantida em standby.
+- Resolve: extensão, tabela, índices, upsert, consulta semântica e isolamento por projeto validados.
+- Verificação: container saudável, 21 testes, compilação, Compose, diff, hook e smoke real aprovados.
+- Pasta: `handoffs/011-persistencia-vetorial-pgvector/`

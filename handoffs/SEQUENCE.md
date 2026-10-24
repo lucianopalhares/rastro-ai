@@ -19,10 +19,11 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 4 | `006-retrieval-vetorial-minimo` | `ia` | `verified` | `005` | consulta retorna chunks filtrados pelo projeto |
 | 5 | `007-respostas-com-citacoes` | `ia` | `verified` | `006` | pergunta responde com fonte ou ausência de evidência |
 | 6 | `008-evaluation-baseline` | `ia` | `verified` | `007` | dataset mínimo e baseline versionado executados |
-| 7 | `009-observabilidade-e-custo` | `ia` | `proposed` | `007` | trace registra execução, latência, tokens e custo |
-| 8 | `010-autorizacao-tools-e-mcp` | `api`/`ia` | `proposed` | `008` e `009` | acesso por projeto e tools de leitura autorizadas |
+| 7 | `011-persistencia-vetorial-pgvector` | `root`/`ia` | `verified` | `008` | PostgreSQL com pgvector, volume e busca semântica persistente |
+| 8 | `009-observabilidade-e-custo` | `ia` | `proposed` | `007` e `011` | trace registra execução, latência, tokens e custo; standby |
+| 9 | `010-autorizacao-tools-e-mcp` | `api`/`ia` | `proposed` | `008`, `009` e `011` | acesso por projeto e tools de leitura autorizadas; standby |
 
 ## Estado ativo
 
 - Implementação ativa: `009-observabilidade-e-custo`.
-- Próxima capacidade: registrar execução, latência, tokens e custo em traces.
+- Próxima capacidade: observabilidade e custo permanecem em standby até nova autorização explícita.
