@@ -310,3 +310,4 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: ciclo da implementação `004` encerrado com evidência de aplicação e verificação.
 - Verificação: hook válido, smoke HTTP `201`, 2 suítes/7 testes e build NestJS aprovados.
 - Pasta: `handoffs/004-upload-minimo-de-arquivos/`.
+- Commit: `71f41be` — `Finalizar upload mínimo de arquivos`.

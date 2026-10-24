@@ -62,4 +62,4 @@
 - Registros conferidos: README consolidado, versões `v1`–`v4`, timeline da implementação, timeline global e `CURRENT.md`.
 - Verificações: hook estrutural válido; fixture não vazio com participantes; smoke HTTP `201 Created`; testes Docker com 2 suítes/7 testes; build NestJS aprovado.
 - Avanço: `CURRENT.md` atualizado de `004` para `005`, conforme `SEQUENCE.md`.
-- Commit: será registrado na entrada final após a criação do commit explícito da tarefa.
+- Commit: `71f41be` — `Finalizar upload mínimo de arquivos`; registro criado após a validação final.
