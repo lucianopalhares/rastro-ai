@@ -331,3 +331,23 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: implementação 005 verificada com testes, compilação e hook estrutural.
 - Verificação: 7 testes unitários passaram, `compileall` passou e 8 arquivos de handoff foram validados.
 - Pasta: `handoffs/005-extracao-e-chunking/`.
+
+## 006 — Retrieval vetorial mínimo
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: permitir consulta de chunks relevantes com isolamento obrigatório por projeto.
+- Impactos: adiciona retrieval síncrono, lexical e determinístico em memória; embeddings, banco e worker permanecem fora do escopo.
+- Resolve: ausência de contrato, indexação e consulta após a geração de chunks.
+- Verificação: 11 testes, `compileall` e hook estrutural passaram.
+- Pasta: `handoffs/006-retrieval-vetorial-minimo/` | Próxima ação: finalizar tarefa 006.
+
+## 006 — Finalização verificada
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: confirmar testes, registros e critérios da implementação de retrieval mínimo.
+- Impactos: `CURRENT.md` avança para `007`; alterações futuras de embeddings e persistência continuam fora do escopo.
+- Resolve: ciclo da implementação 006 encerrado com retrieval filtrado por projeto verificado.
+- Verificação: 11 testes, `compileall` e hook estrutural passaram.
+- Pasta: `handoffs/006-retrieval-vetorial-minimo/` | Próxima ação: iniciar 007.

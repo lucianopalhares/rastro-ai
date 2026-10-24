@@ -16,7 +16,7 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 1 | `003-consolidar-ciclo-de-vida-documentos` | `api` | `verified` | `002` | contrato, projeto, estados e transições cobertos por testes |
 | 2 | `004-upload-minimo-de-arquivos` | `api` | `verified` | `003` | `.md` e `.txt` recebidos, armazenados e associados; smoke HTTP `201` com estado `pending` |
 | 3 | `005-extracao-e-chunking` | `ia` | `verified` | `004` | texto extraído e chunks reproduzíveis gerados |
-| 4 | `006-retrieval-vetorial-minimo` | `ia` | `proposed` | `005` | consulta retorna chunks filtrados pelo projeto |
+| 4 | `006-retrieval-vetorial-minimo` | `ia` | `verified` | `005` | consulta retorna chunks filtrados pelo projeto |
 | 5 | `007-respostas-com-citacoes` | `ia` | `proposed` | `006` | pergunta responde com fonte ou ausência de evidência |
 | 6 | `008-evaluation-baseline` | `ia` | `proposed` | `007` | dataset mínimo e baseline versionado executados |
 | 7 | `009-observabilidade-e-custo` | `ia` | `proposed` | `007` | trace registra execução, latência, tokens e custo |
@@ -24,5 +24,5 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 
 ## Estado ativo
 
-- Implementação ativa: `005-extracao-e-chunking`.
-- Próxima capacidade: extração e chunking do conteúdo recebido pela API.
+- Implementação ativa: `007-respostas-com-citacoes`.
+- Próxima capacidade: responder perguntas com evidências recuperadas e citar fontes.

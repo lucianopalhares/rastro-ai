@@ -26,10 +26,15 @@ def _find_chunk_end(text: str, start: int, chunk_size: int) -> int:
     return boundary if boundary > start else limit
 
 
+# /**
+#  * Divide texto normalizado em chunks reproduzíveis associados a um projeto.
+#  * Histórico: v1 — propaga `project_id` sem alterar offsets, tamanho ou sobreposição.
+#  */
 def chunk_text(
     text: str,
     *,
     document_id: str,
+    project_id: str = "",
     chunk_size: int = 800,
     overlap: int = 120,
 ) -> tuple[DocumentChunk, ...]:
@@ -63,6 +68,7 @@ def chunk_text(
                     content=normalized[content_start:content_end],
                     start_offset=content_start,
                     end_offset=content_end,
+                    project_id=project_id,
                 )
             )
 

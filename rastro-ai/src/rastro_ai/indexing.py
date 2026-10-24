@@ -18,10 +18,15 @@ def extract_text(path: str | Path) -> str:
     return Utf8FileTextExtractor().extract(path)
 
 
+# /**
+#  * Mantém a fachada legada e propaga o projeto para os chunks produzidos.
+#  * Histórico: v1 — adiciona `project_id` para integração com retrieval.
+#  */
 def chunk_text(
     text: str,
     *,
     document_id: str,
+    project_id: str = "",
     chunk_size: int = 800,
     overlap: int = 120,
 ) -> tuple[DocumentChunk, ...]:
@@ -32,15 +37,21 @@ def chunk_text(
     return domain_chunk_text(
         text,
         document_id=document_id,
+        project_id=project_id,
         chunk_size=chunk_size,
         overlap=overlap,
     )
 
 
+# /**
+#  * Mantém a indexação de arquivo e permite associar seus chunks a um projeto.
+#  * Histórico: v1 — adiciona `project_id` sem quebrar chamadas existentes.
+#  */
 def index_document(
     document_id: str,
     path: str | Path,
     *,
+    project_id: str = "",
     chunk_size: int = 800,
     overlap: int = 120,
 ) -> tuple[DocumentChunk, ...]:
@@ -49,6 +60,7 @@ def index_document(
     return _index_document.execute(
         document_id,
         path,
+        project_id=project_id,
         chunk_size=chunk_size,
         overlap=overlap,
     )
