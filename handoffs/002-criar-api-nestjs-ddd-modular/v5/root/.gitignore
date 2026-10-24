@@ -1,0 +1,69 @@
+## Alteração: regras de arquivos não versionáveis
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/.gitignore`
+- Aplicação: `root`
+- Localização: arquivo inexistente na raiz do repositório; criar como configuração compartilhada do workspace.
+- Operação: insert
+- Âncoras: arquivo inexistente; inserir como novo arquivo na raiz.
+- O que o trecho faz: exclui dependências, builds, caches, logs, ambientes locais e saídas geradas.
+- Motivo: impedir que arquivos derivados ou potencialmente sensíveis sejam versionados.
+- Impacto: `git status` deixa de listar artefatos locais; código, handoffs e `.env.example` permanecem versionáveis.
+- Pré-requisitos: nenhum.
+
+### Localização exata
+
+```text
+Trecho anterior:
+arquivo inexistente
+
+Ponto estrutural:
+novo arquivo `/home/dev/dev/ia/rastro-ai/.gitignore`
+
+Trecho posterior:
+primeiro arquivo de configuração da raiz após a criação
+```
+
+### Conteúdo copiável
+
+```gitignore
+# Dependencies
+**/node_modules/
+
+# Build and test output
+**/dist/
+**/coverage/
+*.tsbuildinfo
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors and operating system files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Generated workspace analysis
+/graphify-out/
+```
+
+### Explicação do trecho
+
+- O que este código faz: aplica padrões globais aos diretórios do workspace e preserva exemplos de ambiente.
+- Por que inserir: reduz ruído no versionamento e evita o commit acidental de configurações locais.
+- O que permanece inalterado: código-fonte, documentação, `.agents/` e `handoffs/`.
+
+### Verificação
+
+1. Criar o arquivo indicado na raiz com o conteúdo copiável.
+2. Executar `git check-ignore -v rastro-ai/dist/main.js graphify-out/qualquer-arquivo`.
+3. Confirmar que `git check-ignore -v rastro-ai/.env.example` não retorna correspondência.

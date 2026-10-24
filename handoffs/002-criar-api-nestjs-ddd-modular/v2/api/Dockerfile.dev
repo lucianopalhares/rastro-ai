@@ -1,0 +1,50 @@
+## Alteração: instalar dependências de desenvolvimento sem lockfile
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/rastro-ai/Dockerfile.dev`
+- Aplicação: `api`
+- Localização: linha 5, etapa de instalação após `COPY package*.json ./`.
+- Operação: `replace`
+- Âncoras: anterior `COPY package*.json ./`; posterior `COPY tsconfig*.json nest-cli.json ./`.
+- O que o trecho faz: instala as dependências declaradas em `package.json` durante o build da imagem de desenvolvimento.
+- Motivo: `npm ci` exige `package-lock.json` ou `npm-shrinkwrap.json`, e nenhum desses arquivos existe no contexto `rastro-ai` usado pelo Compose.
+- Impacto: o build de desenvolvimento passa a funcionar com o estado atual do repositório; a instalação não é determinística até que um lockfile seja versionado.
+- Pré-requisitos: nenhum; manter `package.json` no mesmo diretório.
+
+### Localização exata
+
+```text
+Trecho anterior:
+COPY package*.json ./
+
+Ponto estrutural:
+etapa de instalação de dependências do Dockerfile.dev
+
+Trecho posterior:
+COPY tsconfig*.json nest-cli.json ./
+```
+
+### Conteúdo atual
+
+```dockerfile
+RUN npm ci
+```
+
+### Conteúdo copiável
+
+```dockerfile
+RUN npm install
+```
+
+### Explicação do trecho
+
+- O que este código faz: troca a instalação limpa baseada em lockfile por uma instalação compatível com o único manifesto existente.
+- Por que substituir: o erro `EUSAGE` ocorre antes da compilação porque `npm ci` não pode operar sem lockfile.
+- O que permanece inalterado: imagem base, cópia dos arquivos, comando de desenvolvimento, portas e hot reload.
+
+### Aplicação e verificação
+
+1. Substituir somente `RUN npm ci` por `RUN npm install` no arquivo original.
+2. Executar `docker compose config` na raiz do projeto.
+3. Executar `docker compose build api`.
+4. Executar `docker compose up -d` e confirmar que o serviço inicia `npm run start:dev`.
+5. Como melhoria posterior, versionar `rastro-ai/package-lock.json` e retornar o Dockerfile para `npm ci` em uma rodada própria.

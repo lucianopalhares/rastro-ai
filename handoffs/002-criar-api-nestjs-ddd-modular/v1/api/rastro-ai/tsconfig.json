@@ -1,0 +1,37 @@
+## Alteração: compatibilidade com TypeScript 6
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/rastro-ai/tsconfig.json`
+- Aplicação: `api`
+- Operação: `replace`
+- Âncoras: substituir entre `"allowSyntheticDefaultImports": true,` e `"incremental": true,` dentro de `compilerOptions`.
+- Motivo: o TypeScript 6 exige `rootDir` explícito quando o diretório comum é `src` e sinaliza `baseUrl` como deprecated.
+- Impacto: mantém o layout de saída em `dist` e silencia a depreciação durante a migração; o alias `@/*` continua preservado.
+- Dependências: aplicar após a atualização do TypeScript para a versão 6; não depende de alteração em `tsconfig.build.json`.
+
+### Trecho atual
+
+```json
+"allowSyntheticDefaultImports": true,
+"target": "ES2023",
+"sourceMap": true,
+"outDir": "./dist",
+"baseUrl": "./",
+"incremental": true,
+```
+
+### Trecho substituto copiável
+
+```json
+"allowSyntheticDefaultImports": true,
+"target": "ES2023",
+"rootDir": "./src",
+"sourceMap": true,
+"outDir": "./dist",
+"baseUrl": "./",
+"ignoreDeprecations": "6.0",
+"incremental": true,
+```
+
+### Verificação
+
+Na raiz do repositório, executar `docker compose up -d --build` e confirmar que o serviço `api` inicia o watch sem `TS5011` ou `TS5101`. Em seguida, executar `docker compose exec api npm run build`; o comando deve concluir sem erros e gerar `rastro-ai/dist`.

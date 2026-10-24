@@ -2,7 +2,7 @@
 services:
   api:
     build:
-      context: ./rastro-ai
+      context: ./rastro-api
       dockerfile: Dockerfile.dev
     command: npm run start:dev
     environment:
@@ -13,7 +13,7 @@ services:
     ports:
       - '3039:3000'
     volumes:
-      - ./rastro-ai:/app
+      - ./rastro-api:/app
       - /app/node_modules
     healthcheck:
       test:

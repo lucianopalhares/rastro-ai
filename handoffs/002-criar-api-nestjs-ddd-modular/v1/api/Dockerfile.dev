@@ -1,0 +1,38 @@
+## Alteração: instalar dependências de forma determinística no desenvolvimento
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/rastro-ai/Dockerfile.dev`
+- Aplicação: `api`
+- Localização: etapa de instalação após `COPY package*.json ./`, linha 5
+- Operação: `replace`
+- Âncoras: anterior `COPY package*.json ./`; posterior `COPY tsconfig*.json nest-cli.json ./`
+- O que o trecho faz: instala as dependências durante a construção da imagem de desenvolvimento.
+- Motivo: `npm install` re-resolve dependências e expõe conflitos variáveis; o lockfile deve ser a fonte determinística da imagem.
+- Impacto: o build passa a falhar cedo se o `package-lock.json` estiver ausente ou divergente, evitando imagens com árvore diferente da validada localmente.
+- Pré-requisitos: aplicar `package.json` e gerar `rastro-ai/package-lock.json` com `npm install --package-lock-only`.
+
+### Conteúdo atual
+
+```dockerfile
+RUN npm install
+```
+
+### Conteúdo copiável
+
+```dockerfile
+RUN npm ci
+```
+
+### Explicação do trecho
+
+`npm ci` instala exatamente o lockfile copiado pelo padrão `package*.json` e não modifica a resolução durante o build. O restante do Dockerfile, incluindo o volume de `node_modules` definido no Compose, permanece inalterado.
+
+### Verificação
+
+```bash
+cd /home/dev/dev/ia/rastro-ai
+docker compose config
+docker compose build api
+docker compose up api
+```
+
+Resultado esperado: a imagem é construída sem `ERESOLVE` e o serviço inicia em modo watch na porta publicada pelo Compose. Encerrar o processo com `Ctrl+C` após a verificação local.

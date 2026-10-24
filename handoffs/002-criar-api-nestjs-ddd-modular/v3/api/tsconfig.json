@@ -1,0 +1,61 @@
+## Alteração: compatibilidade com TypeScript 6
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/rastro-ai/tsconfig.json`
+- Aplicação: `api`
+- Localização: `compilerOptions`, entre `"allowSyntheticDefaultImports": true` e `"incremental": true`.
+- Operação: `replace`
+- Âncoras: anterior `"allowSyntheticDefaultImports": true,`; posterior `"incremental": true,`.
+- O que o trecho faz: define o diretório-fonte do build e controla a mensagem de depreciação do TypeScript 6.
+- Motivo: o watch reporta `TS5011` sem `rootDir` explícito e `TS5101` porque `baseUrl` será removido no TypeScript 7.
+- Impacto: preserva o layout compilado em `dist`, mantém o alias `@/*` e silencia a depreciação durante a migração.
+- Pré-requisitos: aplicar após a instalação das dependências da API; não requer alteração em `tsconfig.build.json`.
+
+### Localização exata
+
+```text
+Trecho anterior:
+"allowSyntheticDefaultImports": true,
+
+Ponto estrutural:
+objeto compilerOptions do arquivo tsconfig.json
+
+Trecho posterior:
+"incremental": true,
+```
+
+### Conteúdo atual
+
+```json
+"allowSyntheticDefaultImports": true,
+"target": "ES2023",
+"sourceMap": true,
+"outDir": "./dist",
+"baseUrl": "./",
+"incremental": true,
+```
+
+### Conteúdo copiável
+
+```json
+"allowSyntheticDefaultImports": true,
+"target": "ES2023",
+"rootDir": "./src",
+"sourceMap": true,
+"outDir": "./dist",
+"baseUrl": "./",
+"ignoreDeprecations": "6.0",
+"incremental": true,
+```
+
+### Explicação do trecho
+
+- O que este código faz: informa que o código-fonte está em `src` e silencia a depreciação de `baseUrl` específica da versão 6.
+- Por que substituir: o `tsconfig.build.json` herda essas opções e o processo de watch falha antes de compilar.
+- O que permanece inalterado: `paths`, `outDir`, regras de strictness, exclusões do build e demais opções do compilador.
+
+### Aplicação e verificação
+
+1. Substituir somente o fragmento indicado em `rastro-ai/tsconfig.json`.
+2. Executar `docker compose up -d --build`.
+3. Conferir os logs de `api` e confirmar que não aparecem `TS5011` nem `TS5101`.
+4. Executar `docker compose exec api npm run build` e confirmar a geração de `rastro-ai/dist`.

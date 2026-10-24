@@ -1,0 +1,39 @@
+## Alteração: alinhar TypeScript ao NestJS Schematics 12
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/rastro-ai/package.json`
+- Aplicação: `api`
+- Localização: `devDependencies.typescript`, linha 43; entre `tsconfig-paths` e o fechamento de `devDependencies`
+- Operação: `replace`
+- Âncoras: anterior `"tsconfig-paths": "^4.2.0"`; posterior `}` de `devDependencies`
+- O que o trecho faz: declara a versão de TypeScript usada para desenvolvimento e compilação da API.
+- Motivo: `@nestjs/schematics@12.0.10`, resolvido por `^12.0.5`, exige `typescript >=6.0.0`, mas o projeto declara `^5.9.3`.
+- Impacto: elimina o `ERESOLVE`; após aplicar, gerar `package-lock.json` com `npm install --package-lock-only` antes de usar `npm ci`.
+- Pré-requisitos: nenhum; aplicar antes da alteração do `Dockerfile.dev`.
+
+### Conteúdo atual
+
+```json
+"typescript": "^5.9.3"
+```
+
+### Conteúdo copiável
+
+```json
+"typescript": "^6.0.0"
+```
+
+### Explicação do trecho
+
+O intervalo passa a aceitar a major compatível com o peer dependency exigido pelo Schematics 12. Depois da substituição, execute `npm install --package-lock-only` no diretório da API para criar o lockfile versionado. Nenhuma dependência de runtime é alterada.
+
+### Verificação
+
+```bash
+cd /home/dev/dev/ia/rastro-ai/rastro-ai
+npm install --package-lock-only
+npm ci
+npm run build
+npm test
+```
+
+Resultado esperado: a árvore de dependências instala sem `ERESOLVE`, o build termina com código 0 e os testes passam.

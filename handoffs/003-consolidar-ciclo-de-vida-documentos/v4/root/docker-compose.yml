@@ -1,0 +1,62 @@
+## Alteração: apontar o serviço API para rastro-api
+
+- Arquivo original: `/home/dev/dev/ia/rastro-ai/docker-compose.yml`
+- Aplicação: `root`
+- Localização: linhas 4–6 e 15–17, bloco `services.api.build` e volumes do serviço.
+- Operação: replace
+- Âncoras: `build.context` antes de `command`; volume bind mount antes do volume anônimo de `node_modules`.
+- O que o trecho faz: define a pasta usada para construir e montar o container da API.
+- Motivo: a API foi movida de `rastro-ai` para `rastro-api`, mas o Compose permaneceu com o caminho anterior.
+- Impacto: o Docker passará a encontrar `rastro-api/Dockerfile.dev` e montar o código correto no container.
+- Dependências: a pasta `rastro-api` e seu `Dockerfile.dev` devem existir.
+
+### Conteúdo atual
+
+```yaml
+    build:
+      context: ./rastro-ai
+      dockerfile: Dockerfile.dev
+    command: npm run start:dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      CORS_ORIGIN: '*'
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - '3039:3000'
+    volumes:
+      - ./rastro-ai:/app
+      - /app/node_modules
+```
+
+### Conteúdo copiável
+
+```yaml
+    build:
+      context: ./rastro-api
+      dockerfile: Dockerfile.dev
+    command: npm run start:dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      CORS_ORIGIN: '*'
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - '3039:3000'
+    volumes:
+      - ./rastro-api:/app
+      - /app/node_modules
+```
+
+### Explicação do trecho
+
+- O código faz: usa a API NestJS real como contexto de build e origem do bind mount.
+- Por que substituir: o caminho antigo não contém mais `Dockerfile.dev`, provocando falha antes do build.
+- O que permanece inalterado: comando, ambiente, porta, health check e volume anônimo de dependências.
+
+### Verificação
+
+1. Aplicar a substituição no `docker-compose.yml` da raiz.
+2. Executar `docker compose config`.
+3. Executar `docker compose up --build`.
+4. Confirmar que o serviço encontra o Dockerfile, inicia o watch e responde ao health check em `/api/v1/health`.

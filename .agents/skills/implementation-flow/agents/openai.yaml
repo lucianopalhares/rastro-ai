@@ -1,0 +1,7 @@
+interface:
+  display_name: "Implementation Flow"
+  short_description: "Administra implementações isoladas e seus handoffs"
+  default_prompt: "Use $implementation-flow para iniciar ou finalizar uma tarefa do Rastro AI."
+
+policy:
+  allow_implicit_invocation: false
