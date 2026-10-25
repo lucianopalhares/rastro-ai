@@ -652,5 +652,5 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: elimina a ambiguidade de `retrieval.index_chunks()` e dos nomes genéricos de vector stores.
 - Verificação: testes, evaluation, compilação, busca de referências e hook estrutural registrados em `017/v2`.
 - Pasta: `handoffs/017-renomear-fluxo-extracao-chunking/` | Próxima ação: verificar e finalizar `017`.
-- Commit: `e6858d7` — `Reorganizar arquitetura do serviço Python`.
+- Commit: `acf2c2b` — `Esclarecer nomes do fluxo de chunks e retrieval`.
 - Verificação: commit criado com lista explícita dos arquivos da implementação.

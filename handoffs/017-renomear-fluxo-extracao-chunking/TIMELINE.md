@@ -24,3 +24,10 @@
 - Problema resolvido: separar semanticamente persistência, busca e adaptação LangChain nos nomes do runtime.
 - Verificação: testes, evaluation, compilação, referências antigas e hook estrutural previstos nesta rodada.
 - Pendência: finalizar a implementação após a verificação.
+
+## v2 — Commit criado
+
+- Data/hora: 2026-10-25 -03:00.
+- Status: `verified`.
+- Commit: `acf2c2b` — `Esclarecer nomes do fluxo de chunks e retrieval`.
+- Verificação: commit criado com lista explícita de 29 arquivos da implementação; alterações não relacionadas ficaram fora do índice.
