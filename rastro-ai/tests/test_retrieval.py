@@ -4,18 +4,18 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
-from rastro_ai.document_indexing.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
+from rastro_ai.document_indexing.application.use_cases.retrieve_chunks import SearchRelevantChunksUseCase
 from rastro_ai.document_indexing.domain.entities import DocumentChunk
 from rastro_ai.document_indexing.infrastructure.retrieval.in_memory_vector_store import (
-    InMemoryVectorStore,
+    InMemoryChunkVectorStore,
 )
 
 
 class RetrievalTests(unittest.TestCase):
     # /** Histórico: v1 — prepara store isolado para cada cenário de retrieval. */
     def setUp(self) -> None:
-        self.store = InMemoryVectorStore()
-        self.use_case = RetrieveChunksUseCase(self.store)
+        self.store = InMemoryChunkVectorStore()
+        self.use_case = SearchRelevantChunksUseCase(self.store)
 
     # /** Histórico: v1 — verifica ranking por termos coincidentes. */
     def test_retrieval_ranks_matching_chunks(self) -> None:

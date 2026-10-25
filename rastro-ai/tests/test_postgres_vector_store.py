@@ -8,7 +8,7 @@ from langchain_core.documents import Document
 
 from rastro_ai.document_indexing.domain.entities import DocumentChunk
 from rastro_ai.document_indexing.infrastructure.retrieval.postgres_vector_store import (
-    PostgresVectorStore,
+    PostgresChunkVectorStore,
 )
 
 
@@ -55,12 +55,12 @@ class FakeLangChainVectorStore:
         ][:k]
 
 
-class PostgresVectorStoreTests(unittest.TestCase):
+class PostgresChunkVectorStoreTests(unittest.TestCase):
     """Verifica o contrato local sem depender de um banco real."""
 
     def setUp(self) -> None:
         self.vector_store = FakeLangChainVectorStore()
-        self.store = PostgresVectorStore(self.vector_store, FakeEmbeddingRepository())
+        self.store = PostgresChunkVectorStore(self.vector_store, FakeEmbeddingRepository())
 
     # /**
     #  * Confirma que o adapter envia embeddings, metadata e ID determinístico ao PGVector.
@@ -103,7 +103,7 @@ class PostgresVectorStoreTests(unittest.TestCase):
             def embed(self, _texts: tuple[str, ...]) -> tuple[tuple[float, ...], ...]:
                 return ((1.0,),)
 
-        store = PostgresVectorStore(self.vector_store, InvalidEmbeddingProvider())
+        store = PostgresChunkVectorStore(self.vector_store, InvalidEmbeddingProvider())
 
         with self.assertRaisesRegex(ValueError, "dimension"):
             store.upsert([DocumentChunk("doc-1", 0, "texto", 0, 5, "project-1")])

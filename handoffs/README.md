@@ -23,6 +23,7 @@
 | `014` | `exigir-pgvector-no-runtime` | `ia` | `verified` |
 | `015` | `adaptar-chunking-para-langchain` | `ia` | `verified` |
 | `016` | `reorganizar-arquitetura-python` | `ia` | `verified` |
+| `017` | `renomear-fluxo-extracao-chunking` | `ia` | `verified` |
 
 ## Padrão de validação para novas versões
 

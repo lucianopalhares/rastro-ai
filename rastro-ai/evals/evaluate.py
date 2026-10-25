@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import Any
 
 from rastro_ai.document_indexing.application.use_cases.answer_question import AnswerQuestionUseCase
-from rastro_ai.document_indexing.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
+from rastro_ai.document_indexing.application.use_cases.retrieve_chunks import SearchRelevantChunksUseCase
 from rastro_ai.document_indexing.domain.entities import DocumentChunk
-from rastro_ai.document_indexing.infrastructure.retrieval.in_memory_vector_store import InMemoryVectorStore
+from rastro_ai.document_indexing.infrastructure.retrieval.in_memory_vector_store import InMemoryChunkVectorStore
 
 DATASET_PATH = Path(__file__).with_name("dataset.json")
 BASELINE_PATH = Path(__file__).with_name("baseline.json")
@@ -63,13 +63,13 @@ def run_evaluation(dataset: dict[str, Any]) -> EvaluationResult:
     cases = dataset["cases"]
 
     for case in cases:
-        store = InMemoryVectorStore()
+        store = InMemoryChunkVectorStore()
         chunks = []
         for document in case["documents"]:
             project_id = document.get("project_id", case["project_id"])
             chunks.append(DocumentChunk(document["id"], 0, document["text"], 0, len(document["text"]), project_id))
         store.upsert(chunks)
-        retriever = RetrieveChunksUseCase(store)
+        retriever = SearchRelevantChunksUseCase(store)
         answer = AnswerQuestionUseCase(retriever).execute(case["project_id"], case["question"])
         retrieved_ids = {result.chunk.document_id for result in retriever.execute(case["project_id"], case["question"])}
         expected_sources = set(case.get("expected_sources", []))

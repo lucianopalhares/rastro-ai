@@ -52,7 +52,7 @@ class RuntimeVectorStoreTests(unittest.TestCase):
             [
                 sys.executable,
                 "-c",
-                "from rastro_ai.bootstrap.container import build_retrieval_container; build_retrieval_container()",
+                "from rastro_ai.bootstrap.container import build_semantic_search_container; build_semantic_search_container()",
             ],
             cwd=ROOT,
             env=environment,
@@ -78,7 +78,7 @@ class RuntimeVectorStoreTests(unittest.TestCase):
             [
                 sys.executable,
                 "-c",
-                "from rastro_ai.bootstrap.container import build_retrieval_container; build_retrieval_container()",
+                "from rastro_ai.bootstrap.container import build_semantic_search_container; build_semantic_search_container()",
             ],
             cwd=ROOT,
             env=environment,

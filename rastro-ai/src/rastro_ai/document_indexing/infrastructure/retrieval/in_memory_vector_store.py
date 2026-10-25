@@ -37,8 +37,8 @@ def _cosine_similarity(left: Counter[str], right: Counter[str]) -> float:
 #  * Histórico: v1 — adiciona upsert, filtro por projeto e ranking por cosseno.
 #  * Histórico: v2 — deixa explícito que o adaptador não substitui embeddings nem pgvector.
 #  */
-class InMemoryVectorStore:
-    """Implementa o contrato de retrieval sem banco, modelo ou rede para cenários isolados."""
+class InMemoryChunkVectorStore:
+    """Busca chunks sem banco, modelo ou rede para cenários isolados."""
 
     # /** Histórico: v1 — inicializa o índice efêmero do processo. */
     def __init__(self) -> None:

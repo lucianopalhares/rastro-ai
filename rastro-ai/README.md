@@ -29,7 +29,7 @@ Os namespaces duplicados `chunking`, `documents`, `document_ingestion`, `embeddi
 
 - A lógica de negócio deixa de ficar concentrada em um único arquivo.
 - O chunking padrão agora privilegia títulos/parágrafos Markdown, usa `tiktoken` com orçamento real de 500 tokens, overlap de 60 tokens e preserva offsets; parâmetros legados `chunk_size`/`overlap` continuam disponíveis.
-- Chunks podem carregar `project_id`; `retrieve_chunks` filtra o projeto antes de ordenar por similaridade de cosseno sobre frequência de termos.
+- Chunks podem carregar `project_id`; `search_relevant_chunks` filtra o projeto antes de ordenar por similaridade de cosseno sobre frequência de termos.
 - `answer_question` reproduz somente os trechos recuperados, inclui documento, índice e offsets nas citações e declara ausência de evidência quando nada é encontrado.
 - Apenas `.md` e `.txt` em UTF-8 são aceitos; arquivos vazios ou formatos não suportados falham.
 - O backend de runtime é síncrono e exige `VECTOR_STORE_BACKEND=postgres`; chunks e embeddings do `text-embedding-3-small` são persistidos no PostgreSQL/pgvector e consultados semanticamente. O store em memória permanece somente em testes e evaluation determinística explícita.
@@ -69,7 +69,7 @@ Para verificar a compilação:
 python3 -m compileall -q src tests
 ```
 
-Para validar manualmente o caso de uso, importe `IndexDocumentUseCase`, injete `Utf8FileTextExtractor` e execute `execute(document_id, path)`. A resposta é uma tupla de `DocumentChunk` com `document_id`, `index`, `content`, `start_offset` e `end_offset`.
+Para validar manualmente o caso de uso, importe `ExtractAndChunkDocumentUseCase`, injete `Utf8FileTextExtractor` e execute `execute(document_id, path)`. A resposta é uma tupla de `DocumentChunk` com `document_id`, `index`, `content`, `start_offset` e `end_offset`. Para o fluxo completo, use `extract_chunk_and_persist_document(...)`, que também gera embeddings e persiste no PGVector.
 
 Para usar o backend persistente, defina `OPENAI_API_KEY`, `DATABASE_URL=postgresql://rastro:rastro@localhost:55432/rastro`, `VECTOR_STORE_BACKEND=postgres`, `EMBEDDING_MODEL=text-embedding-3-small` e `EMBEDDING_DIMENSIONS=384`. O custo publicado do modelo é US$0,02 por 1 milhão de tokens; `SUPABASE_DB_URL` pode substituir `DATABASE_URL` sem mudar o schema ou as consultas.
 

@@ -20,8 +20,8 @@ from ...domain.entities import DocumentChunk, RetrievedChunk
 #  * Existe para manter o provider e as validações da Rastro independentes do vector store.
 #  * Histórico: v6 — cria a ponte entre `EmbeddingRepository` e `Embeddings`.
 #  */
-class RepositoryEmbeddings(Embeddings):
-    """Expõe embeddings da aplicação para as operações do LangChain PGVector."""
+class LangChainEmbeddingAdapter(Embeddings):
+    """Adapta embeddings da aplicação para as operações do LangChain PGVector."""
 
     def __init__(self, repository: EmbeddingRepository) -> None:
         self._repository = repository
@@ -50,8 +50,8 @@ class RepositoryEmbeddings(Embeddings):
 #  * Histórico: v1 — adiciona upsert, filtro por projeto e consulta cosine via pgvector.
 #  * Histórico: v6 — delega persistência e similaridade a `langchain-postgres`.
 #  */
-class PostgresVectorStore:
-    """Implementa a porta local sobre o vector store PGVector."""
+class PostgresChunkVectorStore:
+    """Persiste e busca chunks vetorizados no PostgreSQL com PGVector."""
 
     def __init__(self, vector_store: Any, embedding_repository: EmbeddingRepository) -> None:
         self._vector_store = vector_store
@@ -65,7 +65,7 @@ class PostgresVectorStore:
     #  * Histórico: v6 — cria `PGVector` com dimensão e distância cosine explícitas.
     #  */
     @classmethod
-    def from_environment(cls, embedding_repository: EmbeddingRepository) -> "PostgresVectorStore":
+    def from_environment(cls, embedding_repository: EmbeddingRepository) -> "PostgresChunkVectorStore":
         """Monta o adapter usando a URL de banco e a coleção do ambiente."""
 
         database_url = environ.get("SUPABASE_DB_URL") or environ.get("DATABASE_URL")
@@ -73,7 +73,7 @@ class PostgresVectorStore:
             raise ValueError("DATABASE_URL or SUPABASE_DB_URL is required")
 
         vector_store = PGVector(
-            embeddings=RepositoryEmbeddings(embedding_repository),
+            embeddings=LangChainEmbeddingAdapter(embedding_repository),
             connection=database_url,
             collection_name=environ.get("PGVECTOR_COLLECTION", "rastro_document_chunks"),
             embedding_length=384,

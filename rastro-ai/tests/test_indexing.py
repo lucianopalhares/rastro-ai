@@ -4,7 +4,9 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
-from rastro_ai.document_indexing.application.use_cases.index_document import IndexDocumentUseCase
+from rastro_ai.document_indexing.application.use_cases.extract_and_chunk_document import (
+    ExtractAndChunkDocumentUseCase,
+)
 from rastro_ai.document_indexing.domain.services import chunk_text
 from rastro_ai.document_indexing.infrastructure.extraction.utf8_file_text_extractor import (
     Utf8FileTextExtractor,
@@ -17,8 +19,8 @@ from unittest.mock import patch
 from rastro_ai.indexing import (
     chunk_text as public_chunk_text,
     extract_text,
-    index_document,
-    index_document_in_store,
+    extract_and_chunk_document,
+    extract_chunk_and_persist_document,
 )
 
 
@@ -102,12 +104,12 @@ class IndexingTests(unittest.TestCase):
         )
 
 
-    def test_index_document_extracts_and_chunks_fixture(self) -> None:
+    def test_extract_and_chunk_document_extracts_and_chunks_fixture(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "meeting.txt"
             path.write_text("Decisão: usar PostgreSQL.\n" * 20, encoding="utf-8")
 
-            chunks = index_document("doc-1", path, chunk_size=60, overlap=10)
+            chunks = extract_and_chunk_document("doc-1", path, chunk_size=60, overlap=10)
 
             self.assertGreater(len(chunks), 1)
             self.assertTrue(chunks[0].content.startswith("Decisão"))
@@ -142,7 +144,7 @@ class IndexingTests(unittest.TestCase):
                 return "Conteúdo de teste"
 
         extractor = InMemoryExtractor()
-        use_case = IndexDocumentUseCase(extractor, LangChainTextChunker())
+        use_case = ExtractAndChunkDocumentUseCase(extractor, LangChainTextChunker())
 
         chunks = use_case.execute("doc-1", "ignored.txt", chunk_size=100, overlap=10)
 
@@ -167,7 +169,7 @@ class IndexingTests(unittest.TestCase):
                 return chunk_text("resultado", document_id=kwargs["document_id"], chunk_size=100)
 
         chunker = SpyChunker()
-        use_case = IndexDocumentUseCase(InMemoryExtractor(), chunker)
+        use_case = ExtractAndChunkDocumentUseCase(InMemoryExtractor(), chunker)
 
         chunks = use_case.execute(
             "doc-1",
@@ -208,7 +210,7 @@ class IndexingTests(unittest.TestCase):
     #  * Histórico: v2 — deixa de observar a criação implícita do PGVector durante o import;
     #  * a composição do backend passa a ser responsabilidade do container explícito.
     #  */
-    def test_index_document_in_store_persists_chunks(self) -> None:
+    def test_extract_chunk_and_persist_document_persists_chunks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "meeting.txt"
             path.write_text("Conteúdo indexável", encoding="utf-8")
@@ -220,10 +222,10 @@ class IndexingTests(unittest.TestCase):
                     "DATABASE_URL": "postgresql://test/test",
                     "OPENAI_API_KEY": "test-key",
                 },
-            ), patch("rastro_ai.retrieval.index_chunks") as index_chunks:
-                chunks = index_document_in_store("doc-1", path, project_id="project-1")
+            ), patch("rastro_ai.retrieval.persist_document_chunks") as persist_chunks:
+                chunks = extract_chunk_and_persist_document("doc-1", path, project_id="project-1")
 
-            index_chunks.assert_called_once_with(chunks)
+            persist_chunks.assert_called_once_with(chunks)
             self.assertEqual(chunks[0].project_id, "project-1")
 
     def test_infrastructure_adapter_is_composable(self) -> None:

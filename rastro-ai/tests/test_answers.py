@@ -9,22 +9,22 @@ from rastro_ai.document_indexing.application.use_cases.answer_question import (
 )
 from rastro_ai.document_indexing.domain.entities import DocumentChunk
 from rastro_ai.document_indexing.infrastructure.retrieval.in_memory_vector_store import (
-    InMemoryVectorStore,
+    InMemoryChunkVectorStore,
 )
 
 
 class AnswerTests(unittest.TestCase):
     # /** Histórico: v1 — prepara retrieval isolado para respostas determinísticas. */
     def setUp(self) -> None:
-        self.store = InMemoryVectorStore()
+        self.store = InMemoryChunkVectorStore()
         self.use_case = AnswerQuestionUseCase(self._retriever())
 
     def _retriever(self):
         from rastro_ai.document_indexing.application.use_cases.retrieve_chunks import (
-            RetrieveChunksUseCase,
+            SearchRelevantChunksUseCase,
         )
 
-        return RetrieveChunksUseCase(self.store)
+        return SearchRelevantChunksUseCase(self.store)
 
     # /** Histórico: v1 — verifica que resposta e citação reproduzem a evidência recuperada. */
     def test_answer_contains_retrieved_excerpt_and_citation(self) -> None:

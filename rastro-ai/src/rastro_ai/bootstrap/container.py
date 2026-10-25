@@ -9,8 +9,10 @@ from ..document_indexing.application.ports import VectorStore
 from ..document_indexing.application.use_cases.answer_question import (
     AnswerQuestionUseCase,
 )
-from ..document_indexing.application.use_cases.index_document import IndexDocumentUseCase
-from ..document_indexing.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
+from ..document_indexing.application.use_cases.extract_and_chunk_document import (
+    ExtractAndChunkDocumentUseCase,
+)
+from ..document_indexing.application.use_cases.retrieve_chunks import SearchRelevantChunksUseCase
 from ..document_indexing.infrastructure.chunking.langchain_text_chunker import (
     LangChainTextChunker,
 )
@@ -21,7 +23,7 @@ from ..document_indexing.infrastructure.extraction.utf8_file_text_extractor impo
     Utf8FileTextExtractor,
 )
 from ..document_indexing.infrastructure.retrieval.postgres_vector_store import (
-    PostgresVectorStore,
+    PostgresChunkVectorStore,
 )
 
 
@@ -37,7 +39,7 @@ class IndexingContainer:
 
     text_extractor: Utf8FileTextExtractor
     text_chunker: LangChainTextChunker
-    index_document: IndexDocumentUseCase
+    extract_and_chunk_document: ExtractAndChunkDocumentUseCase
 
 
 # /**
@@ -46,11 +48,11 @@ class IndexingContainer:
 #  * Histórico: v1 — cria o container explícito do fluxo de retrieval.
 #  */
 @dataclass(frozen=True, slots=True)
-class RetrievalContainer:
-    """Expõe as dependências compostas para retrieval e respostas."""
+class SemanticSearchContainer:
+    """Expõe as dependências compostas para busca semântica e respostas."""
 
     vector_store: VectorStore
-    retrieve_chunks: RetrieveChunksUseCase
+    search_relevant_chunks: SearchRelevantChunksUseCase
     answer_question: AnswerQuestionUseCase
 
 
@@ -67,7 +69,9 @@ def build_indexing_container() -> IndexingContainer:
     return IndexingContainer(
         text_extractor=text_extractor,
         text_chunker=text_chunker,
-        index_document=IndexDocumentUseCase(text_extractor, text_chunker),
+        extract_and_chunk_document=ExtractAndChunkDocumentUseCase(
+            text_extractor, text_chunker
+        ),
     )
 
 
@@ -77,20 +81,20 @@ def build_indexing_container() -> IndexingContainer:
 #  * preservando a importação segura das fachadas e mantendo o backend PostgreSQL obrigatório.
 #  * Histórico: v1 — move a seleção do backend para o composition root.
 #  */
-def build_retrieval_container() -> RetrievalContainer:
+def build_semantic_search_container() -> SemanticSearchContainer:
     """Retorna o container vetorial configurado explicitamente pelo ambiente."""
 
     backend = environ.get("VECTOR_STORE_BACKEND", "").strip().casefold()
     if backend != "postgres":
         raise ValueError("VECTOR_STORE_BACKEND must be 'postgres'")
 
-    vector_store = PostgresVectorStore.from_environment(
+    vector_store = PostgresChunkVectorStore.from_environment(
         OpenAIEmbeddingRepository.from_environment()
     )
-    retrieve_chunks = RetrieveChunksUseCase(vector_store)
-    return RetrievalContainer(
+    search_relevant_chunks = SearchRelevantChunksUseCase(vector_store)
+    return SemanticSearchContainer(
         vector_store=vector_store,
-        retrieve_chunks=retrieve_chunks,
-        answer_question=AnswerQuestionUseCase(retrieve_chunks),
+        search_relevant_chunks=search_relevant_chunks,
+        answer_question=AnswerQuestionUseCase(search_relevant_chunks),
     )
 

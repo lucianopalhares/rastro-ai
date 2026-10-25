@@ -46,7 +46,7 @@ def chunk_text(
 #  * Mantém a indexação de arquivo e permite associar seus chunks a um projeto.
 #  * Histórico: v1 — adiciona `project_id` sem quebrar chamadas existentes.
 #  */
-def index_document(
+def extract_and_chunk_document(
     document_id: str,
     path: str | Path,
     *,
@@ -58,7 +58,7 @@ def index_document(
 ) -> tuple[DocumentChunk, ...]:
     """Extrai um arquivo e gera seus chunks em uma única operação determinística."""
 
-    return build_indexing_container().index_document.execute(
+    return build_indexing_container().extract_and_chunk_document.execute(
         document_id,
         path,
         project_id=project_id,
@@ -70,11 +70,12 @@ def index_document(
 
 
 # /**
-#  * Indexa os chunks produzidos no vector store compartilhado pelo processo Python.
-#  * Existe para unir extração, chunking e persistência no boundary recebido pela API.
+#  * Extrai, divide e persiste os chunks de um documento no vector store.
+#  * Existe para unir preparação documental e persistência no boundary recebido pela API.
 #  * Histórico: v1 — adiciona a operação de indexação ponta a ponta.
+#  * Histórico: v2 — renomeia a operação para explicitar extração, chunking e persistência.
 #  */
-def index_document_in_store(
+def extract_chunk_and_persist_document(
     document_id: str,
     path: str | Path,
     *,
@@ -86,9 +87,9 @@ def index_document_in_store(
 ) -> tuple[DocumentChunk, ...]:
     """Extrai, divide e persiste os chunks de um documento."""
 
-    from .retrieval import index_chunks
+    from .retrieval import persist_document_chunks
 
-    chunks = index_document(
+    chunks = extract_and_chunk_document(
         document_id,
         path,
         project_id=project_id,
@@ -97,5 +98,5 @@ def index_document_in_store(
         max_tokens=max_tokens,
         overlap_tokens=overlap_tokens,
     )
-    index_chunks(chunks)
+    persist_document_chunks(chunks)
     return chunks

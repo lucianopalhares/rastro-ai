@@ -38,7 +38,7 @@ class ServiceTests(unittest.TestCase):
         handler.send_header = lambda *_args: None
         handler.end_headers = lambda: None
 
-        with patch("rastro_ai.service.index_document_in_store", return_value=(object(),)) as index:
+        with patch("rastro_ai.service.extract_chunk_and_persist_document", return_value=(object(),)) as index:
             handler.do_POST()
 
         self.assertEqual(handler.response_status, 200)

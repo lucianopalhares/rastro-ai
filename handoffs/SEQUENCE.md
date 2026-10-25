@@ -42,12 +42,13 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
 | --- | --- | --- | --- | --- | --- |
 | 14 | `016-reorganizar-arquitetura-python` | `ia` | `verified` | `015` | composition root explícito, fachadas sem estado global no import e testes/evaluation preservados |
-| 15 | `017-consolidar-namespaces-python` | `ia` | `proposed` | `016` | um namespace canônico por capacidade, aliases de compatibilidade documentados e imports internos consolidados |
-| 16 | `018-separar-orquestracao-python` | `ia` | `proposed` | `017` | workflows LangGraph isolados de casos de uso, estado e políticas de retry/observabilidade definidos |
-| 17 | `019-reorganizar-evaluation-python` | `ia` | `proposed` | `018` | runners, datasets, métricas e baselines separados, com evaluation determinística e avaliação semântica extensível |
+| 15 | `017-renomear-fluxo-extracao-chunking` | `ia` | `verified` | `016` | nomes distinguem extração/chunking de persistência e todos os imports internos usam o vocabulário novo |
+| 16 | `018-consolidar-namespaces-python` | `ia` | `proposed` | `017` | um namespace canônico por capacidade, aliases de compatibilidade documentados e imports internos consolidados |
+| 17 | `019-separar-orquestracao-python` | `ia` | `proposed` | `018` | workflows LangGraph isolados de casos de uso, estado e políticas de retry/observabilidade definidos |
+| 18 | `020-reorganizar-evaluation-python` | `ia` | `proposed` | `019` | runners, datasets, métricas e baselines separados, com evaluation determinística e avaliação semântica extensível |
 
 ## Estado ativo
 
-- Implementação ativa: `017-consolidar-namespaces-python`.
+- Implementação ativa: `017-renomear-fluxo-extracao-chunking`.
 - Dependência: `016-reorganizar-arquitetura-python` está `verified`.
-- Critério da próxima etapa: consolidar o namespace canônico e confirmar compatibilidade dos imports antes de mover workflows ou evaluation.
+- Critério da etapa: validar a semântica dos nomes e preservar o fluxo API → Python → PGVector antes de consolidar namespaces.

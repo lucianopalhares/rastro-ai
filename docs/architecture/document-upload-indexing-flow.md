@@ -70,13 +70,13 @@ IndexingRequestHandler.do_POST()
 ├── _required_string(document, 'content')
 ├── tempfile.NamedTemporaryFile()
 │
-└── index_document_in_store()
-    ├── index_document()
+└── extract_chunk_and_persist_document()
+    ├── extract_and_chunk_document()
     │   ├── bootstrap.build_indexing_container()
     │   │   ├── Utf8FileTextExtractor()
     │   │   ├── LangChainTextChunker()
-    │   │   └── IndexDocumentUseCase(extractor, chunker)
-    │   └── IndexDocumentUseCase.execute()
+    │   │   └── ExtractAndChunkDocumentUseCase(extractor, chunker)
+    │   └── ExtractAndChunkDocumentUseCase.execute()
     │       ├── Utf8FileTextExtractor.extract()
     │       │   ├── lê UTF-8
     │       │   └── normalize_text()
@@ -86,12 +86,12 @@ IndexingRequestHandler.do_POST()
     │           ├── splitter.create_documents(...)
     │           └── DocumentChunk(...)
     │
-    └── retrieval.index_chunks()
-        └── bootstrap.build_retrieval_container()
+    └── persist_document_chunks()
+        └── bootstrap.build_semantic_search_container()
             ├── valida VECTOR_STORE_BACKEND=postgres
             ├── OpenAIEmbeddingRepository.from_environment()
-            ├── PostgresVectorStore.from_environment(...)
-            └── PostgresVectorStore.upsert()
+            ├── PostgresChunkVectorStore.from_environment(...)
+            └── PostgresChunkVectorStore.upsert()
                 ├── OpenAIEmbeddingRepository.embed()
                 │   └── OpenAIEmbeddings.embed_documents()
                 │       └── provider OpenAI /v1/embeddings
@@ -108,19 +108,19 @@ IndexingRequestHandler.do_POST()
 2. `_read_payload()` — lê os dados JSON da requisição.
 3. `_required_string()` — verifica se cada informação obrigatória existe.
 4. `tempfile.NamedTemporaryFile()` — cria um arquivo temporário para leitura.
-5. `index_document_in_store()` — coordena a criação dos pedaços e a gravação dos vetores.
-6. `index_document()` — solicita ao composition root as dependências de indexação.
-7. `build_indexing_container()` — monta extractor, chunker e `IndexDocumentUseCase` sem acessar banco ou provider externo.
-8. `IndexDocumentUseCase.execute()` — organiza a extração e a divisão do documento.
+5. `extract_chunk_and_persist_document()` — coordena a extração, a criação dos pedaços e a gravação dos vetores.
+6. `extract_and_chunk_document()` — solicita ao composition root as dependências de extração e chunking.
+7. `build_indexing_container()` — monta extractor, chunker e `ExtractAndChunkDocumentUseCase` sem acessar banco ou provider externo.
+8. `ExtractAndChunkDocumentUseCase.execute()` — organiza a extração e a divisão do documento.
 9. `Utf8FileTextExtractor.extract()` — abre o arquivo e lê seu conteúdo como texto.
 10. `normalize_text()` — limpa e padroniza o texto.
 11. `LangChainTextChunker.chunk()` — divide o texto em pedaços menores.
 12. `RecursiveCharacterTextSplitter` — escolhe os melhores pontos para separar o texto.
 13. `splitter.create_documents()` — produz os documentos menores.
 14. `DocumentChunk` — representa um pedaço do documento dentro da aplicação.
-15. `retrieval.index_chunks()` — solicita ao composition root as dependências de persistência.
-16. `build_retrieval_container()` — valida o backend PostgreSQL e monta embeddings, vector store e casos de uso.
-17. `PostgresVectorStore.upsert()` — prepara e grava os pedaços no banco vetorial.
+15. `persist_document_chunks()` — solicita ao composition root as dependências de persistência.
+16. `build_semantic_search_container()` — valida o backend PostgreSQL e monta embeddings, vector store e casos de uso.
+17. `PostgresChunkVectorStore.upsert()` — prepara e grava os pedaços no banco vetorial.
 18. `OpenAIEmbeddingRepository.embed()` — pede os vetores para o provider de embeddings.
 19. `OpenAIEmbeddings.embed_documents()` — usa o LangChain para fazer essa chamada.
 20. `provider OpenAI /v1/embeddings` — transforma cada texto em uma lista de números.
@@ -131,8 +131,8 @@ As fachadas `indexing.py` e `retrieval.py` não mantêm instâncias globais. A i
 ## Repository e provider
 
 ```text
-PostgresVectorStore
-└── RepositoryEmbeddings
+PostgresChunkVectorStore
+└── LangChainEmbeddingAdapter
     └── OpenAIEmbeddingRepository
         └── LangChain OpenAIEmbeddings
             └── provider externo OpenAI
@@ -140,8 +140,8 @@ PostgresVectorStore
 
 ### Explicação simples da relação entre repository e provider
 
-1. `PostgresVectorStore` — controla a gravação e a busca dos vetores.
-2. `RepositoryEmbeddings` — faz a ponte entre o banco vetorial e o repository de embeddings.
+1. `PostgresChunkVectorStore` — controla a gravação e a busca dos chunks vetorizados.
+2. `LangChainEmbeddingAdapter` — faz a ponte entre o PGVector e o contrato local de embeddings.
 3. `OpenAIEmbeddingRepository` — organiza a chamada ao serviço de embeddings.
 4. `LangChain OpenAIEmbeddings` — componente do LangChain que executa a integração.
 5. `provider externo OpenAI` — serviço que converte textos em vetores numéricos.
@@ -149,12 +149,12 @@ PostgresVectorStore
 Na API, `DocumentRepository` é atualmente fornecido por
 `InMemoryDocumentRepository`, portanto os metadados do documento permanecem
 em memória durante a execução do processo. A persistência vetorial acontece no
-serviço Python por meio de `PostgresVectorStore`, que recebe os embeddings do
+serviço Python por meio de `PostgresChunkVectorStore`, que recebe os embeddings do
 `OpenAIEmbeddingRepository` e delega a gravação ao `PGVector` do LangChain.
 
 O `OpenAIEmbeddingRepository` mantém as validações da aplicação, enquanto o
 `OpenAIEmbeddings` abstrai o transporte, batching e integração com o provider.
-O `PostgresVectorStore` mantém o isolamento por `project_id`, offsets,
+O `PostgresChunkVectorStore` mantém o isolamento por `project_id`, offsets,
 dimensão, metadata e IDs determinísticos antes de chamar o PGVector.
 
 ## Fora deste fluxo
@@ -170,7 +170,7 @@ arquivo -> texto -> chunks -> embeddings -> PGVector/PostgreSQL
 ## Arquivos de referência
 
 - API: [`documents.controller.ts`](../../rastro-api/src/modules/documents/presentation/documents.controller.ts), [`upload-document.use-case.ts`](../../rastro-api/src/modules/documents/application/upload-document.use-case.ts), [`http-document-indexer.ts`](../../rastro-api/src/modules/documents/infrastructure/http-document-indexer.ts).
-- Indexação: [`service.py`](../../rastro-ai/src/rastro_ai/service.py), [`indexing.py`](../../rastro-ai/src/rastro_ai/indexing.py), [`container.py`](../../rastro-ai/src/rastro_ai/bootstrap/container.py), [`index_document.py`](../../rastro-ai/src/rastro_ai/document_indexing/application/use_cases/index_document.py), [`langchain_text_chunker.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/chunking/langchain_text_chunker.py).
+- Indexação: [`service.py`](../../rastro-ai/src/rastro_ai/service.py), [`indexing.py`](../../rastro-ai/src/rastro_ai/indexing.py), [`container.py`](../../rastro-ai/src/rastro_ai/bootstrap/container.py), [`extract_and_chunk_document.py`](../../rastro-ai/src/rastro_ai/document_indexing/application/use_cases/extract_and_chunk_document.py), [`langchain_text_chunker.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/chunking/langchain_text_chunker.py).
 - Embeddings e vector store: [`openai_embedding_repository.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/embeddings/openai_embedding_repository.py), [`postgres_vector_store.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/retrieval/postgres_vector_store.py), [`retrieval.py`](../../rastro-ai/src/rastro_ai/retrieval.py).
 
 ## Observação operacional

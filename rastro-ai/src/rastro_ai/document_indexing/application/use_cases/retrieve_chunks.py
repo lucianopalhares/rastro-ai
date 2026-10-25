@@ -11,8 +11,8 @@ from ..ports import VectorStore
 #  * Existe para manter validações e isolamento por projeto fora da infraestrutura.
 #  * Histórico: v1 — adiciona consulta vetorial determinística por projeto.
 #  */
-class RetrieveChunksUseCase:
-    """Consulta chunks indexados sem conhecer a implementação do store."""
+class SearchRelevantChunksUseCase:
+    """Busca chunks relevantes sem conhecer a implementação do store."""
 
     # /** Histórico: v1 — injeta o contrato de store sem acoplar infraestrutura. */
     def __init__(self, vector_store: VectorStore) -> None:

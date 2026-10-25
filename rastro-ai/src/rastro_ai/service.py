@@ -8,7 +8,7 @@ import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from .indexing import index_document_in_store
+from .indexing import extract_chunk_and_persist_document
 
 
 # /**
@@ -52,7 +52,7 @@ class IndexingRequestHandler(BaseHTTPRequestHandler):
             with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=suffix) as file:
                 file.write(content)
                 file.flush()
-                chunks = index_document_in_store(
+                chunks = extract_chunk_and_persist_document(
                     document_id,
                     file.name,
                     project_id=project_id,

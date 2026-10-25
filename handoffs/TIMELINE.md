@@ -616,5 +616,41 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Commit: `ceb639e` — `Reorganizar arquitetura do serviço Python`.
 - Próxima ação: `017-consolidar-namespaces-python`; `CURRENT.md` avançado para `017`.
 - Pasta: `handoffs/016-reorganizar-arquitetura-python/`.
+
+## 017 — Renomear fluxo de extração e chunking
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`) e documentação arquitetural.
+- Por que foi feita: distinguir geração de chunks da persistência vetorial nos nomes do código.
+- Impactos: fachadas, caso de uso, serviço, exports, testes e documentos usam `extract_and_chunk_document` e `index_document_chunks`.
+- Resolve: elimina a ambiguidade de `index_document()` e `index_document_in_store()` sem alterar o runtime funcional.
+- Verificação: testes, evaluation, compilação, busca de referências e hook estrutural registrados na versão `017/v1`.
+- Pasta: `handoffs/017-renomear-fluxo-extracao-chunking/` | Próxima ação: verificar e finalizar `017`.
+
+## 017 — Nomenclatura semântica verificada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`) e documentação arquitetural.
+- Verificação: 36 testes, evaluation `20/20`, compilação, imports semânticos, ausência de referências ativas antigas e hook estrutural aprovados.
+- Pendências: imports externos dos nomes antigos precisam migrar; smoke externo não foi repetido nesta rodada.
+- Pasta: `handoffs/017-renomear-fluxo-extracao-chunking/` | Próxima ação: finalizar `017` antes de ativar `018`.
+
+## 017 — Renomeação verificada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`) e documentação arquitetural.
+- Verificação: 36 testes, evaluation `20/20`, compilação, imports novos, ausência de referências antigas e hook estrutural aprovados.
+- Pendências: consumidores externos dos nomes antigos precisam migrar; nenhuma alteração externa foi executada.
+- Pasta: `handoffs/017-renomear-fluxo-extracao-chunking/` | Próxima ação: finalizar `017` antes de ativar `018`.
+
+## 017 — Nomenclatura semântica aplicada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`) e documentação arquitetural.
+- Por que foi feita: tornar explícitas as responsabilidades de persistência, busca, containers, stores e adapters.
+- Impactos: nomes internos e exports mudaram; contrato HTTP, embeddings, PGVector e evaluation permanecem iguais.
+- Resolve: elimina a ambiguidade de `retrieval.index_chunks()` e dos nomes genéricos de vector stores.
+- Verificação: testes, evaluation, compilação, busca de referências e hook estrutural registrados em `017/v2`.
+- Pasta: `handoffs/017-renomear-fluxo-extracao-chunking/` | Próxima ação: verificar e finalizar `017`.
 - Commit: `e6858d7` — `Reorganizar arquitetura do serviço Python`.
 - Verificação: commit criado com lista explícita dos arquivos da implementação.
