@@ -1,11 +1,11 @@
 # Estado das aplicações do Rastro AI
 
-- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para `012-integrar-upload-indexacao-python`.
+- Raiz: a iniciativa está na Fase 1; `CURRENT.md` mantém a última implementação finalizada `015-adaptar-chunking-para-langchain` até a abertura de uma nova tarefa.
 - API (`rastro-api`): a tarefa `004` está `verified`; a API recebe `.md` e `.txt` não vazios, armazena localmente, associa ao projeto/documento e retorna `status: pending`.
 - Frontend (`rastro-front`): nenhuma capacidade desta sequência foi aplicada ainda.
-- IA (`rastro-ai`): extração/chunking, retrieval lexical determinístico e respostas extrativas com citações estão verificados; evaluation é a próxima etapa.
+- IA (`rastro-ai`): extração/chunking, embeddings e PGVector com LangChain, retrieval e respostas extrativas com citações estão verificados; reranking, chains, prompts e LangGraph permanecem preparados para evolução futura.
 - Invariantes atuais: o upload preserva o arquivo original, envia o conteúdo ao indexador Python e retorna `ready` ou `failed`; retry assíncrono permanece fora do escopo.
-- Próxima capacidade: nenhuma tarefa sucessora foi ativada; retry, idempotência e processamento assíncrono ficam como evolução futura.
+- Próxima capacidade: nenhuma sucessora está ativa; reranking, chains, prompts, LangGraph, retry, idempotência e processamento assíncrono ficam como evolução futura.
 
 ## Implementações registradas
 
@@ -20,7 +20,8 @@
 | `007` | `respostas-com-citacoes` | `ia` | `verified` |
 | `011` | `persistencia-vetorial-pgvector` | `root`/`ia` | `verified` |
 | `012` | `integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` |
-| `014` | `exigir-pgvector-no-runtime` | `ia` | `proposed` |
+| `014` | `exigir-pgvector-no-runtime` | `ia` | `verified` |
+| `015` | `adaptar-chunking-para-langchain` | `ia` | `verified` |
 
 ## Padrão de validação para novas versões
 
