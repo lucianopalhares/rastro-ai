@@ -36,5 +36,5 @@
 - Arquivos: aplicação Python, testes, documentação e handoffs `016/v1` e `016/v2` conferidos; implementações anteriores preservadas.
 - Pendências: consumidores externos dos aliases removidos não foram pesquisados fora do repositório; sem deploy ou migração.
 - Próxima etapa: `017-consolidar-namespaces-python`; `CURRENT.md` avançado para `017`.
-- Commit: `e6858d7` — `Reorganizar arquitetura do serviço Python`.
+- Commit: `ceb639e` — `Reorganizar arquitetura do serviço Python`.
 - Verificação do commit: lista explícita de 50 arquivos da implementação; alterações não relacionadas ficaram fora do índice.

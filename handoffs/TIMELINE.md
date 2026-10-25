@@ -613,7 +613,7 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Data/hora: 2026-10-25 -03:00 | Status: `verified`.
 - Aplicação afetada: IA (`rastro-ai`).
 - Verificação: testes, evaluation `20/20`, compilação, imports canônicos, rejeição dos aliases removidos, hook e `git diff --check` aprovados.
-- Commit: será registrado após a criação explícita com os arquivos da implementação.
+- Commit: `ceb639e` — `Reorganizar arquitetura do serviço Python`.
 - Próxima ação: `017-consolidar-namespaces-python`; `CURRENT.md` avançado para `017`.
 - Pasta: `handoffs/016-reorganizar-arquitetura-python/`.
 - Commit: `e6858d7` — `Reorganizar arquitetura do serviço Python`.
