@@ -536,7 +536,7 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 ## 015 — Commit criado
 
 - Data/hora: 2026-10-25 -03:00 | Status: `verified`.
-- Commit: `607a22c` — `Consolidar fluxo LangChain de indexação`.
+- Commit: `73bbec1` — `Consolidar fluxo LangChain de indexação`.
 - Verificação: lista explícita da implementação commitada; alterações não relacionadas permaneceram fora do índice.
 - Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: nenhuma.
 

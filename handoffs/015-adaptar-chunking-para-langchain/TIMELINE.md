@@ -99,5 +99,5 @@
 
 - Data/hora: 2026-10-25 -03:00.
 - Status: `verified`.
-- Commit: `607a22c` — `Consolidar fluxo LangChain de indexação`.
+- Commit: `73bbec1` — `Consolidar fluxo LangChain de indexação`.
 - Verificação: commit criado com lista explícita de 48 arquivos da implementação; alterações não relacionadas permaneceram fora do índice.
