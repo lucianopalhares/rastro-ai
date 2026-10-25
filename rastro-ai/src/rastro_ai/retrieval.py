@@ -3,39 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from os import environ
-
-from .semantic_search.application.use_cases.answer_question import (
-    Answer,
-    AnswerQuestionUseCase,
-)
-from .semantic_search.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
-from .documents.domain.entities import DocumentChunk, RetrievedChunk
-# /**
-#  * Seleciona o store persistente exigido pelo runtime para indexação e busca semântica.
-#  * Existe para impedir que uma configuração ausente ou inválida degrade silenciosamente para busca lexical.
-#  * Histórico: v1 — adiciona `VECTOR_STORE_BACKEND=postgres` com embeddings locais.
-#  * v2 — seleciona o repository externo OpenAI para o backend persistente.
-#  * v3 — remove o fallback implícito em memória e exige `postgres` no runtime.
-#  */
-def _build_vector_store():
-    """Cria o backend persistente conforme a configuração explícita do processo."""
-
-    backend = environ.get("VECTOR_STORE_BACKEND", "").strip().casefold()
-    if backend != "postgres":
-        raise ValueError("VECTOR_STORE_BACKEND must be 'postgres'")
-
-    from .embeddings.infrastructure.openai.repository import OpenAIEmbeddingRepository
-    from .semantic_search.infrastructure.pgvector.repository import PostgresVectorStore
-
-    return PostgresVectorStore.from_environment(
-        OpenAIEmbeddingRepository.from_environment()
-    )
-
-
-_vector_store = _build_vector_store()
-_retrieve_chunks = RetrieveChunksUseCase(_vector_store)
-_answer_question = AnswerQuestionUseCase(_retrieve_chunks)
+from .bootstrap.container import build_retrieval_container
+from .document_indexing.application.use_cases.answer_question import Answer
+from .document_indexing.domain.entities import DocumentChunk, RetrievedChunk
 
 
 # /**
@@ -45,7 +15,7 @@ _answer_question = AnswerQuestionUseCase(_retrieve_chunks)
 def index_chunks(chunks: Sequence[DocumentChunk]) -> None:
     """Disponibiliza chunks para consultas posteriores no processo."""
 
-    _vector_store.upsert(chunks)
+    build_retrieval_container().vector_store.upsert(chunks)
 
 
 # /**
@@ -55,7 +25,7 @@ def index_chunks(chunks: Sequence[DocumentChunk]) -> None:
 def retrieve_chunks(project_id: str, query: str, *, limit: int = 5) -> tuple[RetrievedChunk, ...]:
     """Retorna resultados ordenados pela similaridade vetorial do repository configurado."""
 
-    return _retrieve_chunks.execute(project_id, query, limit=limit)
+    return build_retrieval_container().retrieve_chunks.execute(project_id, query, limit=limit)
 
 
 # /**
@@ -65,4 +35,6 @@ def retrieve_chunks(project_id: str, query: str, *, limit: int = 5) -> tuple[Ret
 def answer_question(project_id: str, question: str, *, limit: int = 5) -> Answer:
     """Retorna evidências citáveis ou informa que não há suporte documental."""
 
-    return _answer_question.execute(project_id, question, limit=limit)
+    return build_retrieval_container().answer_question.execute(
+        project_id, question, limit=limit
+    )

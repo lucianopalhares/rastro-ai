@@ -203,8 +203,10 @@ class IndexingTests(unittest.TestCase):
         self.assertTrue(all(chunk.project_id == "project-1" for chunk in chunks))
 
     # /**
-    #  * Confirma que a operação ponta a ponta envia os chunks ao vector store.
+    #  * Confirma que a operação ponta a ponta envia os chunks ao boundary de persistência.
     #  * Histórico: v1 — cobre a integração entre indexação e persistência.
+    #  * Histórico: v2 — deixa de observar a criação implícita do PGVector durante o import;
+    #  * a composição do backend passa a ser responsabilidade do container explícito.
     #  */
     def test_index_document_in_store_persists_chunks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -218,13 +220,10 @@ class IndexingTests(unittest.TestCase):
                     "DATABASE_URL": "postgresql://test/test",
                     "OPENAI_API_KEY": "test-key",
                 },
-            ), patch(
-                "rastro_ai.document_indexing.infrastructure.retrieval.postgres_vector_store.PGVector"
-            ) as pgvector, patch("rastro_ai.retrieval.index_chunks") as index_chunks:
+            ), patch("rastro_ai.retrieval.index_chunks") as index_chunks:
                 chunks = index_document_in_store("doc-1", path, project_id="project-1")
 
             index_chunks.assert_called_once_with(chunks)
-            pgvector.assert_called_once()
             self.assertEqual(chunks[0].project_id, "project-1")
 
     def test_infrastructure_adapter_is_composable(self) -> None:

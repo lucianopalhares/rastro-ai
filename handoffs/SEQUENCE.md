@@ -36,3 +36,18 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 11 | `013-configurar-debug-python-api-vscode` | `root`/`api`/`ia` | `verified` | `012` | Docker, inspector Node, debugpy, requests API/Python e fluxo API → Python documentados e verificados |
 | 12 | `014-exigir-pgvector-no-runtime` | `ia` | `verified` | `013` | runtime Python exige pgvector/embeddings, fallback lexical não é selecionado silenciosamente e testes/smoke comprovam a configuração |
 | 13 | `015-adaptar-chunking-para-langchain` | `ia` | `verified` | `014` | caso de uso usa `TextChunker`, adaptador LangChain preserva chunks/offsets, PGVector persiste na coleção LangChain e schema legado foi removido |
+
+## Fase 2 — Organização evolutiva do serviço Python
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 14 | `016-reorganizar-arquitetura-python` | `ia` | `verified` | `015` | composition root explícito, fachadas sem estado global no import e testes/evaluation preservados |
+| 15 | `017-consolidar-namespaces-python` | `ia` | `proposed` | `016` | um namespace canônico por capacidade, aliases de compatibilidade documentados e imports internos consolidados |
+| 16 | `018-separar-orquestracao-python` | `ia` | `proposed` | `017` | workflows LangGraph isolados de casos de uso, estado e políticas de retry/observabilidade definidos |
+| 17 | `019-reorganizar-evaluation-python` | `ia` | `proposed` | `018` | runners, datasets, métricas e baselines separados, com evaluation determinística e avaliação semântica extensível |
+
+## Estado ativo
+
+- Implementação ativa: `017-consolidar-namespaces-python`.
+- Dependência: `016-reorganizar-arquitetura-python` está `verified`.
+- Critério da próxima etapa: consolidar o namespace canônico e confirmar compatibilidade dos imports antes de mover workflows ou evaluation.

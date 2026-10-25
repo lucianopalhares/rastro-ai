@@ -19,13 +19,11 @@ O caso de uso não conhece o sistema de arquivos diretamente: recebe um extrator
 
 ## Organização dos módulos
 
-- `documents/`: entidades compartilhadas de documentos e chunks;
-- `chunking/`: política estrutural de divisão e offsets;
-- `embeddings/`: porta agnóstica e adapters de providers externos;
-- `semantic_search/`: retrieval, resposta e repositories de memória/pgvector;
-- `document_ingestion/`: orquestração de extração e chunking.
+- `document_indexing/`: namespace canônico atual para entidades, portas, casos de uso e adapters;
+- `bootstrap/`: composition root que monta os fluxos de indexação e retrieval;
+- `indexing.py` e `retrieval.py`: fachadas públicas mantidas para o runtime e consumidores do pacote.
 
-`document_indexing/` permanece como namespace de compatibilidade para consumidores antigos; o código de produção importa os novos limites por capacidade.
+Os namespaces duplicados `chunking`, `documents`, `document_ingestion`, `embeddings` e `semantic_search` foram removidos nesta reorganização; consumidores externos devem migrar para as fachadas públicas ou para `document_indexing`.
 
 ## O que muda na aplicação
 

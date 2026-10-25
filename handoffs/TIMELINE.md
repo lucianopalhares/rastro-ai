@@ -579,3 +579,42 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: uma única estratégia de chunking nos caminhos públicos, com teste dedicado.
 - Verificação: 31 testes, evaluation `20/20` e compilação aprovados; hook estrutural válido.
 - Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: solicitar finalização e gerar commit explícito.
+
+## 016 — Composition root do serviço Python
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: preparar a evolução para orquestração e evaluation sem criar infraestrutura durante imports.
+- Impactos: containers explícitos para indexação e retrieval; API pública e contratos atuais preservados.
+- Resolve: remove instâncias globais das fachadas e move a validação do backend para a composição do runtime.
+- Verificação: unittest, evaluation, compilação, importação segura e hook estrutural registrados na versão `016/v1`.
+- Pasta: `handoffs/016-reorganizar-arquitetura-python/` | Próxima ação: finalizar `016` antes de ativar `017`.
+
+## 016 — Composition root verificado
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Verificação: 36 testes, evaluation `20/20`, importação segura sem backend, compilação, `git diff --check` e hook estrutural aprovados.
+- Pendências: namespaces, workflows e evaluation permanecem planejados e não foram aplicados nesta etapa.
+- Pasta: `handoffs/016-reorganizar-arquitetura-python/` | Próxima ação: executar `skill finalizar tarefa 016` para encerrar e criar o commit explícito.
+
+## 016 — Duplicações removidas e verificado
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: eliminar aliases sem consumidores internos e provider de embeddings não utilizado.
+- Impactos: namespaces antigos deixam de ser importáveis; fachadas públicas e `document_indexing` permanecem como caminhos suportados.
+- Resolve: reduz caminhos duplicados para entidades, casos de uso, adapters e chunking.
+- Verificação: 36 testes, evaluation `20/20`, compilação e busca de referências residuais aprovados.
+- Pasta: `handoffs/016-reorganizar-arquitetura-python/` | Próxima ação: confirmar consumidores externos e finalizar `016`.
+
+## 016 — Finalizada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Verificação: testes, evaluation `20/20`, compilação, imports canônicos, rejeição dos aliases removidos, hook e `git diff --check` aprovados.
+- Commit: será registrado após a criação explícita com os arquivos da implementação.
+- Próxima ação: `017-consolidar-namespaces-python`; `CURRENT.md` avançado para `017`.
+- Pasta: `handoffs/016-reorganizar-arquitetura-python/`.
+- Commit: `e6858d7` — `Reorganizar arquitetura do serviço Python`.
+- Verificação: commit criado com lista explícita dos arquivos da implementação.

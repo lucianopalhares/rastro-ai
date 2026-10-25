@@ -5,7 +5,7 @@
 - Frontend (`rastro-front`): nenhuma capacidade desta sequência foi aplicada ainda.
 - IA (`rastro-ai`): extração/chunking, embeddings e PGVector com LangChain, retrieval e respostas extrativas com citações estão verificados; reranking, chains, prompts e LangGraph permanecem preparados para evolução futura.
 - Invariantes atuais: o upload preserva o arquivo original, envia o conteúdo ao indexador Python e retorna `ready` ou `failed`; retry assíncrono permanece fora do escopo.
-- Próxima capacidade: nenhuma sucessora está ativa; reranking, chains, prompts, LangGraph, retry, idempotência e processamento assíncrono ficam como evolução futura.
+- Próxima capacidade ativa: `017-consolidar-namespaces-python`; a implementação `016-reorganizar-arquitetura-python` foi verificada e finalizada.
 
 ## Implementações registradas
 
@@ -22,6 +22,7 @@
 | `012` | `integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` |
 | `014` | `exigir-pgvector-no-runtime` | `ia` | `verified` |
 | `015` | `adaptar-chunking-para-langchain` | `ia` | `verified` |
+| `016` | `reorganizar-arquitetura-python` | `ia` | `verified` |
 
 ## Padrão de validação para novas versões
 

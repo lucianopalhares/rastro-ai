@@ -3,21 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
-from .documents.domain.entities import DocumentChunk
-from .document_ingestion.application.use_cases.index_document import IndexDocumentUseCase
-from .document_ingestion.infrastructure.extraction.utf8_file_text_extractor import (
-    Utf8FileTextExtractor,
-)
-from .document_indexing.infrastructure.chunking.langchain_text_chunker import LangChainTextChunker
-
-_index_document = IndexDocumentUseCase(Utf8FileTextExtractor(), LangChainTextChunker())
-_text_chunker = LangChainTextChunker()
+from .bootstrap.container import build_indexing_container
+from .document_indexing.domain.entities import DocumentChunk
 
 
 def extract_text(path: str | Path) -> str:
     """Mantém a API legada enquanto delega a leitura ao adaptador de infraestrutura."""
 
-    return Utf8FileTextExtractor().extract(path)
+    return build_indexing_container().text_extractor.extract(path)
 
 
 # /**
@@ -38,7 +31,7 @@ def chunk_text(
 ) -> tuple[DocumentChunk, ...]:
     """Mantém a API legada enquanto delega ao adaptador de chunking configurado."""
 
-    return _text_chunker.chunk(
+    return build_indexing_container().text_chunker.chunk(
         text,
         document_id=document_id,
         project_id=project_id,
@@ -65,7 +58,7 @@ def index_document(
 ) -> tuple[DocumentChunk, ...]:
     """Extrai um arquivo e gera seus chunks em uma única operação determinística."""
 
-    return _index_document.execute(
+    return build_indexing_container().index_document.execute(
         document_id,
         path,
         project_id=project_id,
