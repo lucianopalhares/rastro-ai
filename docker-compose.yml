@@ -27,6 +27,8 @@ services:
       PORT: 3000
       CORS_ORIGIN: '*'
       CHOKIDAR_USEPOLLING: 'true'
+      AI_INDEXING_URL: http://ai-indexer:8000/index
+      AI_INDEXING_TIMEOUT_MS: '60000'
     ports:
       - '3039:3000'
     volumes:
@@ -42,6 +44,32 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  ai-indexer:
+    build:
+      context: ./rastro-ai
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: python -m rastro_ai.service
+    environment:
+      PYTHONPATH: /app/src
+      AI_PORT: 8000
+      VECTOR_STORE_BACKEND: postgres
+      DATABASE_URL: postgresql://rastro:rastro@vector-db:5432/rastro
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      EMBEDDING_MODEL: text-embedding-3-small
+      EMBEDDING_DIMENSIONS: '384'
+    depends_on:
+      vector-db:
+        condition: service_healthy
+    ports:
+      - '${AI_INDEXER_PORT:-18473}:8000'
+    healthcheck:
+      test: ['CMD-SHELL', 'python -c "import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8000/health\")"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
 volumes:
   rastro_vector_db:

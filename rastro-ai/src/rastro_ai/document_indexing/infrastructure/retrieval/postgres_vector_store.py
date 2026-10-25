@@ -7,7 +7,7 @@ from os import environ
 from typing import Any
 
 from ...domain.entities import DocumentChunk, RetrievedChunk
-from ...application.ports import EmbeddingProvider
+from ...application.ports import EmbeddingRepository
 
 
 # /**
@@ -21,10 +21,10 @@ class PostgresVectorStore:
     def __init__(
         self,
         connection_factory: Callable[[], Any],
-        embedding_provider: EmbeddingProvider,
+        embedding_repository: EmbeddingRepository,
     ) -> None:
         self._connection_factory = connection_factory
-        self._embedding_provider = embedding_provider
+        self._embedding_repository = embedding_repository
 
     # /**
     #  * Cria um store configurado pelas variáveis de ambiente da aplicação.
@@ -32,7 +32,7 @@ class PostgresVectorStore:
     #  * Histórico: v1 — aceita DATABASE_URL ou SUPABASE_DB_URL e modelo configurável.
     #  */
     @classmethod
-    def from_environment(cls, embedding_provider: EmbeddingProvider) -> "PostgresVectorStore":
+    def from_environment(cls, embedding_repository: EmbeddingRepository) -> "PostgresVectorStore":
         """Monta o adaptador usando a URL de banco configurada."""
 
         database_url = environ.get("SUPABASE_DB_URL") or environ.get("DATABASE_URL")
@@ -44,7 +44,7 @@ class PostgresVectorStore:
 
             return psycopg.connect(database_url)
 
-        return cls(connect, embedding_provider)
+        return cls(connect, embedding_repository)
 
     # /**
     #  * Insere ou atualiza os chunks e seus embeddings em uma transação.
@@ -56,10 +56,12 @@ class PostgresVectorStore:
 
         with self._connection_factory() as connection:
             with connection.cursor() as cursor:
-                for chunk in chunks:
+                embeddings = self._embedding_repository.embed(tuple(chunk.content for chunk in chunks))
+                if len(embeddings) != len(chunks):
+                    raise ValueError("embedding count must match chunk count")
+                for chunk, embedding in zip(chunks, embeddings, strict=True):
                     if not chunk.project_id.strip():
                         raise ValueError("project_id is required")
-                    embedding = self._embedding_provider.embed(chunk.content)
                     self._validate_dimension(embedding)
                     cursor.execute(
                         """
@@ -92,7 +94,10 @@ class PostgresVectorStore:
     def search(self, project_id: str, query: str, *, limit: int) -> tuple[RetrievedChunk, ...]:
         """Retorna os chunks semanticamente mais próximos da consulta."""
 
-        embedding = self._embedding_provider.embed(query)
+        embeddings = self._embedding_repository.embed((query,))
+        if len(embeddings) != 1:
+            raise ValueError("query embedding count must be one")
+        embedding = embeddings[0]
         self._validate_dimension(embedding)
         with self._connection_factory() as connection:
             with connection.cursor() as cursor:

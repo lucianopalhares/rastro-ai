@@ -25,5 +25,11 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 
 ## Estado ativo
 
-- Implementação ativa: `009-observabilidade-e-custo`.
-- Próxima capacidade: observabilidade e custo permanecem em standby até nova autorização explícita.
+- Última implementação verificada: `012-integrar-upload-indexacao-python`.
+- Próxima capacidade: nenhuma tarefa sucessora foi ativada; aguardar nova autorização explícita.
+
+## Fase 1 — Integração de upload e indexação
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 10 | `012-integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` | `004`, `005`, `011` | upload dispara indexação Python; documento chega a `ready` ou `failed`; chunks ficam consultáveis e o fluxo é coberto por testes e smoke |

@@ -5,6 +5,7 @@ import { DocumentFileStorage } from './application/document-file.storage';
 import { DocumentRepository } from './application/document.repository';
 import { UploadDocumentUseCase } from './application/upload-document.use-case';
 import { InMemoryDocumentRepository } from './infrastructure/in-memory-document.repository';
+import { HttpDocumentIndexer } from './infrastructure/http-document-indexer';
 import { LocalDocumentFileStorage } from './infrastructure/local-document-file.storage';
 import { DocumentsController } from './presentation/documents.controller';
 
@@ -18,6 +19,7 @@ import { DocumentsController } from './presentation/documents.controller';
   providers: [
     InMemoryDocumentRepository,
     LocalDocumentFileStorage,
+    HttpDocumentIndexer,
     {
       provide: 'DocumentRepository',
       useExisting: InMemoryDocumentRepository,
@@ -37,8 +39,9 @@ import { DocumentsController } from './presentation/documents.controller';
       useFactory: (
         documentRepository: DocumentRepository,
         documentFileStorage: DocumentFileStorage,
-      ) => new UploadDocumentUseCase(documentRepository, documentFileStorage),
-      inject: ['DocumentRepository', 'DocumentFileStorage'],
+        documentIndexer: HttpDocumentIndexer,
+      ) => new UploadDocumentUseCase(documentRepository, documentFileStorage, documentIndexer),
+      inject: ['DocumentRepository', 'DocumentFileStorage', HttpDocumentIndexer],
     },
   ],
 })

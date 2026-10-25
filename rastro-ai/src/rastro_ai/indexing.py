@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from .document_indexing.application.use_cases.index_document import IndexDocumentUseCase
-from .document_indexing.domain.entities import DocumentChunk
-from .document_indexing.infrastructure.extraction.utf8_file_text_extractor import (
+from .documents.domain.entities import DocumentChunk
+from .document_ingestion.application.use_cases.index_document import IndexDocumentUseCase
+from .document_ingestion.infrastructure.extraction.utf8_file_text_extractor import (
     Utf8FileTextExtractor,
 )
 
@@ -21,18 +21,21 @@ def extract_text(path: str | Path) -> str:
 # /**
 #  * Mantém a fachada legada e propaga o projeto para os chunks produzidos.
 #  * Histórico: v1 — adiciona `project_id` para integração com retrieval.
+#  * Histórico: v2 — expõe orçamento de tokens do chunking estrutural.
 #  */
 def chunk_text(
     text: str,
     *,
     document_id: str,
     project_id: str = "",
-    chunk_size: int = 800,
-    overlap: int = 120,
+    chunk_size: int | None = None,
+    overlap: int | None = None,
+    max_tokens: int = 500,
+    overlap_tokens: int = 60,
 ) -> tuple[DocumentChunk, ...]:
     """Mantém a API legada enquanto delega a política ao serviço de domínio."""
 
-    from .document_indexing.domain.services import chunk_text as domain_chunk_text
+    from .chunking.domain.chunker import chunk_text as domain_chunk_text
 
     return domain_chunk_text(
         text,
@@ -40,6 +43,8 @@ def chunk_text(
         project_id=project_id,
         chunk_size=chunk_size,
         overlap=overlap,
+        max_tokens=max_tokens,
+        overlap_tokens=overlap_tokens,
     )
 
 
@@ -52,8 +57,10 @@ def index_document(
     path: str | Path,
     *,
     project_id: str = "",
-    chunk_size: int = 800,
-    overlap: int = 120,
+    chunk_size: int | None = None,
+    overlap: int | None = None,
+    max_tokens: int = 500,
+    overlap_tokens: int = 60,
 ) -> tuple[DocumentChunk, ...]:
     """Extrai um arquivo e gera seus chunks em uma única operação determinística."""
 
@@ -63,4 +70,38 @@ def index_document(
         project_id=project_id,
         chunk_size=chunk_size,
         overlap=overlap,
+        max_tokens=max_tokens,
+        overlap_tokens=overlap_tokens,
     )
+
+
+# /**
+#  * Indexa os chunks produzidos no vector store compartilhado pelo processo Python.
+#  * Existe para unir extração, chunking e persistência no boundary recebido pela API.
+#  * Histórico: v1 — adiciona a operação de indexação ponta a ponta.
+#  */
+def index_document_in_store(
+    document_id: str,
+    path: str | Path,
+    *,
+    project_id: str = "",
+    chunk_size: int | None = None,
+    overlap: int | None = None,
+    max_tokens: int = 500,
+    overlap_tokens: int = 60,
+) -> tuple[DocumentChunk, ...]:
+    """Extrai, divide e persiste os chunks de um documento."""
+
+    from .retrieval import index_chunks
+
+    chunks = index_document(
+        document_id,
+        path,
+        project_id=project_id,
+        chunk_size=chunk_size,
+        overlap=overlap,
+        max_tokens=max_tokens,
+        overlap_tokens=overlap_tokens,
+    )
+    index_chunks(chunks)
+    return chunks

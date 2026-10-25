@@ -5,33 +5,31 @@ from __future__ import annotations
 from collections.abc import Sequence
 from os import environ
 
-from .document_indexing.application.use_cases.answer_question import (
+from .semantic_search.application.use_cases.answer_question import (
     Answer,
     AnswerQuestionUseCase,
 )
-from .document_indexing.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
-from .document_indexing.domain.entities import DocumentChunk, RetrievedChunk
-from .document_indexing.infrastructure.retrieval.in_memory_vector_store import (
+from .semantic_search.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
+from .documents.domain.entities import DocumentChunk, RetrievedChunk
+from .semantic_search.infrastructure.memory.repository import (
     InMemoryVectorStore,
 )
-from .document_indexing.infrastructure.embeddings import SentenceTransformerEmbeddingProvider
-from .document_indexing.infrastructure.retrieval.postgres_vector_store import PostgresVectorStore
 
 # /**
 #  * Seleciona o store persistente quando configurado e mantém memória como fallback local.
 #  * Existe para preservar testes e desenvolvimento sem banco, sem esconder a configuração de produção.
 #  * Histórico: v1 — adiciona `VECTOR_STORE_BACKEND=postgres` com embeddings locais.
+#  * v2 — seleciona o repository externo OpenAI para o backend persistente.
 #  */
 def _build_vector_store():
     """Cria o backend de retrieval conforme a configuração do processo."""
 
     if environ.get("VECTOR_STORE_BACKEND", "memory").casefold() == "postgres":
-        model_name = environ.get(
-            "EMBEDDING_MODEL",
-            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-        )
+        from .embeddings.infrastructure.openai.repository import OpenAIEmbeddingRepository
+        from .semantic_search.infrastructure.pgvector.repository import PostgresVectorStore
+
         return PostgresVectorStore.from_environment(
-            SentenceTransformerEmbeddingProvider(model_name)
+            OpenAIEmbeddingRepository.from_environment()
         )
     return InMemoryVectorStore()
 
@@ -56,7 +54,7 @@ def index_chunks(chunks: Sequence[DocumentChunk]) -> None:
 #  * Histórico: v1 — expõe a consulta pública com limite configurável.
 #  */
 def retrieve_chunks(project_id: str, query: str, *, limit: int = 5) -> tuple[RetrievedChunk, ...]:
-    """Retorna resultados ordenados pela similaridade vetorial determinística."""
+    """Retorna resultados ordenados pela similaridade vetorial do repository configurado."""
 
     return _retrieve_chunks.execute(project_id, query, limit=limit)
 

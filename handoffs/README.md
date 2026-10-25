@@ -1,11 +1,11 @@
 # Estado das aplicações do Rastro AI
 
-- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para `008-evaluation-baseline`.
+- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para `012-integrar-upload-indexacao-python`.
 - API (`rastro-api`): a tarefa `004` está `verified`; a API recebe `.md` e `.txt` não vazios, armazena localmente, associa ao projeto/documento e retorna `status: pending`.
 - Frontend (`rastro-front`): nenhuma capacidade desta sequência foi aplicada ainda.
 - IA (`rastro-ai`): extração/chunking, retrieval lexical determinístico e respostas extrativas com citações estão verificados; evaluation é a próxima etapa.
-- Invariantes atuais: o upload não inicia extração nem indexação; o armazenamento local e o processamento assíncrono permanecem limitados ao escopo atual.
-- Próxima capacidade: `008-evaluation-baseline`, dependente das respostas com citações verificadas.
+- Invariantes atuais: o upload preserva o arquivo original, envia o conteúdo ao indexador Python e retorna `ready` ou `failed`; retry assíncrono permanece fora do escopo.
+- Próxima capacidade: nenhuma tarefa sucessora foi ativada; retry, idempotência e processamento assíncrono ficam como evolução futura.
 
 ## Implementações registradas
 
@@ -18,9 +18,11 @@
 | `005` | `extracao-e-chunking` | `ia` | `verified` |
 | `006` | `retrieval-vetorial-minimo` | `ia` | `verified` |
 | `007` | `respostas-com-citacoes` | `ia` | `verified` |
+| `011` | `persistencia-vetorial-pgvector` | `root`/`ia` | `verified` |
+| `012` | `integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` |
 
 ## Padrão de validação para novas versões
 
 Cada novo `vN/README.md` deve incluir `## Jornada da aplicação nesta versão`, `## Como usar e validar a aplicação nesta versão` e `## Cobertura por comportamento` antes de `## Instruções de validação`. Registre o propósito, a evolução para a pessoa usuária, o request completo ou os passos de frontend quando existirem e, caso a integração ainda não exista, a limitação e a validação executável disponível; handoffs históricos permanecem válidos sem retroatividade.
 
-Este resumo representa o estado funcional conhecido das aplicações e da raiz após a conclusão da tarefa `004`.
+Este resumo representa o estado funcional conhecido das aplicações e da raiz após a verificação da tarefa `012`; o runtime possui upload, indexação Python e persistência vetorial integrados.

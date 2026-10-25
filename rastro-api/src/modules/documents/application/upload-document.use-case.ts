@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Document } from '../domain/document';
 import { DocumentFileStorage } from './document-file.storage';
+import { DocumentIndexer } from './document-indexer';
 import { DocumentRepository } from './document.repository';
 
 /**
@@ -22,15 +23,21 @@ export interface UploadDocumentInput {
  * v1 = criou o fluxo síncrono mínimo antes da futura indexação assíncrona.
  */
 export class UploadDocumentUseCase {
+  /**
+   * Recebe persistência, armazenamento e indexação para compor o fluxo do upload.
+   * Histórico: v1 — adiciona a porta opcional de indexação para preservar testes e usos locais.
+   */
   constructor(
     private readonly documentRepository: DocumentRepository,
     private readonly documentFileStorage: DocumentFileStorage,
+    private readonly documentIndexer: DocumentIndexer = { index: async () => undefined },
   ) {}
 
   /**
-   * Grava os bytes, cria o documento e retorna seus dados serializáveis.
+   * Grava os bytes, indexa o documento e retorna seu estado serializável.
    *
    * v1 = aceitou somente arquivos não vazios com extensão `.md` ou `.txt`.
+   * v2 = encaminha o conteúdo ao Python e persiste `ready` ou `failed`.
    */
   async execute(input: UploadDocumentInput): Promise<ReturnType<Document['toJSON']>> {
     const extension = this.getSupportedExtension(input.originalName);
@@ -58,6 +65,15 @@ export class UploadDocumentUseCase {
         sizeBytes: input.sizeBytes,
       },
     });
+
+    document.changeStatus('processing');
+
+    try {
+      await this.documentIndexer.index(document.toJSON());
+      document.changeStatus('ready');
+    } catch (error) {
+      document.changeStatus('failed');
+    }
 
     await this.documentRepository.save(document);
     return document.toJSON();

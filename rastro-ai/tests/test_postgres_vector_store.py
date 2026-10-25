@@ -10,11 +10,11 @@ from rastro_ai.document_indexing.infrastructure.retrieval.postgres_vector_store 
 )
 
 
-class FakeEmbeddingProvider:
-    """Fornece vetores controlados sem baixar um modelo nos testes unitários."""
+class FakeEmbeddingRepository:
+    """Fornece vetores controlados sem chamar um provedor externo nos testes."""
 
-    def embed(self, text: str) -> tuple[float, ...]:
-        return (float(len(text)),) + (0.0,) * 383
+    def embed(self, texts: tuple[str, ...]) -> tuple[tuple[float, ...], ...]:
+        return tuple((float(len(text)),) + (0.0,) * 383 for text in texts)
 
 
 class FakeCursor:
@@ -58,7 +58,7 @@ class PostgresVectorStoreTests(unittest.TestCase):
     def setUp(self) -> None:
         self.cursor = FakeCursor()
         self.store = PostgresVectorStore(
-            lambda: FakeConnection(self.cursor), FakeEmbeddingProvider()
+            lambda: FakeConnection(self.cursor), FakeEmbeddingRepository()
         )
 
     def test_upsert_persists_chunk_with_vector(self) -> None:
@@ -82,8 +82,8 @@ class PostgresVectorStoreTests(unittest.TestCase):
 
     def test_rejects_incompatible_embedding_dimension(self) -> None:
         class InvalidEmbeddingProvider:
-            def embed(self, _text: str) -> tuple[float, ...]:
-                return (1.0,)
+            def embed(self, _texts: tuple[str, ...]) -> tuple[tuple[float, ...], ...]:
+                return ((1.0,),)
 
         store = PostgresVectorStore(
             lambda: FakeConnection(self.cursor), InvalidEmbeddingProvider()

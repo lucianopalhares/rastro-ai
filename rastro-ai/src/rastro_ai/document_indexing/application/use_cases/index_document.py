@@ -19,6 +19,7 @@ class IndexDocumentUseCase:
     # /**
     #  * Extrai e divide o documento, carregando o projeto no metadado de cada chunk.
     #  * Histórico: v1 — inclui `project_id` para preparar o isolamento do retrieval.
+    #  * Histórico: v2 — usa chunking estrutural por tokens por padrão.
     #  */
     def execute(
         self,
@@ -26,8 +27,10 @@ class IndexDocumentUseCase:
         path: str | Path,
         *,
         project_id: str = "",
-        chunk_size: int = 800,
-        overlap: int = 120,
+        chunk_size: int | None = None,
+        overlap: int | None = None,
+        max_tokens: int = 500,
+        overlap_tokens: int = 60,
     ) -> tuple[DocumentChunk, ...]:
         """Executa a indexação mantendo o domínio isolado de arquivos e frameworks."""
 
@@ -38,4 +41,6 @@ class IndexDocumentUseCase:
             project_id=project_id,
             chunk_size=chunk_size,
             overlap=overlap,
+            max_tokens=max_tokens,
+            overlap_tokens=overlap_tokens,
         )

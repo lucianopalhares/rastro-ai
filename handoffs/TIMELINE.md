@@ -419,3 +419,23 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: extensão, tabela, índices, upsert, consulta semântica e isolamento por projeto validados.
 - Verificação: container saudável, 21 testes, compilação, Compose, diff, hook e smoke real aprovados.
 - Pasta: `handoffs/011-persistencia-vetorial-pgvector/`
+
+## 012 — Integrar upload da API à indexação Python
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: API `rastro-api`, IA `rastro-ai` e raiz compartilhada se o transporte exigir.
+- Por que foi feita: registrar a próxima capacidade para que um arquivo enviado pela API seja indexado pela aplicação Python.
+- Impactos: API envia documentos ao serviço Python e persiste `ready`/`failed`; retry e idempotência automática não foram incluídos.
+- Resolve: conecta o upload `pending` à extração, chunking e persistência dos chunks.
+- Pasta: `handoffs/012-integrar-upload-indexacao-python/`
+
+## 012 — Integrar upload da API à indexação Python verificada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: API `rastro-api`, IA `rastro-ai` e raiz compartilhada.
+- Por que foi feita: confirmar ponta a ponta o upload, chunking, embeddings externos e persistência vetorial.
+- Impactos: documento curto gerou 1 chunk e documento longo gerou 3 chunks; ambos ficaram `ready` com embeddings de dimensão `384` no PostgreSQL.
+- Resolve: critério da integração confirmado com testes, compilação, build, Compose, smoke HTTP real e validação estrutural.
+- Verificação: API com 10 testes e build; Python com 26 testes, `compileall` e imports modulares; imagem Docker, Compose, banco e hook estrito aprovados.
+- Pendências: retry, idempotência explícita, processamento assíncrono e remoção dos wrappers legados.
+- Pasta: `handoffs/012-integrar-upload-indexacao-python/` | Próxima ação: aguardar nova autorização explícita.

@@ -11,20 +11,30 @@ O módulo `rastro_ai.document_indexing` usa uma organização DDD modular:
 - `infrastructure/`: adaptador `Utf8FileTextExtractor` para arquivos locais;
 - `infrastructure/retrieval/`: store vetorial determinístico em memória;
 - `infrastructure/retrieval/postgres_vector_store.py`: store persistente compatível com pgvector/Supabase;
-- `infrastructure/embeddings/`: embeddings locais multilíngues para a busca semântica;
+- `infrastructure/embeddings/`: repository agnóstico e adaptador OpenAI para embeddings externos;
 - `application/use_cases/answer_question.py`: resposta extrativa e citações verificáveis;
 - `rastro_ai/indexing.py` e `rastro_ai/retrieval.py`: fachadas públicas de indexação e consulta.
 
 O caso de uso não conhece o sistema de arquivos diretamente: recebe um extrator pela porta da aplicação. Isso permite trocar a origem futura por API, object storage ou worker sem alterar o domínio.
 
+## Organização dos módulos
+
+- `documents/`: entidades compartilhadas de documentos e chunks;
+- `chunking/`: política estrutural de divisão e offsets;
+- `embeddings/`: porta agnóstica e adapters de providers externos;
+- `semantic_search/`: retrieval, resposta e repositories de memória/pgvector;
+- `document_ingestion/`: orquestração de extração e chunking.
+
+`document_indexing/` permanece como namespace de compatibilidade para consumidores antigos; o código de produção importa os novos limites por capacidade.
+
 ## O que muda na aplicação
 
 - A lógica de negócio deixa de ficar concentrada em um único arquivo.
-- O chunking continua com o mesmo comportamento: tamanho padrão de 800 caracteres, sobreposição de 120 e offsets sobre o texto normalizado.
+- O chunking padrão agora privilegia títulos/parágrafos Markdown, usa `tiktoken` com orçamento real de 500 tokens, overlap de 60 tokens e preserva offsets; parâmetros legados `chunk_size`/`overlap` continuam disponíveis.
 - Chunks podem carregar `project_id`; `retrieve_chunks` filtra o projeto antes de ordenar por similaridade de cosseno sobre frequência de termos.
 - `answer_question` reproduz somente os trechos recuperados, inclui documento, índice e offsets nas citações e declara ausência de evidência quando nada é encontrado.
 - Apenas `.md` e `.txt` em UTF-8 são aceitos; arquivos vazios ou formatos não suportados falham.
-- O backend padrão continua síncrono e em memória; com `VECTOR_STORE_BACKEND=postgres`, chunks e embeddings são persistidos no PostgreSQL/pgvector e consultados semanticamente.
+- O backend padrão continua síncrono e em memória; com `VECTOR_STORE_BACKEND=postgres`, chunks e embeddings do `text-embedding-3-small` são persistidos no PostgreSQL/pgvector e consultados semanticamente.
 - A integração automática do upload da API com a indexação, workers, geração por LLM e observabilidade continuam fora desta etapa.
 
 ## Como testar
@@ -45,7 +55,7 @@ python3 -m compileall -q src tests
 
 Para validar manualmente o caso de uso, importe `IndexDocumentUseCase`, injete `Utf8FileTextExtractor` e execute `execute(document_id, path)`. A resposta é uma tupla de `DocumentChunk` com `document_id`, `index`, `content`, `start_offset` e `end_offset`.
 
-Para usar o backend persistente local, execute `docker compose up -d vector-db`, defina `DATABASE_URL=postgresql://rastro:rastro@localhost:55432/rastro` e `VECTOR_STORE_BACKEND=postgres`. O modelo padrão é baixado pelo Sentence Transformers na primeira execução. `SUPABASE_DB_URL` pode substituir `DATABASE_URL` sem mudar o schema ou as consultas; `VECTOR_DB_PORT` pode alterar a porta publicada.
+Para usar o backend persistente, defina `OPENAI_API_KEY`, `DATABASE_URL=postgresql://rastro:rastro@localhost:55432/rastro`, `VECTOR_STORE_BACKEND=postgres`, `EMBEDDING_MODEL=text-embedding-3-small` e `EMBEDDING_DIMENSIONS=384`. O custo publicado do modelo é US$0,02 por 1 milhão de tokens; `SUPABASE_DB_URL` pode substituir `DATABASE_URL` sem mudar o schema ou as consultas.
 
 O baseline determinístico de evaluation está versionado em `evals/`; geração por LLM, validação de citações geradas e persistência vetorial permanecem evoluções futuras.
 

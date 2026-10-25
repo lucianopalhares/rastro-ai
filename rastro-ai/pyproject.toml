@@ -9,7 +9,7 @@ description = "Document extraction and indexing primitives for Rastro AI"
 requires-python = ">=3.11"
 dependencies = [
     "psycopg[binary]>=3.2,<4",
-    "sentence-transformers>=3.0,<6",
+    "tiktoken>=0.9,<1",
 ]
 
 [tool.pytest.ini_options]

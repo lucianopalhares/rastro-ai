@@ -11,11 +11,16 @@ from ..domain.entities import DocumentChunk, RetrievedChunk
 #  * Existe para permitir trocar o modelo local por outro provedor sem acoplar o domínio.
 #  * Histórico: v1 — cria o contrato para embeddings persistidos no pgvector.
 #  */
-class EmbeddingProvider(Protocol):
-    """Converte texto em um vetor de dimensão estável."""
+class EmbeddingRepository(Protocol):
+    """
+    Define o repositório de embeddings sem acoplar a aplicação a um provedor.
 
-    def embed(self, text: str) -> tuple[float, ...]:
-        """Retorna o embedding normalizado do texto informado."""
+    O contrato em lote reduz custo e latência ao indexar vários chunks do mesmo documento.
+    """
+
+    # /** Histórico: v2 — substitui o provider local por uma porta de embeddings em lote. */
+    def embed(self, texts: Sequence[str]) -> tuple[tuple[float, ...], ...]:
+        """Retorna um vetor por texto, preservando a ordem de entrada."""
 
 
 class TextExtractor(Protocol):
