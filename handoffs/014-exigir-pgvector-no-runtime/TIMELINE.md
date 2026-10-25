@@ -33,3 +33,9 @@
 - Testes: 28 testes Python, compilação, Compose, containers saudáveis e hook estrutural aprovados.
 - Pendências: nenhuma dentro do escopo; retry e processamento assíncrono continuam fora do escopo.
 - Commit: autorizado pela evidência completa; lista explícita será conferida antes da criação.
+
+## Commit da implementação
+
+- Commit: `52e1820` — `Exigir pgvector no runtime`.
+- Arquivos: código Python, teste de configuração, README da IA e handoffs/controlos explícitos da tarefa `014`.
+- Verificação: smoke API/Python/pgvector, 28 testes, compilação, Compose e hook estrutural aprovados antes do commit.

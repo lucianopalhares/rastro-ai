@@ -485,3 +485,10 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resolve: confirma no fluxo real que o runtime usa embeddings e pgvector, sem fallback lexical.
 - Pendências: nenhuma dentro do escopo; retry e processamento assíncrono permanecem fora do escopo.
 - Pasta: `handoffs/014-exigir-pgvector-no-runtime/` | Próxima ação: gerar commit explícito da tarefa.
+
+## 014 — Commit criado
+
+- Data/hora: 2026-10-25 10:18 -03:00 | Status: `verified`.
+- Commit: `52e1820` — `Exigir pgvector no runtime`.
+- Verificação: smoke API/Python/pgvector, 28 testes, compilação, Compose e hook estrutural aprovados.
+- Pasta: `handoffs/014-exigir-pgvector-no-runtime/` | Próxima ação: nenhuma.
