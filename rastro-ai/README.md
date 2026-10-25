@@ -34,7 +34,7 @@ O caso de uso não conhece o sistema de arquivos diretamente: recebe um extrator
 - Chunks podem carregar `project_id`; `retrieve_chunks` filtra o projeto antes de ordenar por similaridade de cosseno sobre frequência de termos.
 - `answer_question` reproduz somente os trechos recuperados, inclui documento, índice e offsets nas citações e declara ausência de evidência quando nada é encontrado.
 - Apenas `.md` e `.txt` em UTF-8 são aceitos; arquivos vazios ou formatos não suportados falham.
-- O backend padrão continua síncrono e em memória; com `VECTOR_STORE_BACKEND=postgres`, chunks e embeddings do `text-embedding-3-small` são persistidos no PostgreSQL/pgvector e consultados semanticamente.
+- O backend de runtime é síncrono e exige `VECTOR_STORE_BACKEND=postgres`; chunks e embeddings do `text-embedding-3-small` são persistidos no PostgreSQL/pgvector e consultados semanticamente. O store em memória permanece somente em testes e evaluation determinística explícita.
 - A integração automática do upload da API com a indexação, workers, geração por LLM e observabilidade continuam fora desta etapa.
 
 ## Como testar

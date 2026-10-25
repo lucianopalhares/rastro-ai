@@ -457,3 +457,31 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Verificação: API com 10 testes e build; Python com 26 testes, `compileall` e imports modulares; imagem Docker, Compose, banco e hook estrito aprovados.
 - Pendências: retry, idempotência explícita, processamento assíncrono e remoção dos wrappers legados.
 - Pasta: `handoffs/012-integrar-upload-indexacao-python/` | Próxima ação: aguardar nova autorização explícita.
+
+## 014 — Exigir pgvector no runtime
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: impedir fallback lexical silencioso quando o fluxo esperado usa embeddings e pgvector.
+- Impactos: exige backend persistente no runtime e mantém memória somente para testes explícitos.
+- Resolve: divergência entre busca semântica declarada e `InMemoryVectorStore` selecionado sem configuração.
+- Verificação: 28 testes, compilação, Compose, containers saudáveis e hook passaram; smoke PostgreSQL/pgvector pendente por ausência de chave OpenAI.
+- Pasta: `handoffs/014-exigir-pgvector-no-runtime/` | Próxima ação: executar validação completa e promover para `verified`.
+
+## 014 — Finalização com verificação pendente
+
+- Data/hora: 2026-10-25 -03:00 | Status mantido: `applied`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Verificação: 28 testes, compilação, Compose, containers saudáveis e hook estrito aprovados.
+- Pendência: smoke HTTP com OpenAI/pgvector não executado por ausência de `OPENAI_API_KEY`.
+- Commit: não gerado enquanto a verificação externa permanecer pendente.
+- Pasta: `handoffs/014-exigir-pgvector-no-runtime/` | Próxima ação: executar smoke e promover para `verified`.
+
+## 014 — Verificação do fluxo persistente concluída
+
+- Data/hora: 2026-10-25 10:18 -03:00 | Status: `verified`.
+- Aplicação afetada: API `rastro-api`, IA `rastro-ai` e PostgreSQL/pgvector.
+- Verificação: upload API `ready`, endpoint Python `backend: postgres`, chunk persistido com embedding `384`, 28 testes, Compose e hook aprovados.
+- Resolve: confirma no fluxo real que o runtime usa embeddings e pgvector, sem fallback lexical.
+- Pendências: nenhuma dentro do escopo; retry e processamento assíncrono permanecem fora do escopo.
+- Pasta: `handoffs/014-exigir-pgvector-no-runtime/` | Próxima ação: gerar commit explícito da tarefa.

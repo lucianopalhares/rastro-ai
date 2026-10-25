@@ -11,27 +11,26 @@ from .semantic_search.application.use_cases.answer_question import (
 )
 from .semantic_search.application.use_cases.retrieve_chunks import RetrieveChunksUseCase
 from .documents.domain.entities import DocumentChunk, RetrievedChunk
-from .semantic_search.infrastructure.memory.repository import (
-    InMemoryVectorStore,
-)
-
 # /**
-#  * Seleciona o store persistente quando configurado e mantém memória como fallback local.
-#  * Existe para preservar testes e desenvolvimento sem banco, sem esconder a configuração de produção.
+#  * Seleciona o store persistente exigido pelo runtime para indexação e busca semântica.
+#  * Existe para impedir que uma configuração ausente ou inválida degrade silenciosamente para busca lexical.
 #  * Histórico: v1 — adiciona `VECTOR_STORE_BACKEND=postgres` com embeddings locais.
 #  * v2 — seleciona o repository externo OpenAI para o backend persistente.
+#  * v3 — remove o fallback implícito em memória e exige `postgres` no runtime.
 #  */
 def _build_vector_store():
-    """Cria o backend de retrieval conforme a configuração do processo."""
+    """Cria o backend persistente conforme a configuração explícita do processo."""
 
-    if environ.get("VECTOR_STORE_BACKEND", "memory").casefold() == "postgres":
-        from .embeddings.infrastructure.openai.repository import OpenAIEmbeddingRepository
-        from .semantic_search.infrastructure.pgvector.repository import PostgresVectorStore
+    backend = environ.get("VECTOR_STORE_BACKEND", "").strip().casefold()
+    if backend != "postgres":
+        raise ValueError("VECTOR_STORE_BACKEND must be 'postgres'")
 
-        return PostgresVectorStore.from_environment(
-            OpenAIEmbeddingRepository.from_environment()
-        )
-    return InMemoryVectorStore()
+    from .embeddings.infrastructure.openai.repository import OpenAIEmbeddingRepository
+    from .semantic_search.infrastructure.pgvector.repository import PostgresVectorStore
+
+    return PostgresVectorStore.from_environment(
+        OpenAIEmbeddingRepository.from_environment()
+    )
 
 
 _vector_store = _build_vector_store()

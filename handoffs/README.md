@@ -20,6 +20,7 @@
 | `007` | `respostas-com-citacoes` | `ia` | `verified` |
 | `011` | `persistencia-vetorial-pgvector` | `root`/`ia` | `verified` |
 | `012` | `integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` |
+| `014` | `exigir-pgvector-no-runtime` | `ia` | `proposed` |
 
 ## Padrão de validação para novas versões
 

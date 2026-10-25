@@ -128,7 +128,14 @@ class IndexingTests(unittest.TestCase):
             path = Path(directory) / "meeting.txt"
             path.write_text("Conteúdo indexável", encoding="utf-8")
 
-            with patch("rastro_ai.retrieval.index_chunks") as index_chunks:
+            with patch.dict(
+                "os.environ",
+                {
+                    "VECTOR_STORE_BACKEND": "postgres",
+                    "DATABASE_URL": "postgresql://test/test",
+                    "OPENAI_API_KEY": "test-key",
+                },
+            ), patch("rastro_ai.retrieval.index_chunks") as index_chunks:
                 chunks = index_document_in_store("doc-1", path, project_id="project-1")
 
             index_chunks.assert_called_once_with(chunks)

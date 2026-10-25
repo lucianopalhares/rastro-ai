@@ -1,4 +1,4 @@
-"""Store vetorial determinístico em memória para o primeiro fluxo de retrieval."""
+"""Double lexical determinístico em memória para testes e evaluation local."""
 
 from __future__ import annotations
 
@@ -32,12 +32,13 @@ def _cosine_similarity(left: Counter[str], right: Counter[str]) -> float:
 
 
 # /**
-#  * Armazena chunks e executa ranking vetorial lexical em memória.
-#  * Existe como adaptador mínimo e substituível antes da adoção de embeddings reais.
+#  * Armazena chunks e executa ranking lexical determinístico em memória.
+#  * Existe somente para testes isolados e evaluation local, não para o runtime semântico.
 #  * Histórico: v1 — adiciona upsert, filtro por projeto e ranking por cosseno.
+#  * Histórico: v2 — deixa explícito que o adaptador não substitui embeddings nem pgvector.
 #  */
 class InMemoryVectorStore:
-    """Implementa o contrato vetorial sem banco, modelo ou rede."""
+    """Implementa o contrato de retrieval sem banco, modelo ou rede para cenários isolados."""
 
     # /** Histórico: v1 — inicializa o índice efêmero do processo. */
     def __init__(self) -> None:

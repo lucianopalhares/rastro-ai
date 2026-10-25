@@ -62,7 +62,7 @@ class IndexingRequestHandler(BaseHTTPRequestHandler):
                 {
                     "documentId": document_id,
                     "chunks": len(chunks),
-                    "backend": os.environ.get("VECTOR_STORE_BACKEND", "memory"),
+                    "backend": os.environ.get("VECTOR_STORE_BACKEND", "postgres"),
                 },
             )
         except (ValueError, json.JSONDecodeError) as error:
