@@ -72,6 +72,10 @@ IndexingRequestHandler.do_POST()
 │
 └── index_document_in_store()
     ├── index_document()
+    │   ├── bootstrap.build_indexing_container()
+    │   │   ├── Utf8FileTextExtractor()
+    │   │   ├── LangChainTextChunker()
+    │   │   └── IndexDocumentUseCase(extractor, chunker)
     │   └── IndexDocumentUseCase.execute()
     │       ├── Utf8FileTextExtractor.extract()
     │       │   ├── lê UTF-8
@@ -83,15 +87,19 @@ IndexingRequestHandler.do_POST()
     │           └── DocumentChunk(...)
     │
     └── retrieval.index_chunks()
-        └── PostgresVectorStore.upsert()
-            ├── OpenAIEmbeddingRepository.embed()
-            │   └── OpenAIEmbeddings.embed_documents()
-            │       └── provider OpenAI /v1/embeddings
-            ├── valida dimensão 384 e project_id
-            ├── monta metadata do chunk
-            ├── cria ID determinístico SHA-256
-            └── PGVector.add_embeddings()
-                └── PostgreSQL + pgvector
+        └── bootstrap.build_retrieval_container()
+            ├── valida VECTOR_STORE_BACKEND=postgres
+            ├── OpenAIEmbeddingRepository.from_environment()
+            ├── PostgresVectorStore.from_environment(...)
+            └── PostgresVectorStore.upsert()
+                ├── OpenAIEmbeddingRepository.embed()
+                │   └── OpenAIEmbeddings.embed_documents()
+                │       └── provider OpenAI /v1/embeddings
+                ├── valida dimensão 384 e project_id
+                ├── monta metadata do chunk
+                ├── cria ID determinístico SHA-256
+                └── PGVector.add_embeddings()
+                    └── PostgreSQL + pgvector
 ```
 
 ### Explicação simples da etapa Python
@@ -101,20 +109,24 @@ IndexingRequestHandler.do_POST()
 3. `_required_string()` — verifica se cada informação obrigatória existe.
 4. `tempfile.NamedTemporaryFile()` — cria um arquivo temporário para leitura.
 5. `index_document_in_store()` — coordena a criação dos pedaços e a gravação dos vetores.
-6. `index_document()` — lê o arquivo e cria os pedaços de texto.
-7. `IndexDocumentUseCase.execute()` — organiza a extração e a divisão do documento.
-8. `Utf8FileTextExtractor.extract()` — abre o arquivo e lê seu conteúdo como texto.
-9. `normalize_text()` — limpa e padroniza o texto.
-10. `LangChainTextChunker.chunk()` — divide o texto em pedaços menores.
-11. `RecursiveCharacterTextSplitter` — escolhe os melhores pontos para separar o texto.
-12. `splitter.create_documents()` — produz os documentos menores.
-13. `DocumentChunk` — representa um pedaço do documento dentro da aplicação.
-14. `retrieval.index_chunks()` — envia os pedaços para o armazenamento vetorial.
-15. `PostgresVectorStore.upsert()` — prepara e grava os pedaços no banco vetorial.
-16. `OpenAIEmbeddingRepository.embed()` — pede os vetores para o provider de embeddings.
-17. `OpenAIEmbeddings.embed_documents()` — usa o LangChain para fazer essa chamada.
-18. `provider OpenAI /v1/embeddings` — transforma cada texto em uma lista de números.
-19. `PGVector.add_embeddings()` — salva textos, vetores e informações extras no PostgreSQL.
+6. `index_document()` — solicita ao composition root as dependências de indexação.
+7. `build_indexing_container()` — monta extractor, chunker e `IndexDocumentUseCase` sem acessar banco ou provider externo.
+8. `IndexDocumentUseCase.execute()` — organiza a extração e a divisão do documento.
+9. `Utf8FileTextExtractor.extract()` — abre o arquivo e lê seu conteúdo como texto.
+10. `normalize_text()` — limpa e padroniza o texto.
+11. `LangChainTextChunker.chunk()` — divide o texto em pedaços menores.
+12. `RecursiveCharacterTextSplitter` — escolhe os melhores pontos para separar o texto.
+13. `splitter.create_documents()` — produz os documentos menores.
+14. `DocumentChunk` — representa um pedaço do documento dentro da aplicação.
+15. `retrieval.index_chunks()` — solicita ao composition root as dependências de persistência.
+16. `build_retrieval_container()` — valida o backend PostgreSQL e monta embeddings, vector store e casos de uso.
+17. `PostgresVectorStore.upsert()` — prepara e grava os pedaços no banco vetorial.
+18. `OpenAIEmbeddingRepository.embed()` — pede os vetores para o provider de embeddings.
+19. `OpenAIEmbeddings.embed_documents()` — usa o LangChain para fazer essa chamada.
+20. `provider OpenAI /v1/embeddings` — transforma cada texto em uma lista de números.
+21. `PGVector.add_embeddings()` — salva textos, vetores e informações extras no PostgreSQL.
+
+As fachadas `indexing.py` e `retrieval.py` não mantêm instâncias globais. A importação dos módulos é segura; a configuração do PostgreSQL e a criação do vector store acontecem somente quando o fluxo de persistência ou consulta é executado.
 
 ## Repository e provider
 
@@ -158,11 +170,13 @@ arquivo -> texto -> chunks -> embeddings -> PGVector/PostgreSQL
 ## Arquivos de referência
 
 - API: [`documents.controller.ts`](../../rastro-api/src/modules/documents/presentation/documents.controller.ts), [`upload-document.use-case.ts`](../../rastro-api/src/modules/documents/application/upload-document.use-case.ts), [`http-document-indexer.ts`](../../rastro-api/src/modules/documents/infrastructure/http-document-indexer.ts).
-- Indexação: [`service.py`](../../rastro-ai/src/rastro_ai/service.py), [`indexing.py`](../../rastro-ai/src/rastro_ai/indexing.py), [`langchain_text_chunker.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/chunking/langchain_text_chunker.py).
+- Indexação: [`service.py`](../../rastro-ai/src/rastro_ai/service.py), [`indexing.py`](../../rastro-ai/src/rastro_ai/indexing.py), [`container.py`](../../rastro-ai/src/rastro_ai/bootstrap/container.py), [`index_document.py`](../../rastro-ai/src/rastro_ai/document_indexing/application/use_cases/index_document.py), [`langchain_text_chunker.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/chunking/langchain_text_chunker.py).
 - Embeddings e vector store: [`openai_embedding_repository.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/embeddings/openai_embedding_repository.py), [`postgres_vector_store.py`](../../rastro-ai/src/rastro_ai/document_indexing/infrastructure/retrieval/postgres_vector_store.py), [`retrieval.py`](../../rastro-ai/src/rastro_ai/retrieval.py).
 
 ## Observação operacional
 
-O serviço Python precisa iniciar corretamente antes do upload. Se a imagem não
-possuir `langchain-text-splitters`, o import de `rastro_ai.indexing` falha e o
-endpoint `/index` não fica disponível.
+O serviço Python precisa iniciar corretamente antes do upload. A imagem deve
+possuir `langchain-text-splitters`, `langchain-openai`, `langchain-postgres` e
+`langgraph`, conforme o `pyproject.toml` e os Dockerfiles. O endpoint Python
+`/index` usa o backend persistente quando `VECTOR_STORE_BACKEND=postgres`, a
+URL do banco e `OPENAI_API_KEY` estão configuradas.
