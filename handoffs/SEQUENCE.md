@@ -25,7 +25,7 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 
 ## Estado ativo
 
-- Última implementação verificada: `012-integrar-upload-indexacao-python`.
+- Última implementação verificada: `013-configurar-debug-python-api-vscode`.
 - Próxima capacidade: nenhuma tarefa sucessora foi ativada; aguardar nova autorização explícita.
 
 ## Fase 1 — Integração de upload e indexação
@@ -33,3 +33,4 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
 | --- | --- | --- | --- | --- | --- |
 | 10 | `012-integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` | `004`, `005`, `011` | upload dispara indexação Python; documento chega a `ready` ou `failed`; chunks ficam consultáveis e o fluxo é coberto por testes e smoke |
+| 11 | `013-configurar-debug-python-api-vscode` | `root`/`api`/`ia` | `verified` | `012` | Docker, inspector Node, debugpy, requests API/Python e fluxo API → Python documentados e verificados |

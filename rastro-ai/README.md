@@ -47,6 +47,24 @@ python3 -m unittest discover -s tests -v
 
 Resultado esperado: 18 testes aprovados.
 
+## Debug com Docker e VS Code
+
+Na raiz do repositório, construa as imagens de desenvolvimento:
+
+```bash
+docker compose build api ai-indexer
+```
+
+Inicie os serviços e o banco vetorial:
+
+```bash
+docker compose up api ai-indexer vector-db
+```
+
+Com os containers em execução, no VS Code abra a raiz do repositório, selecione `Debug Docker: API + Python` e pressione `F5`. O VS Code fará attach à API na porta `9229` e ao Python via `debugpy` na porta `5678`.
+
+Breakpoints podem ser colocados em `src/rastro_ai/service.py`, `src/rastro_ai/indexing.py` e nos casos de uso chamados pelo endpoint `/index`. O serviço Python usa o backend PostgreSQL do Compose e requer `OPENAI_API_KEY` para gerar embeddings.
+
 Para verificar a compilação:
 
 ```bash

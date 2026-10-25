@@ -2,6 +2,24 @@
 
 Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerada correspondente.
 
+## 013 — Configurar debug do Python e da API no VS Code
+
+- Data/hora: 2026-10-24 -03:00 | Status: `applied`
+- Aplicação afetada: raiz (`.vscode`) e API (`rastro-api/package.json`), com debug do serviço `rastro-ai`.
+- Por que foi feito: permitir breakpoints simultâneos no fluxo API → indexador Python.
+- Impactos: adiciona perfil composto local e script NestJS de debug; produção e Compose permanecem inalterados.
+- Resolve: inicialização manual separada dos processos durante diagnóstico.
+- Pasta: `handoffs/013-configurar-debug-python-api-vscode/`
+
+## 013 — Finalização da configuração de debug
+
+- Data/hora: 2026-10-24 -03:00 | Status: `verified`
+- Aplicação afetada: raiz, API NestJS e serviço Python.
+- Por que foi feito: consolidar breakpoints Docker e o fluxo reproduzível API → Python.
+- Impactos: adiciona debugpy/inspector, documentação e requests de validação; runtime funcional preservado.
+- Resolve: diagnóstico integrado dos dois processos; build Docker, health checks e smoke de upload/indexação aprovados.
+- Pasta: `handoffs/013-configurar-debug-python-api-vscode/`
+
 ## 001 — Exemplo de validação de citações
 
 - Data/hora: 2026-10-23 11:03 -03:00 | Status: `proposed`

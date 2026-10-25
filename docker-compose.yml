@@ -21,7 +21,7 @@ services:
     build:
       context: ./rastro-api
       dockerfile: Dockerfile.dev
-    command: npm run start:dev
+    command: npm run start:debug
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -31,6 +31,7 @@ services:
       AI_INDEXING_TIMEOUT_MS: '60000'
     ports:
       - '3039:3000'
+      - '9229:9229'
     volumes:
       - ./rastro-api:/app
       - /app/node_modules
@@ -48,9 +49,9 @@ services:
   ai-indexer:
     build:
       context: ./rastro-ai
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     working_dir: /app
-    command: python -m rastro_ai.service
+    command: python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 -m rastro_ai.service
     environment:
       PYTHONPATH: /app/src
       AI_PORT: 8000
@@ -64,6 +65,7 @@ services:
         condition: service_healthy
     ports:
       - '${AI_INDEXER_PORT:-18473}:8000'
+      - '5678:5678'
     healthcheck:
       test: ['CMD-SHELL', 'python -c "import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8000/health\")"']
       interval: 10s

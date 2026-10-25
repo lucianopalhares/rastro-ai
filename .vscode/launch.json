@@ -1,0 +1,80 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: AI service",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "rastro_ai.service",
+      "cwd": "${workspaceFolder}/rastro-ai",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/rastro-ai/src",
+        "AI_HOST": "127.0.0.1",
+        "AI_PORT": "8000",
+        "VECTOR_STORE_BACKEND": "memory"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "API: NestJS",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/rastro-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "3000",
+        "CORS_ORIGIN": "*",
+        "AI_INDEXING_URL": "http://127.0.0.1:8000/index",
+        "AI_INDEXING_TIMEOUT_MS": "60000"
+      },
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true,
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Docker: Python AI service",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "127.0.0.1",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/rastro-ai/src",
+          "remoteRoot": "/app/src"
+        }
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Docker: API NestJS",
+      "type": "node",
+      "request": "attach",
+      "address": "127.0.0.1",
+      "port": 9229,
+      "sourceMaps": true,
+      "localRoot": "${workspaceFolder}/rastro-api",
+      "remoteRoot": "/app",
+      "outFiles": ["${workspaceFolder}/rastro-api/dist/**/*.js"],
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug: API + Python",
+      "configurations": ["Python: AI service", "API: NestJS"],
+      "stopAll": true
+    },
+    {
+      "name": "Debug Docker: API + Python",
+      "configurations": ["Docker: Python AI service", "Docker: API NestJS"],
+      "stopAll": false
+    }
+  ]
+}

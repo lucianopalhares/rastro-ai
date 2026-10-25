@@ -90,6 +90,8 @@ export class DocumentsController {
    * Recebe um arquivo textual e cria o documento do projeto.
    *
    * v1 = adicionou multipart com limite de 5 MiB para `.md` e `.txt`.
+   * v5/v6 = tentaram contornar um comando curl sem o marcador de arquivo;
+   * v7 restaura o binding padrão após corrigir o comando.
    */
   @Post('upload')
   @UseInterceptors(

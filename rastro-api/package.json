@@ -8,6 +8,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug 0.0.0.0:9229 --watch",
     "start:prod": "node dist/main.js",
     "test": "jest --config jest.config.js --passWithNoTests --runInBand"
   },
@@ -18,6 +19,7 @@
     "@nestjs/platform-express": "^12.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "multer": "^2.5.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
