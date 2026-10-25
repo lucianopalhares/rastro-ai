@@ -8,8 +8,10 @@ from .document_ingestion.application.use_cases.index_document import IndexDocume
 from .document_ingestion.infrastructure.extraction.utf8_file_text_extractor import (
     Utf8FileTextExtractor,
 )
+from .document_indexing.infrastructure.chunking.langchain_text_chunker import LangChainTextChunker
 
-_index_document = IndexDocumentUseCase(Utf8FileTextExtractor())
+_index_document = IndexDocumentUseCase(Utf8FileTextExtractor(), LangChainTextChunker())
+_text_chunker = LangChainTextChunker()
 
 
 def extract_text(path: str | Path) -> str:
@@ -22,6 +24,7 @@ def extract_text(path: str | Path) -> str:
 #  * Mantém a fachada legada e propaga o projeto para os chunks produzidos.
 #  * Histórico: v1 — adiciona `project_id` para integração com retrieval.
 #  * Histórico: v2 — expõe orçamento de tokens do chunking estrutural.
+#  * Histórico: v4 — usa o mesmo adaptador LangChain do caso de uso de indexação.
 #  */
 def chunk_text(
     text: str,
@@ -33,11 +36,9 @@ def chunk_text(
     max_tokens: int = 500,
     overlap_tokens: int = 60,
 ) -> tuple[DocumentChunk, ...]:
-    """Mantém a API legada enquanto delega a política ao serviço de domínio."""
+    """Mantém a API legada enquanto delega ao adaptador de chunking configurado."""
 
-    from .chunking.domain.chunker import chunk_text as domain_chunk_text
-
-    return domain_chunk_text(
+    return _text_chunker.chunk(
         text,
         document_id=document_id,
         project_id=project_id,

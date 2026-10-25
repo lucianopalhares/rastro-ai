@@ -25,8 +25,8 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 
 ## Estado ativo
 
-- Última implementação verificada: `013-configurar-debug-python-api-vscode`.
-- Próxima capacidade ativa: `014-exigir-pgvector-no-runtime`, proposta para eliminar o fallback lexical silencioso.
+- Última implementação verificada: `014-exigir-pgvector-no-runtime`.
+- Próxima capacidade ativa: `015-adaptar-chunking-para-langchain`, proposta para preparar o chunking compatível com LangChain.
 
 ## Fase 1 — Integração de upload e indexação
 
@@ -35,3 +35,4 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 10 | `012-integrar-upload-indexacao-python` | `api`/`ia`/`root` | `verified` | `004`, `005`, `011` | upload dispara indexação Python; documento chega a `ready` ou `failed`; chunks ficam consultáveis e o fluxo é coberto por testes e smoke |
 | 11 | `013-configurar-debug-python-api-vscode` | `root`/`api`/`ia` | `verified` | `012` | Docker, inspector Node, debugpy, requests API/Python e fluxo API → Python documentados e verificados |
 | 12 | `014-exigir-pgvector-no-runtime` | `ia` | `verified` | `013` | runtime Python exige pgvector/embeddings, fallback lexical não é selecionado silenciosamente e testes/smoke comprovam a configuração |
+| 13 | `015-adaptar-chunking-para-langchain` | `ia` | `verified` | `014` | caso de uso usa `TextChunker`, adaptador LangChain preserva chunks/offsets, PGVector persiste na coleção LangChain e schema legado foi removido |

@@ -39,6 +39,22 @@ class Answer:
 
 
 # /**
+#  * Define a geração de resposta sobre evidências já recuperadas e ordenadas.
+#  * Existe para permitir chains LangChain sem acoplar o caso de uso ao modelo ou prompt.
+#  * Histórico: v7 — cria a porta de geração estruturada com citações verificáveis.
+#  */
+class AnswerGenerator(Protocol):
+    """Contrato para adapters de geração de respostas fundamentadas."""
+
+    def generate(
+        self,
+        question: str,
+        context: tuple[RetrievedChunk, ...],
+    ) -> Answer:
+        """Gera uma resposta referenciando somente o contexto recebido."""
+
+
+# /**
 #  * Define uma porta mínima para consultar evidências por projeto.
 #  * Existe para testar a resposta sem acoplar o caso de uso ao store concreto.
 #  * Histórico: v1 — cria o contrato de retrieval usado pela geração extrativa.

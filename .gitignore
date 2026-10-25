@@ -36,6 +36,8 @@ pnpm-debug.log*
 !/docs/
 /docs/*
 !/docs/sdd-minimo.md
+!/docs/architecture/
+!/docs/architecture/document-upload-indexing-flow.md
 
 /.agents
 

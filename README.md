@@ -76,6 +76,9 @@ Resultado esperado: HTTP `200`, documento com `projectId: "debug-project"` e `st
 
 ## Fluxo de indexação pela API
 
+A árvore detalhada de classes, métodos, repositories e providers está em
+[`docs/architecture/document-upload-indexing-flow.md`](docs/architecture/document-upload-indexing-flow.md).
+
 O fluxo integrado começa no upload da API e delega a indexação ao processo Python:
 
 ```text

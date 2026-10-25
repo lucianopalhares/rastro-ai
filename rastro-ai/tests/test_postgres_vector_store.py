@@ -4,6 +4,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
+from langchain_core.documents import Document
+
 from rastro_ai.document_indexing.domain.entities import DocumentChunk
 from rastro_ai.document_indexing.infrastructure.retrieval.postgres_vector_store import (
     PostgresVectorStore,
@@ -17,77 +19,91 @@ class FakeEmbeddingRepository:
         return tuple((float(len(text)),) + (0.0,) * 383 for text in texts)
 
 
-class FakeCursor:
-    """Registra SQL e devolve uma linha controlada de retrieval."""
+class FakeLangChainVectorStore:
+    """Registra operações do adapter LangChain e devolve documentos controlados."""
 
     def __init__(self) -> None:
-        self.commands: list[tuple[str, tuple[object, ...]]] = []
+        self.added: dict[str, object] = {}
+        self.filter: dict[str, str] | None = None
 
-    def __enter__(self):
-        return self
+    def add_embeddings(self, **kwargs: object) -> list[str]:
+        self.added = kwargs
+        return list(kwargs["ids"])
 
-    def __exit__(self, *_args) -> None:
-        return None
-
-    def execute(self, query: str, params: tuple[object, ...]) -> None:
-        self.commands.append((query, params))
-
-    def fetchall(self):
-        return [("doc-1", 0, "conteúdo", 0, 9, "project-1", 0.91)]
-
-
-class FakeConnection:
-    """Simula o ciclo transacional esperado pelo adaptador PostgreSQL."""
-
-    def __init__(self, cursor: FakeCursor) -> None:
-        self.cursor_instance = cursor
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_args) -> None:
-        return None
-
-    def cursor(self):
-        return self.cursor_instance
+    def similarity_search_with_score_by_vector(
+        self,
+        *,
+        embedding: list[float],
+        k: int,
+        filter: dict[str, str],
+    ) -> list[tuple[Document, float]]:
+        self.filter = filter
+        return [
+            (
+                Document(
+                    page_content="conteúdo",
+                    metadata={
+                        "document_id": "doc-1",
+                        "chunk_index": 0,
+                        "start_offset": 0,
+                        "end_offset": 9,
+                        "project_id": "project-1",
+                    },
+                ),
+                0.09,
+            )
+        ][:k]
 
 
 class PostgresVectorStoreTests(unittest.TestCase):
-    """Verifica o contrato do adaptador sem depender de um banco real."""
+    """Verifica o contrato local sem depender de um banco real."""
 
     def setUp(self) -> None:
-        self.cursor = FakeCursor()
-        self.store = PostgresVectorStore(
-            lambda: FakeConnection(self.cursor), FakeEmbeddingRepository()
-        )
+        self.vector_store = FakeLangChainVectorStore()
+        self.store = PostgresVectorStore(self.vector_store, FakeEmbeddingRepository())
 
-    def test_upsert_persists_chunk_with_vector(self) -> None:
-        self.store.upsert(
-            [DocumentChunk("doc-1", 0, "conteúdo", 0, 9, "project-1")]
-        )
+    # /**
+    #  * Confirma que o adapter envia embeddings, metadata e ID determinístico ao PGVector.
+    #  * Histórico: v1 — cobria o SQL próprio de persistência.
+    #  * Histórico: v6 — cobre a integração com a interface LangChain `add_embeddings`.
+    #  */
+    def test_upsert_persists_metadata_and_stable_id(self) -> None:
+        chunk = DocumentChunk("doc-1", 0, "conteúdo", 0, 9, "project-1")
 
-        query, params = self.cursor.commands[0]
-        self.assertIn("ON CONFLICT", query)
-        self.assertEqual(params[0:3], ("project-1", "doc-1", 0))
-        self.assertTrue(str(params[-1]).startswith("[8.0,0.0"))
+        self.store.upsert([chunk])
+        first_id = self.vector_store.added["ids"][0]
 
-    def test_search_returns_chunk_and_project_score(self) -> None:
+        self.store.upsert([chunk])
+
+        self.assertEqual(self.vector_store.added["metadatas"][0]["project_id"], "project-1")
+        self.assertEqual(self.vector_store.added["metadatas"][0]["start_offset"], 0)
+        self.assertEqual(self.vector_store.added["ids"][0], first_id)
+
+    # /**
+    #  * Confirma que a busca sempre aplica o filtro do projeto e reconstrói a entidade local.
+    #  * Histórico: v1 — cobria filtro SQL por projeto e score cosine.
+    #  * Histórico: v6 — cobre metadata filter e conversão de distância para similaridade.
+    #  */
+    def test_search_returns_chunk_and_applies_project_filter(self) -> None:
         results = self.store.search("project-1", "consulta", limit=5)
 
-        self.assertEqual(len(results), 1)
+        self.assertEqual(self.vector_store.filter, {"project_id": "project-1"})
         self.assertEqual(results[0].chunk.document_id, "doc-1")
         self.assertEqual(results[0].chunk.project_id, "project-1")
+        self.assertEqual(results[0].chunk.start_offset, 0)
         self.assertEqual(results[0].score, 0.91)
-        self.assertIn("project_id = %s", self.cursor.commands[0][0])
 
+    # /**
+    #  * Confirma que vetores incompatíveis continuam bloqueados antes do PGVector.
+    #  * Histórico: v1 — valida dimensão do schema próprio.
+    #  * Histórico: v6 — preserva a regra ao trocar o backend concreto.
+    #  */
     def test_rejects_incompatible_embedding_dimension(self) -> None:
         class InvalidEmbeddingProvider:
             def embed(self, _texts: tuple[str, ...]) -> tuple[tuple[float, ...], ...]:
                 return ((1.0,),)
 
-        store = PostgresVectorStore(
-            lambda: FakeConnection(self.cursor), InvalidEmbeddingProvider()
-        )
+        store = PostgresVectorStore(self.vector_store, InvalidEmbeddingProvider())
 
         with self.assertRaisesRegex(ValueError, "dimension"):
             store.upsert([DocumentChunk("doc-1", 0, "texto", 0, 5, "project-1")])

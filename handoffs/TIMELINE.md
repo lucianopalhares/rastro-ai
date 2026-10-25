@@ -492,3 +492,90 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Commit: `52e1820` — `Exigir pgvector no runtime`.
 - Verificação: smoke API/Python/pgvector, 28 testes, compilação, Compose e hook estrutural aprovados.
 - Pasta: `handoffs/014-exigir-pgvector-no-runtime/` | Próxima ação: nenhuma.
+
+## 015 — Adaptar chunking para LangChain
+
+- Data/hora: 2026-10-25 -03:00 | Status: `proposed`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: preparar a substituição do chunker próprio por adaptador LangChain sem acoplar o domínio à biblioteca.
+- Impactos: nenhum no runtime nesta rodada; preservação de offsets, tokens, projeto e baseline é requisito da implementação.
+- Resolve: registra a próxima capacidade após a verificação do pgvector.
+- Verificação: prevista com testes de chunking/indexação, evaluation, compilação, smoke e hook estrutural.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: reconciliar arquivos reais e implementar `v1`.
+
+## 015 — Adaptador LangChain aplicado
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: desacoplar o caso de uso da implementação concreta de chunking.
+- Impactos: LangChain entra somente na infraestrutura; contratos, offsets, projeto e fachada legada são preservados.
+- Resolve: injeta `TextChunker`, converte documentos LangChain em `DocumentChunk` e cobre offsets sobrepostos.
+- Verificação: 30 testes, evaluation `20/20` e compilação aprovados; hook final e smoke externo pendentes.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: solicitar finalização.
+
+## 015 — Dependência Docker corrigida
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`) e imagens Docker de desenvolvimento/produção.
+- Por que foi feita: o container não instalava `langchain-text-splitters`, embora o runtime já o importasse.
+- Impactos: rebuild das imagens passa a incluir a dependência necessária ao adaptador LangChain.
+- Resolve: `ModuleNotFoundError` durante a inicialização do `ai-indexer`.
+- Verificação: build sem cache, import no container, serviço saudável via Compose, 30 testes, evaluation 20/20, compilação e hook aprovados.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: solicitar finalização e gerar commit explícito.
+
+## 015 — Implementação finalizada e verificada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Aplicação afetada: IA (`rastro-ai`), schema PostgreSQL/pgvector e documentação arquitetural.
+- Por que foi feita: consolidar chunking, embeddings e PGVector com LangChain e remover o schema vetorial legado não utilizado.
+- Impactos: novos chunks usam as tabelas `langchain_pg_*`; a tabela local antiga e seus 27 registros foram removidos sem migração.
+- Resolve: fluxo documentado, provider/vector store integrados, schema inicial simplificado e metadados preservados nas tabelas LangChain.
+- Verificação: consultas PostgreSQL, compilação, hook estrutural e validações do Compose concluídos; pytest não disponível na imagem.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: nenhuma.
+
+## 015 — Commit criado
+
+- Data/hora: 2026-10-25 -03:00 | Status: `verified`.
+- Commit: `607a22c` — `Consolidar fluxo LangChain de indexação`.
+- Verificação: lista explícita da implementação commitada; alterações não relacionadas permaneceram fora do índice.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: nenhuma.
+
+## 015 — Vector store PGVector adaptado ao LangChain
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`), PostgreSQL/pgvector e imagens Docker.
+- Por que foi feita: completar a adoção de LangChain no fluxo de chunks, embeddings e busca vetorial.
+- Impactos: a persistência passa a usar coleção/tabelas do `langchain-postgres`; tabela legada permanece e dados existentes não são migrados automaticamente.
+- Resolve: adiciona adapter com IDs estáveis, metadata de citações, filtro obrigatório por projeto e conversão de score.
+- Verificação: 31 testes, evaluation `20/20`, compilação, build Docker, upsert/busca reais do PGVector no Compose e hook aprovados.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: reindexar dados, smoke com credencial e finalizar.
+
+## 015 — Preparação para reranking, chains, prompts e LangGraph
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`) e imagens Docker.
+- Por que foi feita: preparar o fluxo futuro de RAG generativo sem ativar chamadas externas prematuramente.
+- Impactos: adiciona portas, adapters e workflow opcional; o runtime atual continua extrativo e determinístico.
+- Resolve: separa retrieval, reranking, geração estruturada, citações e orquestração futura.
+- Verificação: 35 testes, evaluation `20/20`, compilação, build Docker, import no container e hook aprovados.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: escolher provider, ativar grafo e finalizar.
+
+## 015 — Embeddings integrados ao LangChain
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`) e imagens Docker.
+- Por que foi feita: adotar a interface de embeddings usada no ecossistema LangChain mantendo as regras próprias da Rastro.
+- Impactos: transporte, batching e retries passam pelo `OpenAIEmbeddings`; dimensão, porta, pgvector e contratos locais permanecem controlados.
+- Resolve: substitui o cliente HTTP manual por adapter LangChain testável e compatível com futuros provedores.
+- Verificação: 31 testes, evaluation `20/20`, compilação, build Docker, import no container e hook aprovados; chamada externa pendente por credencial.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: solicitar finalização e smoke com credencial.
+
+## 015 — Fachada de chunking unificada
+
+- Data/hora: 2026-10-25 -03:00 | Status: `applied`.
+- Aplicação afetada: IA (`rastro-ai`).
+- Por que foi feita: eliminar a divergência entre `chunk_text` público e o fluxo `index_document`.
+- Impactos: ambos usam `LangChainTextChunker`; a entidade `DocumentChunk`, offsets e metadados permanecem preservados.
+- Resolve: uma única estratégia de chunking nos caminhos públicos, com teste dedicado.
+- Verificação: 31 testes, evaluation `20/20` e compilação aprovados; hook estrutural válido.
+- Pasta: `handoffs/015-adaptar-chunking-para-langchain/` | Próxima ação: solicitar finalização e gerar commit explícito.
