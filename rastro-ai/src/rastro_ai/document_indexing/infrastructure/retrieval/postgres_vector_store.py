@@ -72,6 +72,7 @@ class PostgresChunkVectorStore:
         if not database_url:
             raise ValueError("DATABASE_URL or SUPABASE_DB_URL is required")
 
+        # chama o pgvector direto pelo langchain
         vector_store = PGVector(
             embeddings=LangChainEmbeddingAdapter(embedding_repository),
             connection=database_url,

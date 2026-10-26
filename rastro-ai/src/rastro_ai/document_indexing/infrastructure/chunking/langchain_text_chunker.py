@@ -66,11 +66,17 @@ class LangChainTextChunker:
         # Divide o texto em partes menores, preservando parágrafos e limites configurados.
         splitter = RecursiveCharacterTextSplitter(
             separators=["\n\n", "\n", " ", ""],
+            # separators=["\n\n", "\n", " ", ""], = Define a lista de separadores que o algoritmo tentará usar, em ordem estricta de prioridade
             chunk_size=splitter_size,
+            # chunk_size=splitter_size, = Define o tamanho máximo permitido para cada chunk gerado.
             chunk_overlap=splitter_overlap,
+            # chunk_overlap=splitter_overlap = Se um conceito importante estiver bem na divisa entre o Chunk 1 e o Chunk 2, ele poderia se perder. Com o overlap (ex: 60 tokens ou caracteres), o final do Chunk 1 se repete no início do Chunk 2, garantindo que o contexto não seja quebrado de forma brusca nas emendas.
             length_function=length_function,
+            # length_function=length_function = Informa ao LangChain como ele deve calcular o tamanho (comprimento) do texto para compará-lo com o chunk_size.
             add_start_index=True,
+            # add_start_index=True = Instrui o LangChain a adicionar automaticamente nos metadados de cada chunk o índice inicial (start_index) indicando em qual posição exata do texto original aquele trecho começa.
             keep_separator=False,
+            # keep_separator=False = Com False, os separadores (como quebras de linha duplas ou espaços extras usados na quebra) são limpos, evitando que os pedaços comecem ou termine com espaços em branco desnecessários.
         )
         # Pede ao LangChain os documentos menores que formarão os chunks.
         documents = splitter.create_documents([normalized])
