@@ -671,3 +671,37 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Verificação: hook estrutural com cobertura comportamental aprovado; alterações locais de Python excluídas por não pertencerem à tarefa.
 - Resultado: governança conferida e tarefa encerrada; não há próxima etapa ativa nesta iniciativa.
 - Pasta: `handoffs/021-revisar-fluxo-e-comentarios-handoffs/`
+
+## 022 — Contrato evolutivo do fluxo de handoffs
+
+- Data/hora: 2026-10-26 -03:00 | Status: `proposed`
+- Aplicação afetada: raiz (`docs/handoff-contracts/`, regras oficiais e controles de handoffs).
+- Por que foi feita: transformar os limites, camadas e melhorias do fluxo em contratos aplicáveis.
+- Impactos: introduz complexidade proporcional para tarefas `small`, `normal` e `large`; não altera runtime.
+- Resolve: falta de contrato único para estado, decisão, evidência e evolução do processo.
+- Pasta: `handoffs/022-contrato-evolutivo-do-fluxo-de-handoffs/`
+
+## 022 — Contrato evolutivo do fluxo de handoffs — aplicação
+
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`
+- Aplicação afetada: raiz (`docs/handoff-contracts/`, regras oficiais, hook e controles).
+- Verificação: hook estrutural, `bash -n` e `git diff --check` passaram; integração/smoke não se aplica ao escopo documental.
+- Resultado: contratos e fluxo proporcional aplicados; tarefa permanece aberta até `skill finalizar tarefa 022`.
+- Pasta: `handoffs/022-contrato-evolutivo-do-fluxo-de-handoffs/`
+
+## 022 — Contrato evolutivo do fluxo de handoffs — v2
+
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`
+- Aplicação afetada: raiz (`AGENTS.md`, `docs/instruction.md`, skill e hook operacional).
+- Por que foi feita: tornar o contrato de estado, decisão e evidência parte obrigatória do fluxo.
+- Verificação: seis arquivos de handoff válidos; `bash -n` e `git diff --check` aprovados.
+- Resultado: contrato 02 integrado sem alterar runtime; tarefa permanece aberta para finalização.
+- Pasta: `handoffs/022-contrato-evolutivo-do-fluxo-de-handoffs/v2/`
+
+## 022 — Contrato evolutivo do fluxo de handoffs — finalização
+
+- Data/hora: 2026-10-26 -03:00 | Status: `verified`
+- Aplicação afetada: raiz (`docs/handoff-contracts/`, regras oficiais, hook e controles).
+- Verificação: seis handoffs válidos, `bash -n`, `git diff --check` e referências do contrato 02 aprovados.
+- Resultado: tarefa encerrada sem mudança de runtime; `CURRENT.md` passou a `idle`.
+- Pasta: `handoffs/022-contrato-evolutivo-do-fluxo-de-handoffs/`

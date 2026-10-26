@@ -20,6 +20,8 @@ O SDD mínimo integrado ao fluxo está documentado em [`docs/sdd-minimo.md`](./s
 
 ## Política de memória e fontes de verdade
 
+O handoff é um controle de mudanças para desenvolvimento assistido por IA, organizado em três camadas: estado (onde a tarefa está), decisão (por que a mudança existe) e evidência (como a conclusão foi demonstrada). Os contratos normativos estão em [`docs/handoff-contracts/01-problemas-e-contratos.md`](./handoff-contracts/01-problemas-e-contratos.md), [`docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md`](./handoff-contracts/02-modelo-estado-decisao-e-evidencia.md) e [`docs/handoff-contracts/03-melhorias-e-complexidade-proporcional.md`](./handoff-contracts/03-melhorias-e-complexidade-proporcional.md).
+
 O fluxo usa os arquivos existentes como uma memória em camadas, sem tratar todos os registros como equivalentes:
 
 1. Código real e testes são a fonte da verdade sobre o comportamento atual.
@@ -27,6 +29,8 @@ O fluxo usa os arquivos existentes como uma memória em camadas, sem tratar todo
 3. `CURRENT.md` e `SEQUENCE.md` são a fonte da verdade sobre tarefa ativa, ordem e dependências.
 4. Os `TIMELINE.md` são a fonte histórica da evolução e não comprovam, sozinhos, que um comportamento ainda existe.
 5. Índices, grafos ou memórias geradas servem para localizar informações e nunca substituem as fontes originais.
+
+Antes de planejar ou verificar uma implementação, leia o contrato [`docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md`](./handoff-contracts/02-modelo-estado-decisao-e-evidencia.md). Ele é obrigatório para estruturar a rodada em estado, decisão e evidência; os demais contratos são consultados quando o escopo tratar de limites ou complexidade proporcional.
 
 Ao iniciar ou continuar uma tarefa, leia `CURRENT.md`, o README da implementação, a última versão, o timeline relevante e, obrigatoriamente, o código e os testes reais. Compare a memória com o estado atual e classifique cada item como `confirmado`, `parcial`, `divergente`, `ausente`, `histórico` ou `pendente`.
 
@@ -83,7 +87,9 @@ As regras detalhadas de handoff aplicam-se às alterações do projeto em geral.
 
 O histórico resumido de todas as implementações deve ser mantido em `handoffs/TIMELINE.md`. Cada entrada deve ter no máximo 8 linhas, com título numerado e, nas linhas seguintes, cada campo iniciado por `- `: data/hora, status, aplicação afetada, por que foi feita, impactos, o que resolve e a pasta relacionada. Antes de entregar, realinhe as entradas inteiras em ordem cronológica sem alterar texto, status ou conteúdo histórico. Além dele, cada implementação deve manter `handoffs/NNN-titulo/TIMELINE.md`, em modo append-only, com o histórico detalhado de cada versão (`v1`, `v2`, `vN`).
 
-`handoffs/CURRENT.md` contém somente o número inicial, com três dígitos, da implementação ativa. Por exemplo, `001` identifica a pasta `handoffs/001-exemplo-validacao-citacoes/`. Apenas essa pasta pode receber novos arquivos durante uma tarefa. Cada nova implementação deve ser isolada, sem copiar ou alterar os handoffs anteriores. Os dois timelines são append-only: o `handoffs/TIMELINE.md` recebe o resumo global e o `TIMELINE.md` dentro da implementação recebe o registro detalhado da versão criada ou atualizada.
+`handoffs/CURRENT.md` contém o número inicial, com três dígitos, da implementação ativa ou `idle` quando nenhuma tarefa está aberta. Por exemplo, `001` identifica a pasta `handoffs/001-exemplo-validacao-citacoes/`. Apenas essa pasta pode receber novos arquivos durante uma tarefa. Cada nova implementação deve ser isolada, sem copiar ou alterar os handoffs anteriores. Os dois timelines são append-only: o `handoffs/TIMELINE.md` recebe o resumo global e o `TIMELINE.md` dentro da implementação recebe o registro detalhado da versão criada ou atualizada.
+
+Uma iniciativa sem tarefa aberta deve declarar `idle` no seu controle de estado, em vez de manter uma implementação finalizada como se estivesse ativa. Se houver mais de uma iniciativa, cada uma deve possuir estado identificável; não use um único ponteiro global para representar atividades concorrentes sem declarar a limitação.
 
 `handoffs/SEQUENCE.md` mantém a ordem central, o status, as dependências e os critérios de avanço das tarefas de cada iniciativa. A IA deve registrar a sequência completa antes de detalhar a primeira tarefa. Ao aplicar, verificar ou reverter uma tarefa, a linha correspondente em `SEQUENCE.md` deve ser atualizada no mesmo ciclo de finalização. `CURRENT.md` só pode apontar para a primeira etapa ainda não finalizada.
 
@@ -123,9 +129,11 @@ Antes de criar registros, classifique a mudança:
 - `normal`: capacidade única com implementação numerada e `v1`.
 - `large`: várias aplicações, contratos, dependências ou validações independentes; exige `SEQUENCE.md` e avanço controlado por `CURRENT.md`.
 
+O nível é proporcional ao risco, não apenas à quantidade de linhas. `small` usa objetivo, arquivos, mudança, validação e resultado; `normal` usa uma implementação com `v1` e as três camadas de estado, decisão e evidência; `large` exige sequência, dependências, cobertura, evaluation ou smoke quando aplicável. Se uma tarefa pequena adquirir dependência, contrato novo, risco operacional, mudança de IA ou múltiplos consumidores, promova-a sem apagar o registro inicial.
+
 A classificação `small` não elimina a rastreabilidade; apenas evita burocracia quando não existe dependência real entre etapas.
 
-Quando houver uma sequência, registre em cada README compacto a iniciativa relacionada, as dependências, a ordem, a próxima etapa e o critério de conclusão. Não copie handoffs anteriores: uma etapa pode referenciar outra pelo número e assumir sua aplicação, mantendo cada pasta isolada e o histórico preservado. `CURRENT.md` deve apontar apenas para a etapa ativa.
+Quando houver uma sequência, registre em cada README compacto a iniciativa relacionada, as dependências, a ordem, a próxima etapa e o critério de conclusão. Não copie handoffs anteriores: uma etapa pode referenciar outra pelo número e assumir sua aplicação, mantendo cada pasta isolada e o histórico preservado. `CURRENT.md` deve apontar apenas para a etapa ativa; após o encerramento, a iniciativa deve apontar para a próxima etapa ou declarar `idle`.
 
 Antes de iniciar uma sequência, a IA deve definir a ordem completa, dependências, pré-requisitos e critérios de conclusão. Deve ativar somente a primeira etapa e criar inicialmente os handoffs detalhados dela; as demais podem existir como etapas planejadas, mas não devem ser executadas antecipadamente.
 
@@ -152,6 +160,8 @@ O usuário não precisa criar a pasta. O agente cria o próximo número disponí
 Cada alteração deve ser aplicada diretamente no arquivo real e registrada no README da versão. Antes de cada classe, interface, método, função, contrato ou bloco novo, alterado ou removido que contenha decisão ou comportamento importante, inserir comentário JSDoc em pt-BR no formato `/** ... */`. O comentário deve explicar em linguagem simples o que o elemento faz, por que existe e qual comportamento protege ou altera. Depois da descrição, manter somente o histórico relevante no formato `NNN-vN`, como `003-v1`; adicionar uma entrada apenas quando houver mudança semântica, não para ajustes puramente mecânicos. Para uma linha isolada, colocar o comentário acima do método ou bloco ao qual ela pertence. Em formatos sem comentários, registrar a exceção no README da versão.
 
 ## Aplicações reais e responsabilidades
+
+Para toda alteração, diferencie status de implementação (`proposed`, `applied`, `verified` ou `rolled-back`) de maturidade da capacidade (`experimental`, `internal`, `ready`, `deprecated` ou equivalente), quando houver impacto de produto, IA, custo, latência, segurança ou operação. O primeiro descreve execução; o segundo descreve decisão de uso.
 
 O JSDoc deve priorizar o efeito compreensível para uma pessoa não técnica e incluir somente as principais decisões internas e o comportamento protegido ou alterado. Imports simples, propriedades óbvias, getters triviais e linhas puramente mecânicas sem decisão comportamental não exigem comentário individual; podem ser explicados somente no README da versão.
 
@@ -218,24 +228,25 @@ O handoff deve informar se a alteração exige execução do dataset completo no
 
 1. Ler `AGENTS.md`.
 2. Ler este documento.
-3. Consultar os documentos relevantes em `docs/fases/`, quando necessário.
-4. Identificar se a alteração pertence à API, ao frontend, à IA ou à raiz compartilhada do projeto.
-5. Inspecionar os arquivos originais relevantes.
-6. Planejar o menor conjunto de alterações.
-7. Criar a próxima pasta numerada em `handoffs/<numero-titulo>/` e sua primeira versão `v1/`, sem alterar implementações anteriores.
-8. Atualizar `handoffs/CURRENT.md` para apontar para a implementação ativa.
-9. Criar ou atualizar `handoffs/<numero-titulo>/TIMELINE.md` antes de entregar a versão.
-10. Atualizar o `README.md` da implementação com o resumo consolidado da tarefa atual e a evolução de todas as versões existentes, incluindo a nova versão, status, mudanças, pendências e próxima ação.
-11. Aplicar diretamente os arquivos reais da aplicação, sem copiar código para `handoffs/`.
-12. Registrar no README da versão localização, operação, motivo, impacto, arquivos alterados e comentários versionados.
-13. Incluir a ordem de execução.
-14. Incluir testes e verificações.
-15. Confirmar que implementações anteriores e alterações não relacionadas permaneceram intactas.
-16. Adicionar uma entrada compacta, de no máximo 8 linhas, ao final de `handoffs/TIMELINE.md` e uma entrada detalhada ao final do timeline da implementação.
-17. Conferir e, se necessário, realinhar somente a posição das entradas inteiras dos dois timelines em ordem cronológica, sem alterar seu texto ou conteúdo.
-18. Registrar o status atual no README compacto da implementação e atualizar a linha correspondente em `handoffs/SEQUENCE.md`, quando a implementação fizer parte de uma sequência. Antes da entrega, conferir se `CURRENT.md`, `SEQUENCE.md`, README e timelines apontam para o mesmo estado; divergências permanecem pendentes.
-19. Executar o checklist de finalização: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, validar o status contra as evidências, executar o hook estrutural e os testes aplicáveis, conferir a lista explícita de commit e confirmar o avanço ou a permanência de `CURRENT.md`.
-20. Atualizar `handoffs/TIMELINE.md` com o resumo da implementação.
+3. Ler `docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md` e aplicar suas três camadas ao plano e à validação.
+4. Consultar os documentos relevantes em `docs/fases/`, quando necessário.
+5. Identificar se a alteração pertence à API, ao frontend, à IA ou à raiz compartilhada do projeto.
+6. Inspecionar os arquivos originais relevantes.
+7. Planejar o menor conjunto de alterações.
+8. Criar a próxima pasta numerada em `handoffs/<numero-titulo>/` e sua primeira versão `v1/`, sem alterar implementações anteriores.
+9. Atualizar `handoffs/CURRENT.md` para apontar para a implementação ativa.
+10. Criar ou atualizar `handoffs/<numero-titulo>/TIMELINE.md` antes de entregar a versão.
+11. Atualizar o `README.md` da implementação com o resumo consolidado da tarefa atual e a evolução de todas as versões existentes, incluindo a nova versão, status, mudanças, pendências e próxima ação.
+12. Aplicar diretamente os arquivos reais da aplicação, sem copiar código para `handoffs/`.
+13. Registrar no README da versão localização, operação, motivo, impacto, arquivos alterados e comentários versionados.
+14. Incluir a ordem de execução.
+15. Incluir testes e verificações.
+16. Confirmar que implementações anteriores e alterações não relacionadas permaneceram intactas.
+17. Adicionar uma entrada compacta, de no máximo 8 linhas, ao final de `handoffs/TIMELINE.md` e uma entrada detalhada ao final do timeline da implementação.
+18. Conferir e, se necessário, realinhar somente a posição das entradas inteiras dos dois timelines em ordem cronológica, sem alterar seu texto ou conteúdo.
+19. Registrar o status atual no README compacto da implementação e atualizar a linha correspondente em `handoffs/SEQUENCE.md`, quando a implementação fizer parte de uma sequência. Antes da entrega, conferir se `CURRENT.md`, `SEQUENCE.md`, README e timelines apontam para o mesmo estado; divergências permanecem pendentes.
+20. Executar o checklist de finalização: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, validar o status contra as evidências, executar o hook estrutural e os testes aplicáveis, conferir a lista explícita de commit e confirmar o avanço ou a permanência de `CURRENT.md`.
+21. Atualizar `handoffs/TIMELINE.md` com o resumo da implementação.
 
 ## Como finalizar uma tarefa
 

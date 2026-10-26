@@ -23,7 +23,7 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 8 | `009-observabilidade-e-custo` | `ia` | `proposed` | `007` e `011` | trace registra execução, latência, tokens e custo; standby |
 | 9 | `010-autorizacao-tools-e-mcp` | `api`/`ia` | `proposed` | `008`, `009` e `011` | acesso por projeto e tools de leitura autorizadas; standby |
 
-## Estado ativo
+## Estado histórico da sequência principal
 
 - Última implementação verificada: `014-exigir-pgvector-no-runtime`.
 - Próxima capacidade ativa: `015-adaptar-chunking-para-langchain`, proposta para preparar o chunking compatível com LangChain.
@@ -47,9 +47,9 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | 17 | `019-separar-orquestracao-python` | `ia` | `proposed` | `018` | workflows LangGraph isolados de casos de uso, estado e políticas de retry/observabilidade definidos |
 | 18 | `020-reorganizar-evaluation-python` | `ia` | `proposed` | `019` | runners, datasets, métricas e baselines separados, com evaluation determinística e avaliação semântica extensível |
 
-## Estado ativo
+## Estado histórico da organização evolutiva
 
-- Implementação ativa: `017-renomear-fluxo-extracao-chunking`.
+- Última implementação da sequência: `017-renomear-fluxo-extracao-chunking`.
 - Dependência: `016-reorganizar-arquitetura-python` está `verified`.
 - Critério da etapa: validar a semântica dos nomes e preservar o fluxo API → Python → PGVector antes de consolidar namespaces.
 
@@ -59,9 +59,22 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | --- | --- | --- | --- | --- | --- |
 | 1 | `021-revisar-fluxo-e-comentarios-handoffs` | `root` | `verified` | `017` verificada; `018`–`020` permanecem reservadas para a Fase 2 | comentários simples com histórico `NNN-vN`, contrato mínimo de versão e consistência dos estados documentados |
 
-## Estado ativo da iniciativa de governança
+## Estado encerrado da iniciativa de governança
 
-- Implementação ativa: `021-revisar-fluxo-e-comentarios-handoffs`.
+- Implementação finalizada: `021-revisar-fluxo-e-comentarios-handoffs`.
 - Dependência: a implementação `017` está verificada; as alterações locais de código não relacionadas permanecem fora desta tarefa.
 - Critério da etapa: regras atualizadas, handoff da versão criado, validação estrutural executada e ausência de mudança de runtime.
-- Encerramento: `021` verificada; não há próxima etapa ativa nesta iniciativa e `CURRENT.md` permanece em `021` como referência do último estado governado.
+- Encerramento: `021` verificada; não há próxima etapa ativa nesta iniciativa.
+
+## Iniciativa de contrato evolutivo do fluxo
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `022-contrato-evolutivo-do-fluxo-de-handoffs` | `root` | `verified` | `021` verificada | três contratos documentados, camadas estado/decisão/evidência incorporadas às regras e fluxo proporcional `small`/`normal`/`large` aplicado |
+
+## Estado ativo da iniciativa de contrato evolutivo
+
+- Implementação ativa: `022-contrato-evolutivo-do-fluxo-de-handoffs`.
+- Dependência: `021` verificada; alterações locais de runtime permanecem fora do escopo.
+- Critério da etapa: documentos normativos criados, regras oficiais atualizadas e validação estrutural registrada.
+- Encerramento: `022` verificada; não há próxima etapa ativa e `CURRENT.md` está `idle`.

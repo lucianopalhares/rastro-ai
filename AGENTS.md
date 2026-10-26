@@ -4,6 +4,8 @@ As regras detalhadas do fluxo de implementações estão em [`docs/instruction.m
 
 Leia `docs/instruction.md` antes de qualquer tarefa. Use `docs/fases/` somente como referência de arquitetura e escopo.
 
+No fluxo de handoffs, leia também [`docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md`](docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md) antes de planejar, aplicar ou verificar uma mudança; ele define o contrato mínimo de estado, decisão e evidência.
+
 ## Regra principal
 
 Implemente diretamente código, configuração, testes e documentação nas aplicações reais. Use `handoffs/` somente para registrar o objetivo, a evolução, os arquivos alterados, as verificações e as pendências; não copie código de aplicação para os handoffs.
@@ -39,6 +41,8 @@ Antes de entregar qualquer implementação, execute `.agents/hooks/validate-hand
 
 ## Handoffs
 
+O handoff é o controle de mudanças do desenvolvimento assistido por IA: ele organiza estado, decisão e evidência. Os contratos completos estão em [`docs/handoff-contracts/01-problemas-e-contratos.md`](docs/handoff-contracts/01-problemas-e-contratos.md), [`docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md`](docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md) e [`docs/handoff-contracts/03-melhorias-e-complexidade-proporcional.md`](docs/handoff-contracts/03-melhorias-e-complexidade-proporcional.md).
+
 Cada implementação usa o formato:
 
 ```text
@@ -56,9 +60,13 @@ handoffs/
     └── v2/ (quando houver nova rodada na mesma tarefa)
 ```
 
-`CURRENT.md` contém somente o número da implementação ativa. `SEQUENCE.md` registra a ordem das tarefas de uma iniciativa. O `handoffs/TIMELINE.md` é o histórico global append-only. Cada implementação também deve conter seu próprio `TIMELINE.md`, append-only, registrando o que cada versão (`v1`, `v2`, `vN`) fez, resolveu ou deixou pendente. Cada rodada de geração dentro de uma tarefa deve ser uma nova versão `vN`, sem sobrescrever versões anteriores. Antes de registrar uma nova entrada, confira e realinhe cronologicamente a ordem dos eventos existentes, sem alterar o texto, status ou conteúdo histórico das entradas.
+`CURRENT.md` contém o número da implementação ativa ou `idle` quando nenhuma tarefa está aberta. `SEQUENCE.md` registra a ordem das tarefas de uma iniciativa. O `handoffs/TIMELINE.md` é o histórico global append-only. Cada implementação também deve conter seu próprio `TIMELINE.md`, append-only, registrando o que cada versão (`v1`, `v2`, `vN`) fez, resolveu ou deixou pendente. Cada rodada de geração dentro de uma tarefa deve ser uma nova versão `vN`, sem sobrescrever versões anteriores. Antes de registrar uma nova entrada, confira e realinhe cronologicamente a ordem dos eventos existentes, sem alterar o texto, status ou conteúdo histórico das entradas.
 
 Cada versão contém somente `README.md` e `TIMELINE.md`. Não copie código, configuração, testes ou documentação de aplicação para `handoffs/`; leia e altere os arquivos reais diretamente. A versão anterior serve apenas para identificar o que foi feito e orientar a reconciliação; a aplicação real decide o que já existe.
+
+Classifique cada mudança pela menor complexidade compatível com o risco: `small` usa registro mínimo, `normal` usa uma implementação com `v1` e `large` usa sequência, dependências e cobertura ampliada. Se a tarefa crescer, promova-a sem apagar o histórico anterior.
+
+Quando não houver tarefa aberta, o controle da iniciativa deve declarar `idle`; uma implementação finalizada não deve permanecer como se estivesse ativa.
 
 Sempre que criar ou atualizar o `vN/README.md`, inclua a seção `## Instruções de validação` com os comandos, URLs, ações manuais ou testes necessários para validar a alteração e o resultado esperado de cada verificação. Quando houver requisição HTTP, inclua o comando completo copiável — por exemplo `curl` — com método, URL, headers, payload ou campos multipart e arquivo de entrada. Mantenha o registro enxuto, limitado a estado-base, escopo autorizado, invariantes, mudança aplicada e evidência.
 

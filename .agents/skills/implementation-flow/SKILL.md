@@ -18,6 +18,8 @@ Discussões não geram handoffs. Antes de criar ou atualizar arquivos, resuma o 
 
 ## Objetivo
 
+O handoff opera em três camadas: estado (tarefa, versão, dependências e pendências), decisão (objetivo, invariantes, riscos e escolhas) e evidência (testes, smoke, evaluation, diff e commit). O contrato dessas camadas e dos limites do processo está em `docs/handoff-contracts/`.
+
 Controlar o ciclo de vida de implementações do projeto aplicando as mudanças diretamente nos arquivos reais. A saída em `handoffs/` contém somente contexto, status e histórico em `README.md` e `TIMELINE.md`; não contém cópias de código. Alterações solicitadas em `.agents/`, `docs/` ou `AGENTS.md` também podem ser feitas diretamente.
 
 Todo código criado ou alterado pela skill deve usar inglês nos nomes de classes, métodos, funções, variáveis, propriedades, interfaces, tipos, enums, módulos e arquivos de código. Os comentários de versionamento no código e o texto instrucional dos registros — localização, motivo, impacto, dependências e verificações — devem ser escritos em pt-BR.
@@ -28,8 +30,9 @@ Antes de agir, leia:
 
 1. `/home/dev/dev/ia/rastro-ai/AGENTS.md`;
 2. `/home/dev/dev/ia/rastro-ai/docs/instruction.md`;
-3. `/home/dev/dev/ia/rastro-ai/handoffs/CURRENT.md`;
-4. o `README.md` da implementação apontada por `CURRENT.md`, quando existir.
+3. `/home/dev/dev/ia/rastro-ai/docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md`;
+4. `/home/dev/dev/ia/rastro-ai/handoffs/CURRENT.md`;
+5. o `README.md` da implementação apontada por `CURRENT.md`, quando existir.
 
 Também leia `handoffs/SEQUENCE.md` quando existir. Ele é a fonte da ordem, do status, das dependências e dos critérios de avanço entre tarefas, mas não é fonte do código.
 
@@ -101,9 +104,13 @@ Cada implementação deve conter uma única capacidade ou etapa aplicável, pouc
 
 Classifique antes de registrar a mudança: `small` para alteração isolada sem dependências e com validação simples; `normal` para uma capacidade única com `v1`; `large` para múltiplas etapas, aplicações ou dependências, exigindo `SEQUENCE.md`. Tarefas `small` continuam registrando arquivos, motivo, impacto e validação, mas não criam sequência desnecessária.
 
+Use a menor categoria compatível com o risco: `small` registra objetivo, arquivos, mudança, validação e resultado; `normal` cria `v1` e documenta estado, decisão e evidência; `large` cria sequência, dependências, cobertura e gates ampliados. Promova a tarefa se surgirem contrato, dependência, risco operacional, mudança de IA ou múltiplos consumidores.
+
 No README de cada etapa, registre, quando aplicável, a iniciativa relacionada, dependências, posição na ordem, próxima etapa e critério de conclusão. `CURRENT.md` aponta somente para a etapa ativa; ao terminar uma etapa, a próxima pode ser ativada preservando o histórico anterior.
 
 Quando a solicitação gerar várias etapas, primeiro defina a sequência completa, as dependências, os pré-requisitos e os critérios de conclusão. Ative somente a primeira etapa e aplique apenas essa etapa na aplicação real. As demais podem ser registradas como planejadas, mas não devem ser aplicadas ou ativadas antecipadamente.
+
+Depois de finalizar a última etapa de uma iniciativa, não mantenha a tarefa finalizada como ativa: registre a próxima etapa ou o estado `idle` no controle correspondente. Se o repositório mantiver um ponteiro global por compatibilidade, ele deve ser tratado como referência histórica, não como autorização para reabrir a tarefa.
 
 Não pule etapas. Só avance depois de receber `skill finalizar tarefa <numero>` para a etapa atual e confirmar status `applied` ou `verified`. Nesse momento, atualize `CURRENT.md` para a próxima etapa da sequência. Se o usuário pedir uma etapa posterior antes da conclusão da atual, recuse o salto, explique a dependência e mantenha a etapa atual ativa.
 

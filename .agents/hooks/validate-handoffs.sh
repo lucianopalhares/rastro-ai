@@ -13,6 +13,31 @@ fail() {
 
 [[ -f "$AGENTS_FILE" ]] || fail "AGENTS.md não foi encontrado"
 
+STATE_CONTRACT_FILE="$ROOT_DIR/docs/handoff-contracts/02-modelo-estado-decisao-e-evidencia.md"
+[[ -f "$STATE_CONTRACT_FILE" ]] || fail "o contrato de estado, decisão e evidência não foi encontrado"
+grep -q '^## Camada 1 — Estado$' "$STATE_CONTRACT_FILE" || fail "o contrato não possui a camada de estado"
+grep -q '^## Camada 2 — Decisão$' "$STATE_CONTRACT_FILE" || fail "o contrato não possui a camada de decisão"
+grep -q '^## Camada 3 — Evidência$' "$STATE_CONTRACT_FILE" || fail "o contrato não possui a camada de evidência"
+
+CURRENT_FILE="$ROOT_DIR/handoffs/CURRENT.md"
+SEQUENCE_FILE="$ROOT_DIR/handoffs/SEQUENCE.md"
+[[ -f "$CURRENT_FILE" ]] || fail "handoffs/CURRENT.md não foi encontrado"
+[[ -f "$SEQUENCE_FILE" ]] || fail "handoffs/SEQUENCE.md não foi encontrado"
+
+current_value="$(tr -d '[:space:]' < "$CURRENT_FILE")"
+if [[ "$current_value" != "idle" ]]; then
+  [[ "$current_value" =~ ^[0-9]{3}$ ]] || fail "CURRENT.md deve conter um número de três dígitos ou idle"
+  active_task_line="$(grep -E "^- Implementação ativa: .*\`${current_value}-" "$SEQUENCE_FILE" || true)"
+  [[ -n "$active_task_line" ]] || fail "CURRENT.md aponta para $current_value, mas SEQUENCE.md não declara essa implementação como ativa"
+  task_readme="$(find "$ROOT_DIR/handoffs" -maxdepth 2 -type f -path "*/${current_value}-*/README.md" -print -quit)"
+  [[ -n "$task_readme" ]] || fail "CURRENT.md aponta para $current_value, mas o README da implementação não existe"
+  task_status="$(grep -m1 -oE 'Status: `[^`]+`' "$task_readme" | sed -E 's/.*`([^`]+)`.*/\1/' || true)"
+  case "$task_status" in
+    proposed|approved|applied) ;;
+    *) fail "CURRENT.md aponta para $current_value, mas a tarefa está com status final ou ausente: ${task_status:-desconhecido}" ;;
+  esac
+fi
+
 while IFS= read -r application_line; do
   application_path="${application_line#*: }"
   application_path="${application_path//\`/}"

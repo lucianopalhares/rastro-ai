@@ -1,11 +1,11 @@
 # Estado das aplicações do Rastro AI
 
-- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para a implementação ativa `021-revisar-fluxo-e-comentarios-handoffs`.
+- Raiz: a iniciativa está na Fase 1; `CURRENT.md` está `idle` após a verificação da implementação `022-contrato-evolutivo-do-fluxo-de-handoffs`.
 - API (`rastro-api`): a tarefa `004` está `verified`; a API recebe `.md` e `.txt` não vazios, armazena localmente, associa ao projeto/documento e retorna `status: pending`.
 - Frontend (`rastro-front`): nenhuma capacidade desta sequência foi aplicada ainda.
 - IA (`rastro-ai`): extração/chunking, embeddings e PGVector com LangChain, retrieval e respostas extrativas com citações estão verificados; reranking, chains, prompts e LangGraph permanecem preparados para evolução futura.
 - Invariantes atuais: o upload preserva o arquivo original, envia o conteúdo ao indexador Python e retorna `ready` ou `failed`; retry assíncrono permanece fora do escopo.
-- Próxima capacidade ativa: `017-consolidar-namespaces-python`; a implementação `016-reorganizar-arquitetura-python` foi verificada e finalizada.
+- Próxima capacidade funcional: a Fase 2 permanece planejada; a iniciativa ativa atual é a governança evolutiva dos handoffs (`022`).
 
 ## Implementações registradas
 
@@ -25,6 +25,7 @@
 | `016` | `reorganizar-arquitetura-python` | `ia` | `verified` |
 | `017` | `renomear-fluxo-extracao-chunking` | `ia` | `verified` |
 | `021` | `revisar-fluxo-e-comentarios-handoffs` | `root` | `verified` |
+| `022` | `contrato-evolutivo-do-fluxo-de-handoffs` | `root` | `verified` |
 
 ## Padrão de validação para novas versões
 
