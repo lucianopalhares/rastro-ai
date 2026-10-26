@@ -14,3 +14,5 @@
 - Evidência: testes Python/NestJS, build, smoke API → Rastro AI → PostgreSQL, validação de limite/isolamento e hook estrutural aprovados.
 - Resultado: endpoint de busca semântica determinística entregue; duplicatas existentes no banco de teste registradas como risco fora do escopo.
 - Controle: `CURRENT.md` passou a `idle` e `SEQUENCE.md` marcou a implementação como `verified`.
+- Commit: `9b57940` — `Publica busca semantica deterministica pela API`.
+- Verificação do commit: lista explícita de 15 arquivos da tarefa, `git diff --cached --check` e commit concluídos.
