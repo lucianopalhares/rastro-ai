@@ -77,3 +77,17 @@ JSON
 ```
 
 Resultado esperado: HTTP `200` com `documentId`, quantidade de `chunks` e `backend: "postgres"`. Essa chamada ignora a API e é útil para atingir breakpoints em `rastro-ai/src/rastro_ai/service.py` e `rastro-ai/src/rastro_ai/indexing.py`.
+
+## Busca semântica
+
+Consulte os chunks do projeto pela API NestJS; o Rastro AI gera o embedding da consulta e
+retorna resultados do PGVector com score e citação:
+
+```bash
+curl --fail-with-body --get \
+  --url 'http://127.0.0.1:3039/api/v1/documents/search?projectId=debug-project&query=qual%20banco%20foi%20decidido&limit=5' \
+  --header 'accept: application/json'
+```
+
+Resultado esperado: HTTP `200` com `projectId`, `query` e `results`. `limit` aceita valores de
+1 a 50; a busca sempre permanece filtrada pelo `projectId` informado.

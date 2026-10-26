@@ -6,13 +6,16 @@ import {
   Get,
   Inject,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
 import { CreateDocumentUseCase } from '../application/create-document.use-case';
 import { DocumentRepository } from '../application/document.repository';
+import { SemanticSearcher } from '../application/semantic-searcher';
 import { UploadDocumentUseCase } from '../application/upload-document.use-case';
 
 /**
@@ -46,6 +49,27 @@ class UploadDocumentRequest {
 }
 
 /**
+ * Define os parâmetros da consulta semântica pública.
+ * Histórico: 023-v1 — valida projeto, pergunta e limite antes do proxy Python.
+ */
+class SemanticSearchRequest {
+  @IsString()
+  @IsNotEmpty()
+  projectId!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  query!: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit = 5;
+}
+
+/**
  * Mantém somente os dados do arquivo necessários para a aplicação.
  *
  * v1 = criou um tipo local para evitar acoplamento do domínio ao Express.
@@ -61,6 +85,7 @@ interface UploadedDocumentFile {
  * Expõe criação, upload e consulta dos documentos.
  *
  * v1 = adicionou o endpoint multipart sem remover o endpoint JSON existente.
+ * 023-v1 = adicionou a consulta semântica determinística por projeto.
  */
 @Controller('documents')
 export class DocumentsController {
@@ -74,6 +99,8 @@ export class DocumentsController {
     private readonly uploadDocumentUseCase: UploadDocumentUseCase,
     @Inject('DocumentRepository')
     private readonly documentRepository: DocumentRepository,
+    @Inject('SemanticSearcher')
+    private readonly semanticSearcher: SemanticSearcher,
   ) {}
 
   /**
@@ -129,5 +156,14 @@ export class DocumentsController {
   async findAll() {
     const documents = await this.documentRepository.findAll();
     return documents.map((document) => document.toJSON());
+  }
+
+  /**
+   * Busca semanticamente os chunks de um projeto e retorna suas citações.
+   * Histórico: 023-v1 — publica o contrato determinístico do Rastro AI na API.
+   */
+  @Get('search')
+  search(@Query() request: SemanticSearchRequest) {
+    return this.semanticSearcher.search(request.projectId, request.query, request.limit);
   }
 }

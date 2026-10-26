@@ -9,6 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .indexing import extract_chunk_and_persist_document
+from .retrieval import search_relevant_chunks
 
 
 # /**
@@ -32,6 +33,9 @@ class IndexingRequestHandler(BaseHTTPRequestHandler):
     #  * Histórico: v1 — adiciona POST `/index` com arquivo temporário UTF-8.
     #  */
     def do_POST(self) -> None:
+        if self.path == "/search":
+            self._search()
+            return
         if self.path != "/index":
             self._send_json(404, {"error": "Not found"})
             return
@@ -70,6 +74,49 @@ class IndexingRequestHandler(BaseHTTPRequestHandler):
         except Exception as error:  # pragma: no cover - boundary protection
             self._send_json(500, {"error": str(error)})
 
+    # /**
+    #  * Executa a busca vetorial determinística solicitada pela API.
+    #  * Existe para manter o isolamento por projeto, limite e score no serviço que possui o PGVector.
+    #  * Histórico: 023-v1 — publica resultados semânticos e citações para o Rastro API.
+    #  */
+    def _search(self) -> None:
+        try:
+            payload = self._read_payload()
+            project_id = self._required_string(payload, "projectId")
+            query = self._required_string(payload, "query")
+            limit = self._read_limit(payload)
+            results = search_relevant_chunks(project_id, query, limit=limit)
+            self._send_json(
+                200,
+                {
+                    "projectId": project_id,
+                    "query": query,
+                    "results": [
+                        {
+                            "documentId": result.chunk.document_id,
+                            "chunkIndex": result.chunk.index,
+                            "content": result.chunk.content,
+                            "startOffset": result.chunk.start_offset,
+                            "endOffset": result.chunk.end_offset,
+                            "projectId": result.chunk.project_id,
+                            "score": result.score,
+                            "citation": {
+                                "documentId": result.chunk.document_id,
+                                "chunkIndex": result.chunk.index,
+                                "startOffset": result.chunk.start_offset,
+                                "endOffset": result.chunk.end_offset,
+                                "excerpt": result.chunk.content,
+                            },
+                        }
+                        for result in results
+                    ],
+                },
+            )
+        except (ValueError, json.JSONDecodeError) as error:
+            self._send_json(400, {"error": str(error)})
+        except Exception as error:  # pragma: no cover - boundary protection
+            self._send_json(500, {"error": str(error)})
+
     # /** Histórico: v1 — limita o corpo recebido para proteger o processo. */
     def _read_payload(self) -> dict[str, object]:
         length = int(self.headers.get("content-length", "0"))
@@ -88,6 +135,17 @@ class IndexingRequestHandler(BaseHTTPRequestHandler):
         value = payload.get(key)
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"{key} is required")
+        return value
+
+    # /**
+    #  * Valida o limite recebido pelo boundary e impede consultas sem controle de custo.
+    #  * Histórico: 023-v1 — limita cada consulta pública a no máximo 50 resultados.
+    #  */
+    @staticmethod
+    def _read_limit(payload: dict[str, object]) -> int:
+        value = payload.get("limit", 5)
+        if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 50:
+            raise ValueError("limit must be an integer between 1 and 50")
         return value
 
     # /** Histórico: v1 — serializa respostas JSON do boundary HTTP. */

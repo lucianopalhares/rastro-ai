@@ -6,6 +6,7 @@ import { DocumentRepository } from './application/document.repository';
 import { UploadDocumentUseCase } from './application/upload-document.use-case';
 import { InMemoryDocumentRepository } from './infrastructure/in-memory-document.repository';
 import { HttpDocumentIndexer } from './infrastructure/http-document-indexer';
+import { HttpSemanticSearcher } from './infrastructure/http-semantic-searcher';
 import { LocalDocumentFileStorage } from './infrastructure/local-document-file.storage';
 import { DocumentsController } from './presentation/documents.controller';
 
@@ -20,6 +21,10 @@ import { DocumentsController } from './presentation/documents.controller';
     InMemoryDocumentRepository,
     LocalDocumentFileStorage,
     HttpDocumentIndexer,
+    {
+      provide: 'SemanticSearcher',
+      useClass: HttpSemanticSearcher,
+    },
     {
       provide: 'DocumentRepository',
       useExisting: InMemoryDocumentRepository,

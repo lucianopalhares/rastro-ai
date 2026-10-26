@@ -62,6 +62,20 @@ JSON
 
 Resultado esperado: HTTP `200` com `documentId`, `chunks` e `backend: "postgres"`.
 
+## Busca semântica pela API
+
+A API pública expõe a busca vetorial determinística por projeto e delega a consulta ao
+Rastro AI, que gera o embedding da pergunta e consulta o PGVector:
+
+```bash
+curl --fail-with-body --get \
+  --url 'http://127.0.0.1:3039/api/v1/documents/search?projectId=debug-project&query=qual%20banco%20foi%20decidido&limit=5' \
+  --header 'accept: application/json'
+```
+
+Resultado esperado: HTTP `200` com `projectId`, `query` e `results`; cada resultado contém
+`documentId`, `chunkIndex`, `content`, `score` e `citation` com offsets verificáveis.
+
 4. Para testar o fluxo completo API → Python, envie o fixture pela API:
 
 ```bash

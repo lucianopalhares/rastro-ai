@@ -72,9 +72,21 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | --- | --- | --- | --- | --- | --- |
 | 1 | `022-contrato-evolutivo-do-fluxo-de-handoffs` | `root` | `verified` | `021` verificada | três contratos documentados, camadas estado/decisão/evidência incorporadas às regras e fluxo proporcional `small`/`normal`/`large` aplicado |
 
-## Estado ativo da iniciativa de contrato evolutivo
+## Estado encerrado da iniciativa de contrato evolutivo
 
-- Implementação ativa: `022-contrato-evolutivo-do-fluxo-de-handoffs`.
+- Implementação finalizada: `022-contrato-evolutivo-do-fluxo-de-handoffs`.
 - Dependência: `021` verificada; alterações locais de runtime permanecem fora do escopo.
 - Critério da etapa: documentos normativos criados, regras oficiais atualizadas e validação estrutural registrada.
 - Encerramento: `022` verificada; não há próxima etapa ativa e `CURRENT.md` está `idle`.
+
+## Fase 3 — Busca semântica consumível pela API
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 19 | `023-busca-semantica-deterministica-api` | `api`/`ia` | `verified` | `011`, `014`, `015`, `017` | endpoint API → Rastro AI retorna resultados filtrados por projeto, limite, score e citações; diagnóstico de embedding documentado |
+
+## Estado encerrado da busca semântica
+
+- Implementação finalizada: `023-busca-semantica-deterministica-api`.
+- Dependência: capacidades vetoriais anteriores verificadas; a v1 foi aplicada nas aplicações reais.
+- Critério da etapa: testes, hook estrutural e smoke API → Rastro AI → PostgreSQL concluídos; `CURRENT.md` voltou a `idle`.

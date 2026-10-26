@@ -705,3 +705,21 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Verificação: seis handoffs válidos, `bash -n`, `git diff --check` e referências do contrato 02 aprovados.
 - Resultado: tarefa encerrada sem mudança de runtime; `CURRENT.md` passou a `idle`.
 - Pasta: `handoffs/022-contrato-evolutivo-do-fluxo-de-handoffs/`
+
+## 023 — Busca semântica determinística pela API — aplicação
+
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-api` e `rastro-ai`.
+- Motivo: publicar o retrieval vetorial existente por endpoint com contrato determinístico.
+- Impacto: nova consulta por projeto com limite, score, offsets e citações; upload preservado.
+- Verificação: embedding direto, indexação real e smoke do indexador confirmados; testes e smoke final da busca pendentes.
+- Pasta: `handoffs/023-busca-semantica-deterministica-api/`
+
+## 023 — Busca semântica determinística pela API — finalização
+
+- Data/hora: 2026-10-26 -03:00 | Status: `verified`
+- Aplicação afetada: `rastro-api` e `rastro-ai`.
+- Verificação: 37 testes Python, 12 testes NestJS, build TypeScript, smoke dos dois endpoints, isolamento por projeto, limite inválido e hook estrutural aprovados.
+- Resultado: busca semântica determinística publicada com score, offsets e citações; diagnóstico de embedding concluído.
+- Controle: `CURRENT.md` voltou a `idle`; implementação 023 encerrada sem alterar implementações anteriores.
+- Pasta: `handoffs/023-busca-semantica-deterministica-api/`
