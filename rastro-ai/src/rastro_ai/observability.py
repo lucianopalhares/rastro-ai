@@ -38,6 +38,7 @@ def update_observation(observation: Any | None, **fields: Any) -> None:
 #  * Abre uma observação Langfuse sem permitir que telemetria interrompa o runtime.
 #  * Existe para registrar duração, status e metadados mínimos sem enviar conteúdo documental.
 #  * Histórico: 024-v1 — cria o boundary opcional para indexação e embeddings.
+#  * Histórico: 025-v1 — permite informar o modelo para usage e custo inferidos.
 #  */
 @contextmanager
 def observe_operation(
@@ -45,6 +46,7 @@ def observe_operation(
     name: str,
     observation_type: str,
     input_metadata: dict[str, Any],
+    model: str | None = None,
 ) -> Iterator[Any | None]:
     """Produz uma observação ativa quando Langfuse está habilitado e configurado."""
 
@@ -56,10 +58,15 @@ def observe_operation(
         from langfuse import get_client
 
         client = get_client()
+        observation_arguments: dict[str, Any] = {
+            "as_type": observation_type,
+            "name": name,
+            "input": input_metadata,
+        }
+        if model:
+            observation_arguments["model"] = model
         observation_context = client.start_as_current_observation(
-            as_type=observation_type,
-            name=name,
-            input=input_metadata,
+            **observation_arguments,
         )
     except Exception:
         # Falhas de configuração ou de inicialização não alteram o runtime.

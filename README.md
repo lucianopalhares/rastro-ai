@@ -91,6 +91,10 @@ Crie o projeto e as chaves na interface, preencha `LANGFUSE_PUBLIC_KEY` e
 O fluxo de indexação passará a registrar duração, status, projeto, contagem de chunks,
 modelo e dimensão sem enviar o texto dos documentos.
 
+Para acompanhar tokens e custo de embeddings, configure o modelo `text-embedding-3-small`
+em `Project Settings > Models`. O Rastro conta os tokens localmente; opcionalmente,
+`LANGFUSE_EMBEDDING_INPUT_COST_PER_TOKEN` informa um preço direto em USD por token.
+
 Os valores padrão do Compose são apenas para desenvolvimento local; troque as senhas,
 `salt`, `NEXTAUTH_SECRET` e `ENCRYPTION_KEY` antes de expor o stack fora da máquina local.
 

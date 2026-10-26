@@ -1,0 +1,11 @@
+# 025 — Tokens e custos de embeddings no Langfuse
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`; aplicação: `rastro-ai` e raiz.
+- Objetivo: registrar tokens de entrada e custo na observação `embedding-generation`.
+- Dependência/ordem: `024` verificada; alterar primeiro o SDK local, depois validar no stack Langfuse existente.
+- Decisão: custo inferido pelo modelo será padrão; custo direto por token será opcional para preços privados/customizados.
+- Invariante: contagem de tokens é local e nenhum texto, vetor ou segredo entra no trace.
+- Impacto: painel exibirá uso e custo quando houver modelo/preço compatível; runtime funcional permanece independente do Langfuse.
+- Evolução: `v1` aplicou modelo top-level, tokenizer local, usage details, custo opcional e testes.
+- Evidência: imagem construída, 37 testes Python aprovados, Compose válido, indexação real HTTP 200 e health do indexador aprovado; endpoint público de observações respondeu 404 no Langfuse v4 local.
+- Pendência: trace novo mostra tokens, mas custo permanece ausente; falta confirmar matching/preço no modelo ou validar o fallback direto `LANGFUSE_EMBEDDING_INPUT_COST_PER_TOKEN`.
+- Pasta/próxima ação: `handoffs/025-tokens-custos-embeddings-langfuse/`; manter ativa para corrigir/verificar custo antes do commit.

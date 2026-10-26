@@ -749,3 +749,21 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resultado: observabilidade self-hosted sanitizada integrada à indexação e embeddings; custo não instrumentado nesta rodada.
 - Controle: `CURRENT.md` voltou a `idle`; implementação 024 encerrada preservando as anteriores.
 - Pasta: `handoffs/024-langfuse-observabilidade-indexacao/`
+
+## 025 — Tokens e custos de embeddings no Langfuse — abertura
+
+- Data/hora: 2026-10-26 -03:00 | Status: `proposed`
+- Aplicação afetada: `rastro-ai` e raiz.
+- Motivo: tornar tokens e custo da chamada de embedding visíveis no trace existente.
+- Impacto: observações passam a registrar uso e custo inferido ou personalizado sem enviar textos.
+- Dependência: implementação `024` verificada.
+- Pasta: `handoffs/025-tokens-custos-embeddings-langfuse/`
+
+## 025 — Tokens e custos de embeddings no Langfuse — aplicação parcial
+
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai` e raiz.
+- Verificação: 37 testes Python, Compose, build, health e indexação HTTP 200 aprovados; tokens aparecem no trace.
+- Pendência: custo não aparece no trace novo; matching/preço do modelo ou custo direto ainda precisa ser confirmado.
+- Controle: `CURRENT.md` permanece `025`; sem commit automático e sem avanço para tarefa posterior.
+- Pasta: `handoffs/025-tokens-custos-embeddings-langfuse/`
