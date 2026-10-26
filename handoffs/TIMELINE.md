@@ -715,6 +715,23 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Verificação: embedding direto, indexação real e smoke do indexador confirmados; testes e smoke final da busca pendentes.
 - Pasta: `handoffs/023-busca-semantica-deterministica-api/`
 
+## 024 — Langfuse para observabilidade da indexação — abertura
+
+- Data/hora: 2026-10-26 -03:00 | Status: `proposed`
+- Aplicação afetada: raiz (`docker-compose.langfuse.yml`, `.env.example`) e `rastro-ai`.
+- Motivo: adicionar rastreamento self-hosted da indexação e embeddings sem alterar o runtime funcional.
+- Impacto: stack local adicional e traces sanitizados; Langfuse pode permanecer desligado por ambiente.
+- Verificação: Compose, suíte Python, health e trace visual ainda pendentes.
+- Pasta: `handoffs/024-langfuse-observabilidade-indexacao/`
+
+## 024 — Langfuse para observabilidade da indexação — aplicação
+
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`
+- Aplicação afetada: raiz e `rastro-ai`.
+- Verificação: stack self-hosted healthy na UI `38917`, health HTTP 200, imagem com SDK Langfuse e 36 testes Python no container aprovados.
+- Resultado: observabilidade opcional e sanitizada adicionada à indexação e embeddings; trace autenticado depende de chaves criadas manualmente.
+- Pasta: `handoffs/024-langfuse-observabilidade-indexacao/`
+
 ## 023 — Busca semântica determinística pela API — finalização
 
 - Data/hora: 2026-10-26 -03:00 | Status: `verified`
@@ -723,3 +740,12 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resultado: busca semântica determinística publicada com score, offsets e citações; diagnóstico de embedding concluído.
 - Controle: `CURRENT.md` voltou a `idle`; implementação 023 encerrada sem alterar implementações anteriores.
 - Pasta: `handoffs/023-busca-semantica-deterministica-api/`
+
+## 024 — Langfuse para observabilidade da indexação — finalização
+
+- Data/hora: 2026-10-26 -03:00 | Status: `verified`
+- Aplicação afetada: raiz e `rastro-ai`.
+- Verificação: usuário confirmou trace autenticado no painel; 36 testes Python no container, Compose, healths, hook e diff aprovados.
+- Resultado: observabilidade self-hosted sanitizada integrada à indexação e embeddings; custo não instrumentado nesta rodada.
+- Controle: `CURRENT.md` voltou a `idle`; implementação 024 encerrada preservando as anteriores.
+- Pasta: `handoffs/024-langfuse-observabilidade-indexacao/`

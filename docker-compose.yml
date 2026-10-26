@@ -60,6 +60,10 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       EMBEDDING_MODEL: text-embedding-3-small
       EMBEDDING_DIMENSIONS: '384'
+      LANGFUSE_ENABLED: ${LANGFUSE_ENABLED:-false}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-http://langfuse-web:3000}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
     depends_on:
       vector-db:
         condition: service_healthy

@@ -76,6 +76,24 @@ curl --fail-with-body --get \
 Resultado esperado: HTTP `200` com `projectId`, `query` e `results`; cada resultado contém
 `documentId`, `chunkIndex`, `content`, `score` e `citation` com offsets verificáveis.
 
+## Observabilidade local com Langfuse
+
+O Langfuse self-hosted é opcional e roda em um Compose complementar. A interface fica em
+`http://127.0.0.1:38917` e o armazenamento de mídia usa a porta `38918`.
+
+```bash
+cp .env.example .env
+docker compose -f docker-compose.yml -f docker-compose.langfuse.yml up -d
+```
+
+Crie o projeto e as chaves na interface, preencha `LANGFUSE_PUBLIC_KEY` e
+`LANGFUSE_SECRET_KEY` no `.env`, defina `LANGFUSE_ENABLED=true` e reinicie o `ai-indexer`.
+O fluxo de indexação passará a registrar duração, status, projeto, contagem de chunks,
+modelo e dimensão sem enviar o texto dos documentos.
+
+Os valores padrão do Compose são apenas para desenvolvimento local; troque as senhas,
+`salt`, `NEXTAUTH_SECRET` e `ENCRYPTION_KEY` antes de expor o stack fora da máquina local.
+
 4. Para testar o fluxo completo API → Python, envie o fixture pela API:
 
 ```bash

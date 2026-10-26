@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from .bootstrap.container import build_indexing_container
 from .document_indexing.domain.entities import DocumentChunk
+from .observability import observe_operation, update_observation
 
 
 def extract_text(path: str | Path) -> str:
@@ -89,14 +90,24 @@ def extract_chunk_and_persist_document(
 
     from .retrieval import persist_document_chunks
 
-    chunks = extract_and_chunk_document(
-        document_id,
-        path,
-        project_id=project_id,
-        chunk_size=chunk_size,
-        overlap=overlap,
-        max_tokens=max_tokens,
-        overlap_tokens=overlap_tokens,
-    )
-    persist_document_chunks(chunks)
-    return chunks
+    with observe_operation(
+        name="document-indexing",
+        observation_type="chain",
+        input_metadata={"documentId": document_id, "projectId": project_id},
+    ) as observation:
+        chunks = extract_and_chunk_document(
+            document_id,
+            path,
+            project_id=project_id,
+            chunk_size=chunk_size,
+            overlap=overlap,
+            max_tokens=max_tokens,
+            overlap_tokens=overlap_tokens,
+        )
+        persist_document_chunks(chunks)
+        update_observation(
+            observation,
+            output={"status": "ready", "chunks": len(chunks)},
+            metadata={"projectId": project_id, "chunkCount": len(chunks)},
+        )
+        return chunks

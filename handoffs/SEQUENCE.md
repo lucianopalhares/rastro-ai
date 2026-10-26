@@ -90,3 +90,15 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 - Implementação finalizada: `023-busca-semantica-deterministica-api`.
 - Dependência: capacidades vetoriais anteriores verificadas; a v1 foi aplicada nas aplicações reais.
 - Critério da etapa: testes, hook estrutural e smoke API → Rastro AI → PostgreSQL concluídos; `CURRENT.md` voltou a `idle`.
+
+## Fase 4 — Observabilidade self-hosted da indexação
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 20 | `024-langfuse-observabilidade-indexacao` | `root`/`ia` | `verified` | `023` | Langfuse self-hosted acessível na porta `38917`; indexação gera trace sanitizado; modo desligado preserva o runtime |
+
+## Estado ativo da observabilidade
+
+- Implementação ativa: `024-langfuse-observabilidade-indexacao`.
+- Dependência: `023` verificada; stack Langfuse e SDK ainda serão aplicados.
+- Critério da etapa: validação de Compose, testes Python, health, indexação e trace visual concluídos.

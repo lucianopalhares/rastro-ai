@@ -7,6 +7,8 @@ from collections.abc import Sequence
 
 from langchain_openai import OpenAIEmbeddings
 
+from ....observability import observe_operation, update_observation
+
 
 # /**
 #  * Implementa o contrato de embeddings sobre o endpoint externo da OpenAI.
@@ -65,7 +67,21 @@ class OpenAIEmbeddingRepository:
 
         if not texts or any(not text.strip() for text in texts):
             raise ValueError("embedding texts are required")
-        values = self._embeddings.embed_documents(list(texts))
+        with observe_operation(
+            name="embedding-generation",
+            observation_type="embedding",
+            input_metadata={
+                "model": self._model,
+                "dimensions": self._dimensions,
+                "itemCount": len(texts),
+            },
+        ) as observation:
+            values = self._embeddings.embed_documents(list(texts))
+            update_observation(
+                observation,
+                output={"dimensions": self._dimensions, "itemCount": len(values)},
+                metadata={"model": self._model},
+            )
         if len(values) != len(texts):
             raise RuntimeError("Embedding provider returned an invalid item count")
         embeddings = tuple(tuple(float(value) for value in embedding) for embedding in values)
