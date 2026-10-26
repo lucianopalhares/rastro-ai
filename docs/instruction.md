@@ -101,7 +101,9 @@ Para gerar uma nova versão, o agente deve: (1) ler o README da tarefa, o `TIMEL
 
 Ao gerar a nova versão, o agente também deve preencher `## O que foi feito` com operações e problema resolvido e `## O que muda na aplicação` com comportamento, impacto, limites, riscos e itens fora do escopo.
 
-O README de cada versão deve registrar `versão`, `versão-base`, data, status, arquivos conferidos, itens já aplicados, divergências, pendências, ordem de aplicação e critério de verificação. Se o arquivo real já contiver o trecho, não gerar novamente. Se a âncora ou o contexto tiver mudado, reconstruir o handoff a partir do arquivo real, podendo trocar `insert` por `replace`; não aplicar cegamente uma instrução histórica.
+O README de cada versão deve registrar `versão`, `versão-base`, estado encontrado, escopo autorizado, invariantes, arquivos conferidos, mudança aplicada, divergências, pendências e critério de verificação. Se o arquivo real já contiver o trecho, não gerar novamente. Se a âncora ou o contexto tiver mudado, reconstruir o handoff a partir do arquivo real, podendo trocar `insert` por `replace`; não aplicar cegamente uma instrução histórica.
+
+O contrato de cada versão deve ser curto: `estado-base`, `escopo autorizado`, `invariantes`, `mudança aplicada` e `evidência`. Não copie diffs, código ou inventários completos; registre somente os arquivos e comportamentos necessários para reconstruir a decisão.
 
 As seções `## O que foi feito` e `## O que muda na aplicação` são obrigatórias mesmo sem mudança de runtime; nesse caso, registre a ausência de alteração comportamental e o impacto documental ou estrutural.
 
@@ -147,11 +149,11 @@ Neste fluxo, “tarefa” e “implementação” significam a mesma unidade de 
 
 O usuário não precisa criar a pasta. O agente cria o próximo número disponível, os `README.md`/`TIMELINE.md` da implementação e da versão, atualiza `CURRENT.md` e adiciona as entradas correspondentes ao final do timeline global e do timeline da implementação.
 
-Cada alteração deve ser aplicada diretamente no arquivo real e registrada no README da versão. Antes de cada classe, interface, método, função, contrato ou bloco removido novo ou alterado, inserir comentário JSDoc em pt-BR no formato `/** ... */`, explicando o que o elemento faz e por que existe. Depois da descrição, manter um histórico acumulado com `v1`, `v2` etc. e a mudança de cada versão. Para uma linha isolada, colocar o comentário acima do método ou bloco ao qual ela pertence. Em formatos sem comentários, registrar a exceção no README da versão.
+Cada alteração deve ser aplicada diretamente no arquivo real e registrada no README da versão. Antes de cada classe, interface, método, função, contrato ou bloco novo, alterado ou removido que contenha decisão ou comportamento importante, inserir comentário JSDoc em pt-BR no formato `/** ... */`. O comentário deve explicar em linguagem simples o que o elemento faz, por que existe e qual comportamento protege ou altera. Depois da descrição, manter somente o histórico relevante no formato `NNN-vN`, como `003-v1`; adicionar uma entrada apenas quando houver mudança semântica, não para ajustes puramente mecânicos. Para uma linha isolada, colocar o comentário acima do método ou bloco ao qual ela pertence. Em formatos sem comentários, registrar a exceção no README da versão.
 
 ## Aplicações reais e responsabilidades
 
-O JSDoc deve incluir também as principais decisões internas e o comportamento protegido ou alterado. Imports simples, propriedades óbvias e linhas puramente mecânicas sem decisão comportamental podem ser explicados somente no README da versão.
+O JSDoc deve priorizar o efeito compreensível para uma pessoa não técnica e incluir somente as principais decisões internas e o comportamento protegido ou alterado. Imports simples, propriedades óbvias, getters triviais e linhas puramente mecânicas sem decisão comportamental não exigem comentário individual; podem ser explicados somente no README da versão.
 
 Os caminhos reais das aplicações neste repositório são:
 
@@ -231,7 +233,7 @@ O handoff deve informar se a alteração exige execução do dataset completo no
 15. Confirmar que implementações anteriores e alterações não relacionadas permaneceram intactas.
 16. Adicionar uma entrada compacta, de no máximo 8 linhas, ao final de `handoffs/TIMELINE.md` e uma entrada detalhada ao final do timeline da implementação.
 17. Conferir e, se necessário, realinhar somente a posição das entradas inteiras dos dois timelines em ordem cronológica, sem alterar seu texto ou conteúdo.
-18. Registrar o status atual no README compacto da implementação e atualizar a linha correspondente em `handoffs/SEQUENCE.md`, quando a implementação fizer parte de uma sequência.
+18. Registrar o status atual no README compacto da implementação e atualizar a linha correspondente em `handoffs/SEQUENCE.md`, quando a implementação fizer parte de uma sequência. Antes da entrega, conferir se `CURRENT.md`, `SEQUENCE.md`, README e timelines apontam para o mesmo estado; divergências permanecem pendentes.
 19. Executar o checklist de finalização: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, validar o status contra as evidências, executar o hook estrutural e os testes aplicáveis, conferir a lista explícita de commit e confirmar o avanço ou a permanência de `CURRENT.md`.
 20. Atualizar `handoffs/TIMELINE.md` com o resumo da implementação.
 

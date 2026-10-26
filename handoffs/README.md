@@ -1,6 +1,6 @@
 # Estado das aplicações do Rastro AI
 
-- Raiz: a iniciativa está na Fase 1; `CURRENT.md` mantém a última implementação finalizada `015-adaptar-chunking-para-langchain` até a abertura de uma nova tarefa.
+- Raiz: a iniciativa está na Fase 1; `CURRENT.md` aponta para a implementação ativa `021-revisar-fluxo-e-comentarios-handoffs`.
 - API (`rastro-api`): a tarefa `004` está `verified`; a API recebe `.md` e `.txt` não vazios, armazena localmente, associa ao projeto/documento e retorna `status: pending`.
 - Frontend (`rastro-front`): nenhuma capacidade desta sequência foi aplicada ainda.
 - IA (`rastro-ai`): extração/chunking, embeddings e PGVector com LangChain, retrieval e respostas extrativas com citações estão verificados; reranking, chains, prompts e LangGraph permanecem preparados para evolução futura.
@@ -24,6 +24,7 @@
 | `015` | `adaptar-chunking-para-langchain` | `ia` | `verified` |
 | `016` | `reorganizar-arquitetura-python` | `ia` | `verified` |
 | `017` | `renomear-fluxo-extracao-chunking` | `ia` | `verified` |
+| `021` | `revisar-fluxo-e-comentarios-handoffs` | `root` | `verified` |
 
 ## Padrão de validação para novas versões
 

@@ -59,7 +59,7 @@ Use o próximo número disponível, com três dígitos, e um título em `kebab-c
 
 Os handoffs desta skill são registros compactos. O código, configuração, testes e documentação permanecem e são alterados diretamente nas aplicações reais. O README da implementação, `CURRENT.md` e os timelines são arquivos de controle.
 
-- `vN/README.md`: resumo, arquivos reais alterados, operações, comentários de versão, verificações e a seção obrigatória `## Instruções de validação`;
+- `vN/README.md`: resumo, estado-base, escopo autorizado, invariantes, arquivos reais alterados, operações, comentários de versão, evidências e a seção obrigatória `## Instruções de validação`;
 - `vN/README.md`: para novas versões, também deve conter `## Cobertura por comportamento`, antes da validação, relacionando cada comportamento alterado a testes unitários/contratos, integração ou smoke/manual real e resultado esperado;
 - `vN/README.md`: para novas versões, também deve conter `## Jornada da aplicação nesta versão` e `## Como usar e validar a aplicação nesta versão`, antes da cobertura, explicando a evolução para uma pessoa usuária e o caminho real de uso;
 - Além da seção de validação, cada `vN/README.md` deve conter, nesta ordem, `## O que foi feito` e `## O que muda na aplicação` antes dela;
@@ -151,7 +151,7 @@ O README de cada versão deve registrar:
 - linhas afetadas após a aplicação, sempre junto da âncora estrutural;
 - função, classe, método, import, chave ou seção;
 - operação: `insert`, `replace` ou `remove`;
-- comentário JSDoc em pt-BR, no formato `/** ... */`, acima de toda classe, interface, método, função, contrato ou bloco alterado; o comentário deve explicar o que o elemento faz, por que existe e manter histórico acumulado com `v1`, `v2` etc. para cada mudança;
+- comentário JSDoc em pt-BR, no formato `/** ... */`, acima de toda classe, interface, método, função, contrato ou bloco novo, alterado ou removido que contenha decisão ou comportamento importante; o comentário deve explicar em linguagem simples o que faz, por que existe e manter histórico acumulado no formato `NNN-vN`, como `003-v1`, somente para mudanças semânticas;
 - principais decisões internas e comportamento protegido ou alterado;
 - o que o trecho faz;
 - por que deve ser inserido, substituído ou removido;
@@ -171,7 +171,7 @@ Antes de entregar, confira os dois timelines e realinhe apenas a posição das e
 
 Os arquivos de saída do handoff são somente `README.md` e `TIMELINE.md`; o caminho real do arquivo alterado deve aparecer no README.
 
-O número de linha nunca é suficiente sozinho. Use o ponto estrutural e o comentário versionado no arquivo real para que a mudança permaneça identificável.
+O número de linha nunca é suficiente sozinho. Use o ponto estrutural e o comentário versionado no arquivo real para que a mudança permaneça identificável. Imports, propriedades óbvias, getters triviais e ajustes mecânicos podem ser registrados somente no README.
 
 O README deve registrar as linhas afetadas após a aplicação junto da âncora estrutural; a linha é referência verificável, não substitui a explicação do trecho.
 
@@ -237,7 +237,8 @@ Quando o usuário disser para finalizar, concluir ou encerrar:
 11. adicione somente a lista explícita, usando `git add -f` apenas quando um handoff da própria tarefa estiver ignorado, e gere o commit automático se todas as condições da tarefa forem atendidas, usando mensagem e corpo em pt-BR;
 12. monte o resumo do commit a partir do `TIMELINE.md` da implementação e do `README.md` consolidado, cobrindo todas as versões;
 13. registre na timeline da implementação o identificador do commit, a mensagem e a verificação executada;
-14. a próxima mudança deve respeitar a etapa apontada por `CURRENT.md`.
+14. a próxima mudança deve respeitar a etapa apontada por `CURRENT.md`;
+15. a consistência entre `CURRENT.md`, `SEQUENCE.md`, README e timelines deve ser conferida antes da entrega; divergências não resolvidas mantêm a implementação ativa.
 
 Antes de concluir, execute o checklist: conferir arquivos reais e handoffs, resolver ou registrar pendências e divergências, confirmar que cada comportamento alterado possui evidência unitária/contratual e integração ou smoke/manual real quando aplicável, executar `REQUIRE_BEHAVIOR_COVERAGE=1 .agents/hooks/validate-handoffs.sh` com os quatro arquivos da implementação e os testes aplicáveis, conferir a lista explícita do commit e verificar se `CURRENT.md` avançou somente quando permitido.
 

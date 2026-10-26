@@ -52,3 +52,16 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 - Implementação ativa: `017-renomear-fluxo-extracao-chunking`.
 - Dependência: `016-reorganizar-arquitetura-python` está `verified`.
 - Critério da etapa: validar a semântica dos nomes e preservar o fluxo API → Python → PGVector antes de consolidar namespaces.
+
+## Iniciativa de governança do fluxo
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `021-revisar-fluxo-e-comentarios-handoffs` | `root` | `verified` | `017` verificada; `018`–`020` permanecem reservadas para a Fase 2 | comentários simples com histórico `NNN-vN`, contrato mínimo de versão e consistência dos estados documentados |
+
+## Estado ativo da iniciativa de governança
+
+- Implementação ativa: `021-revisar-fluxo-e-comentarios-handoffs`.
+- Dependência: a implementação `017` está verificada; as alterações locais de código não relacionadas permanecem fora desta tarefa.
+- Critério da etapa: regras atualizadas, handoff da versão criado, validação estrutural executada e ausência de mudança de runtime.
+- Encerramento: `021` verificada; não há próxima etapa ativa nesta iniciativa e `CURRENT.md` permanece em `021` como referência do último estado governado.

@@ -654,3 +654,20 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Pasta: `handoffs/017-renomear-fluxo-extracao-chunking/` | Próxima ação: verificar e finalizar `017`.
 - Commit: `acf2c2b` — `Esclarecer nomes do fluxo de chunks e retrieval`.
 - Verificação: commit criado com lista explícita dos arquivos da implementação.
+
+## 021 — Revisar fluxo e comentários dos handoffs
+
+- Data/hora: 2026-10-26 -03:00 | Status: `applied`
+- Aplicação afetada: raiz (`AGENTS.md`, `docs/instruction.md` e `.agents/skills/implementation-flow/`).
+- Por que foi feita: explicar decisões importantes em linguagem simples e preservar rastreabilidade sem aumentar ruído.
+- Impactos: comentários usam histórico `NNN-vN`; versões registram estado-base, escopo, invariantes, mudança e evidência.
+- Resolve: ambiguidade sobre comentários obrigatórios e falta de contrato mínimo para cada rodada.
+- Pasta: `handoffs/021-revisar-fluxo-e-comentarios-handoffs/`
+
+## 021 — Revisar fluxo e comentários dos handoffs — finalização
+
+- Data/hora: 2026-10-26 -03:00 | Status: `verified`
+- Aplicação afetada: raiz (`AGENTS.md`, `docs/instruction.md` e `.agents/skills/implementation-flow/`).
+- Verificação: hook estrutural com cobertura comportamental aprovado; alterações locais de Python excluídas por não pertencerem à tarefa.
+- Resultado: governança conferida e tarefa encerrada; não há próxima etapa ativa nesta iniciativa.
+- Pasta: `handoffs/021-revisar-fluxo-e-comentarios-handoffs/`

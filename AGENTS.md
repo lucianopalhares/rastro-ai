@@ -60,13 +60,13 @@ handoffs/
 
 Cada versão contém somente `README.md` e `TIMELINE.md`. Não copie código, configuração, testes ou documentação de aplicação para `handoffs/`; leia e altere os arquivos reais diretamente. A versão anterior serve apenas para identificar o que foi feito e orientar a reconciliação; a aplicação real decide o que já existe.
 
-Sempre que criar ou atualizar o `vN/README.md`, inclua a seção `## Instruções de validação` com os comandos, URLs, ações manuais ou testes necessários para validar a alteração e o resultado esperado de cada verificação. Quando houver requisição HTTP, inclua o comando completo copiável — por exemplo `curl` — com método, URL, headers, payload ou campos multipart e arquivo de entrada.
+Sempre que criar ou atualizar o `vN/README.md`, inclua a seção `## Instruções de validação` com os comandos, URLs, ações manuais ou testes necessários para validar a alteração e o resultado esperado de cada verificação. Quando houver requisição HTTP, inclua o comando completo copiável — por exemplo `curl` — com método, URL, headers, payload ou campos multipart e arquivo de entrada. Mantenha o registro enxuto, limitado a estado-base, escopo autorizado, invariantes, mudança aplicada e evidência.
 
 Além da seção de validação, inclua, nesta ordem, as seções `## O que foi feito` e `## O que muda na aplicação` antes dela. Registre na primeira as operações aplicadas e o problema resolvido; na segunda, o comportamento novo ou preservado, impactos, limites, riscos e itens fora do escopo. Quando não houver mudança de runtime, declare isso explicitamente.
 
 O `README.md` da versão deve registrar os caminhos reais, operações, âncoras, motivo, impacto, dependências, arquivos alterados e verificações. O código permanece exclusivamente na aplicação real.
 
-Antes de cada classe, interface, método, função, contrato ou bloco removido novo ou alterado, use um comentário JSDoc em pt-BR no formato `/** ... */`. O comentário deve explicar o que o elemento faz e por que existe, seguido de um histórico acumulado por versão (`v1`, `v2` etc.) descrevendo cada mudança daquela versão. Para alteração de linha isolada, coloque o comentário acima do método ou bloco ao qual a linha pertence. Em formatos sem comentários, registre a exceção no README da versão.
+Antes de cada classe, interface, método, função, contrato ou bloco novo, alterado ou removido que contenha decisão ou comportamento importante, use um comentário JSDoc em pt-BR no formato `/** ... */`. Explique em linguagem simples o que o elemento faz, por que existe e qual comportamento protege ou altera. Mantenha histórico acumulado no formato `NNN-vN`, como `003-v1`, apenas para mudanças semânticas; ajustes puramente mecânicos não exigem comentário individual. Para alteração de linha isolada, coloque o comentário acima do método ou bloco ao qual a linha pertence. Em formatos sem comentários, registre a exceção no README da versão.
 
 Detalhes do formato estão em `docs/instruction.md` e `handoffs/README.md`.
 
@@ -127,7 +127,7 @@ Antes de entregar, confira se o README da versão contém arquivo original, apli
 
 Confira também se as três seções obrigatórias estão presentes na ordem definida.
 
-A finalização deve confirmar arquivos reais e handoffs, pendências e divergências, evidências do status, hook estrutural, testes aplicáveis, lista explícita de commit e avanço permitido de `CURRENT.md`.
+A finalização deve confirmar arquivos reais e handoffs, pendências e divergências, evidências do status, consistência entre `CURRENT.md`, `SEQUENCE.md`, README e timelines, hook estrutural, testes aplicáveis, lista explícita de commit e avanço permitido de `CURRENT.md`.
 
 Confirme também que o `TIMELINE.md` da implementação foi atualizado no final, sem alterar entradas anteriores. O timeline da implementação registra a evolução detalhada entre versões; o `handoffs/TIMELINE.md` mantém somente o resumo global. Se a ordem estiver errada, mova as entradas inteiras para a posição cronológica correta, sem reescrevê-las.
 
