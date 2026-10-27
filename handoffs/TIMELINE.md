@@ -767,3 +767,12 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Pendência: custo não aparece no trace novo; matching/preço do modelo ou custo direto ainda precisa ser confirmado.
 - Controle: `CURRENT.md` permanece `025`; sem commit automático e sem avanço para tarefa posterior.
 - Pasta: `handoffs/025-tokens-custos-embeddings-langfuse/`
+
+## 025 — Tokens e custos de embeddings no Langfuse — finalização
+
+- Data/hora: 2026-10-27 -03:00 | Status: `verified`
+- Aplicação afetada: `rastro-ai` e raiz.
+- Verificação: Compose válido, 41 testes Python no container, hook estrutural e validação integrada de tokens/custo confirmados pelo usuário.
+- Resultado: observations de embedding registram modelo, usage e custo direto ou inferido sem enviar texto ao trace.
+- Controle: `CURRENT.md` voltou a `idle`; implementação 025 encerrada.
+- Pasta: `handoffs/025-tokens-custos-embeddings-langfuse/`

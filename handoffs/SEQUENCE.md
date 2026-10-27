@@ -96,10 +96,11 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
 | --- | --- | --- | --- | --- | --- |
 | 20 | `024-langfuse-observabilidade-indexacao` | `root`/`ia` | `verified` | `023` | Langfuse self-hosted acessível na porta `38917`; indexação gera trace sanitizado; modo desligado preserva o runtime |
-| 21 | `025-tokens-custos-embeddings-langfuse` | `ia`/`root` | `applied` | `024` | observations de embedding registram modelo, tokens de entrada e custo inferido ou personalizado sem enviar texto |
+| 21 | `025-tokens-custos-embeddings-langfuse` | `ia`/`root` | `verified` | `024` | observations de embedding registram modelo, tokens de entrada e custo inferido ou personalizado sem enviar texto |
 
-## Estado ativo da observabilidade
+## Estado encerrado da observabilidade
 
-- Implementação ativa: `025-tokens-custos-embeddings-langfuse`.
+- Implementação finalizada: `025-tokens-custos-embeddings-langfuse`.
 - Dependência: `024` verificada; stack Langfuse e tracing sanitizado já estão disponíveis.
-- Critério da etapa: embedding informa tokens e custo inferido pelo modelo, com fallback opcional de custo direto e testes sem rede.
+- Critério da etapa: embedding informa tokens e custo inferido pelo modelo, com fallback opcional de custo direto e testes sem rede; integração confirmada pelo usuário.
+- Encerramento: `025` verificada; `CURRENT.md` voltou a `idle`.

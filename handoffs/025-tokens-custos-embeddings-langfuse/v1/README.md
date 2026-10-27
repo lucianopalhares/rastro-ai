@@ -1,6 +1,6 @@
 # 025/v1 — Tokens e custos de embeddings no Langfuse
 
-- Versão: `v1`; versão-base: implementação `024` verificada; data: 2026-10-26 -03:00; status: `applied`.
+- Versão: `v1`; versão-base: implementação `024` verificada; data: 2026-10-27 -03:00; status: `verified`.
 - Estado-base: `embedding-generation` registra modelo apenas em input/metadata; painel mostra status, mas não usage nem cost.
 - Escopo autorizado: adicionar modelo top-level, contagem local de tokens, `usage_details`, custo inferido e custo direto opcional.
 - Invariantes: contagem não envia texto ao Langfuse; falhas de observabilidade não interrompem embeddings; implementação 024 permanece preservada.
@@ -41,4 +41,4 @@ Configure o modelo `text-embedding-3-small` em Project Settings > Models no Lang
 - `docker compose -f docker-compose.yml -f docker-compose.langfuse.yml run --rm --no-deps -v "$PWD/rastro-ai/tests:/app/tests:ro" ai-indexer python -m unittest -q tests.test_observability tests.test_openai_embedding_repository`: esperado, testes de tracing e embeddings aprovados.
 - `REQUIRE_BEHAVIOR_COVERAGE=1 .agents/hooks/validate-handoffs.sh handoffs/025-tokens-custos-embeddings-langfuse/README.md handoffs/025-tokens-custos-embeddings-langfuse/TIMELINE.md handoffs/025-tokens-custos-embeddings-langfuse/v1/README.md handoffs/025-tokens-custos-embeddings-langfuse/v1/TIMELINE.md`: esperado, handoffs válidos.
 - `curl --fail-with-body --request POST --url http://127.0.0.1:18473/index --header 'content-type: application/json' --data '{"document":{"id":"debug-langfuse-cost-001","projectId":"debug-project","name":"langfuse-cost.md","content":"Documento para validar tokens e custos."}}'`: esperado, HTTP 200 e observation `embedding-generation` com usage/cost no painel.
-- Resultado observado: HTTP 200, `chunks: 1`, backend PostgreSQL e health do indexador aprovado após recriação do container; tokens aparecem no trace, mas custo ainda não foi confirmado e permanece pendente a validação de matching/preço ou custo direto.
+- Resultado observado: HTTP 200, `chunks: 1`, backend PostgreSQL e health do indexador aprovado; usuário confirmou tokens e custo no trace após configurar o preço direto; suíte completa passou com 41 testes.
