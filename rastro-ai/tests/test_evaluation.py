@@ -25,9 +25,10 @@ class EvaluationTests(unittest.TestCase):
         cases = load_dataset()["cases"]
         self.assertEqual(len({case["id"] for case in cases}), len(cases))
         for case in cases:
-            self.assertTrue(case["question"])
+            self.assertTrue(case["query"])
             self.assertTrue(case["documents"])
-            self.assertIn("expected_sources", case)
+            self.assertIn("relevant_chunks", case)
+            self.assertIn("expected_answer", case)
 
     # /** Histórico: v1 — verifica que o evaluator reproduz todas as métricas do baseline. */
     def test_evaluation_reproduces_baseline(self) -> None:

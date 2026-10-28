@@ -12,7 +12,7 @@ from rastro_ai.document_indexing.application.use_cases.retrieve_chunks import Se
 from rastro_ai.document_indexing.domain.entities import DocumentChunk
 from rastro_ai.document_indexing.infrastructure.retrieval.in_memory_vector_store import InMemoryChunkVectorStore
 
-DATASET_PATH = Path(__file__).with_name("dataset.json")
+DATASET_PATH = Path(__file__).with_name("dataset") / "golden.json"
 BASELINE_PATH = Path(__file__).with_name("baseline.json")
 
 
@@ -70,16 +70,17 @@ def run_evaluation(dataset: dict[str, Any]) -> EvaluationResult:
             chunks.append(DocumentChunk(document["id"], 0, document["text"], 0, len(document["text"]), project_id))
         store.upsert(chunks)
         retriever = SearchRelevantChunksUseCase(store)
-        answer = AnswerQuestionUseCase(retriever).execute(case["project_id"], case["question"])
-        retrieved_ids = {result.chunk.document_id for result in retriever.execute(case["project_id"], case["question"])}
-        expected_sources = set(case.get("expected_sources", []))
+        answer = AnswerQuestionUseCase(retriever).execute(case["project_id"], case["query"])
+        retrieved_ids = {result.chunk.document_id for result in retriever.execute(case["project_id"], case["query"])}
+        expected_answer = case["expected_answer"]
+        expected_sources = set(expected_answer.get("source_document_ids", []))
         source_ok = expected_sources.issubset(retrieved_ids) and (bool(expected_sources) or not retrieved_ids)
         citation_ok = all(
             citation.document_id in expected_sources
             and citation.excerpt == next(document["text"] for document in case["documents"] if document["id"] == citation.document_id)
             for citation in answer.citations
         ) and (bool(answer.citations) == bool(expected_sources))
-        abstention_ok = (not answer.citations) == case.get("expect_abstention", False)
+        abstention_ok = (not answer.citations) == expected_answer.get("abstain", False)
         isolation_ok = all(citation.document_id in {document["id"] for document in case["documents"] if document.get("project_id", case["project_id"]) == case["project_id"]} for citation in answer.citations)
         for key, passed in (("source_recall", source_ok), ("citation_precision", citation_ok), ("safe_abstention", abstention_ok), ("project_isolation", isolation_ok)):
             counters[key] += int(passed)

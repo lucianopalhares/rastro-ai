@@ -759,6 +759,165 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Dependência: implementação `024` verificada.
 - Pasta: `handoffs/025-tokens-custos-embeddings-langfuse/`
 
+## 026 — Módulo de evaluation de retrieval — abertura
+
+- Data/hora: 2026-10-27 -03:00 | Status: `proposed`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: medir se o retrieval semântico retorna chunks relevantes na posição correta sem misturar geração de respostas.
+- Impactos: adiciona evaluator isolado, golden dataset e testes sem alterar runtime, embeddings ou API.
+- Dependência: implementação `025` verificada.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v12
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: explicar por que o comando normal não aciona breakpoints e como executar o evaluator com `debugpy`.
+- Verificação: README atualizado com comando copiável, `--wait-for-client`, porta 5678 e mapeamento do evaluator.
+- Resultado: o fluxo de debug ficou separado e explícito, sem alteração de runtime.
+- Pendência: attach interativo e evaluation contra PGVector continuam pendentes.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v13
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai` e configuração local do workspace.
+- Motivo: alinhar o attach do VS Code à porta 5679 usada pelo container temporário de debug.
+- Verificação: `launch.json` usa 5679 e mapeia `/app/evals`; testes e hook serão executados.
+- Resultado: a configuração local está pronta para conectar no debugger sem conflito com o `ai-indexer` permanente.
+- Pendência: validação manual do breakpoint e evaluation integrada permanecem pendentes.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v14
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: explicar diretamente no código o que cada chamada interna de `run_evaluation()` faz.
+- Verificação: comentários adicionados sem alterar cálculos ou ordem; testes e hook serão executados.
+- Resultado: o fluxo de busca, validação e métricas ficou mais simples de acompanhar durante o debug.
+- Pendência: validação manual do breakpoint e evaluation integrada permanecem pendentes.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v15
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai` e Compose da raiz.
+- Motivo: impedir que a evaluation integrada dependa do corpus de debug do banco principal.
+- Verificação: serviço PGVector isolado saudável, Compose válido e 5 testes automatizados aprovados.
+- Resultado: corpus do golden pode ser indexado pelo pipeline real em um banco dedicado, mantendo `expected_answer` no mesmo arquivo.
+- Pendência: preparação e consulta integradas aguardam `OPENAI_API_KEY` configurada.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v16
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: reduzir o comando Docker extenso e separar claramente teste automatizado de evaluation real.
+- Verificação: script shell executado no modo `test` com 5 testes aprovados; Compose e hook serão validados.
+- Resultado: `test`, `real`, `real --prepare` e `--ks` ficaram disponíveis por comando curto.
+- Pendência: modo real continua dependente de OpenAI e do banco de evaluation preparado.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v17
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai` e raiz do projeto.
+- Motivo: oferecer um comando curto na raiz sem duplicar a implementação do script de evaluation.
+- Verificação: atalho encaminha argumentos ao script original; sintaxe, teste automatizado e hook serão executados.
+- Resultado: `./run_evaluation.sh test` e `./run_evaluation.sh real` passam a ser os comandos principais.
+- Pendência: evaluation real permanece dependente de credencial e banco preparado.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v18
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: tornar a saída do evaluator legível, diagnosticável e preparada para futura observabilidade.
+- Verificação: contrato do relatório, testes de retrieval, Compose e hook serão executados.
+- Resultado: saída separada em run, summary, scores, quality, failures e cases sem envio ao Langfuse.
+- Pendência: thresholds e reporter Langfuse serão decisões futuras.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — finalização
+
+- Data/hora: 2026-10-27 -03:00 | Status: `verified`
+- Aplicação afetada: `rastro-ai` e raiz do projeto.
+- Motivo: concluir o evaluator após validação automatizada, estrutural e real contra o banco PGVector isolado.
+- Verificação: 47 testes, Compose, banco saudável, compatibilidade do corpus e evaluation real aprovados; relatório registrou abstinência `0.0` como limite conhecido.
+- Resultado: implementação 026 encerrada e `CURRENT.md` retornou a `idle`.
+- Próxima ação: iniciar nova implementação para thresholds/abstinência ou integração Langfuse, se desejado.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v5
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: eliminar dois datasets concorrentes e preparar um contrato único para retrieval e respostas futuras.
+- Verificação: 45 testes no container, baseline 20/20 e hook estrutural aprovados.
+- Resultado: `evals/dataset/golden.json` é a única fonte de casos; runners usam campos específicos do mesmo schema.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v6
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: explicar claramente a diferença entre testes automatizados e execução real contra PGVector.
+- Verificação: README do módulo e critérios de sucesso documentados; testes e hook serão repetidos.
+- Resultado: fica explícito que testes fake validam código, enquanto PGVector valida o pipeline e exige thresholds de qualidade.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v7
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: alinhar os comandos documentados ao ambiente oficial Docker da aplicação.
+- Verificação: Compose, Dockerfile e comandos revisados; testes e hook serão repetidos.
+- Resultado: Docker é o caminho principal; execução local ficou explicitamente alternativa.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v3
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: separar os datasets dos módulos de implementação e permitir crescimento organizado dos goldens.
+- Verificação: loader padrão e referências atualizados; testes e hook serão repetidos nesta rodada.
+- Resultado: golden passa a viver em `evals/retrieval/dataset/golden.json`, sem mudança de schema ou runtime.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v4
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: tornar explícitos, nos comentários dos métodos, o papel e a ordem de execução de cada métrica.
+- Verificação: comentários revisados; testes e hook serão repetidos nesta rodada.
+- Resultado: fluxo documentado sem alteração de cálculo, contrato ou runtime.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — aplicação v1
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Verificação: 44 testes Python no container, 3 testes específicos e hook estrutural aprovados.
+- Resultado: evaluator isolado calcula métricas de ranking, isolamento, score e abstinência; runtime permanece inalterado.
+- Pendência: executar avaliação contra PGVector real com corpus anotado e credenciais configuradas.
+- Controle: `CURRENT.md` permanece `026`; sem commit final enquanto a integração real não for verificada.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v2
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: desacoplar cada métrica para permitir evolução e testes independentes do orquestrador.
+- Verificação: 4 testes específicos, 45 testes Python no container, hook estrutural e diff limpo.
+- Resultado: sete métricas puras reutilizáveis; runtime e contrato da v1 preservados.
+- Pendência: avaliação integrada contra PGVector com corpus anotado.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
 ## 025 — Tokens e custos de embeddings no Langfuse — aplicação parcial
 
 - Data/hora: 2026-10-26 -03:00 | Status: `applied`
@@ -776,3 +935,33 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resultado: observations de embedding registram modelo, usage e custo direto ou inferido sem enviar texto ao trace.
 - Controle: `CURRENT.md` voltou a `idle`; implementação 025 encerrada.
 - Pasta: `handoffs/025-tokens-custos-embeddings-langfuse/`
+
+## 026 — Módulo de evaluation de retrieval — v8
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: explicar cada comando da seção de validação e como interpretar seu resultado.
+- Verificação: README detalhado com dois cenários, pré-requisitos e critérios de sucesso.
+- Resultado: comandos não ficam mais sem contexto; teste técnico e qualidade real estão diferenciados.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v10
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: mostrar na árvore os métodos/classes reais e explicar a responsabilidade de cada um.
+- Verificação: árvore e explicações adicionadas ao README do módulo; teste e hook serão repetidos.
+- Resultado: o fluxo pode ser acompanhado do `main()` até PGVector, métricas e JSON.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 026 — Módulo de evaluation de retrieval — v9
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: explicar visualmente o que acontece dentro do comando real de evaluation.
+- Verificação: árvore textual adicionada ao README do módulo; teste e hook serão repetidos.
+- Resultado: Docker, evaluator, PGVector, chunks e métricas aparecem em uma sequência única.
+- Pendência: avaliação integrada contra PGVector permanece pendente.
+- Pasta: `handoffs/026-modulo-evaluation-retrieval/`

@@ -1,0 +1,11 @@
+# 026 — Módulo de evaluation de retrieval
+- Data/hora: 2026-10-27 -03:00 | Status: `verified`; aplicação: `rastro-ai`.
+- Objetivo: medir o ranking produzido pelo retrieval real contra um golden dataset, sem alterar o runtime.
+- Dependência/ordem: `025` verificada; executar primeiro testes determinísticos e depois integração explícita com PGVector.
+- Decisão: evaluator injetável e separado do DeepEval; IDs `document_id:index` são o contrato determinístico dos chunks.
+- Invariante: nenhum teste local chama rede ou banco; o comando real exige configuração explícita do ambiente.
+- Impacto: adiciona métricas de ranking, isolamento, score e abstinência; não muda indexação, embeddings ou API.
+- Evolução: `v1` criou evaluator, golden dataset, testes e comando PGVector; `v2` separou cada métrica; `v3` moveu os goldens; `v4` documentou a ordem; `v5` consolidou tudo em um golden único; `v6` explicou os modos; `v7` alinhou Docker; `v8` explicou cada comando; `v9` adicionou a árvore; `v10` detalhou símbolos; `v11` organizou a sequência exata de chamadas; `v12` documentou a execução com `debugpy` e attach do VS Code; `v13` configurou o attach na porta 5679 e o mapeamento do evaluator; `v14` explicou cada chamada interna de `run_evaluation()`; `v15` adicionou corpus compatível e banco PGVector isolado para evaluation; `v16` criou um script para os modos automatizado e real; `v17` adicionou o atalho do script na raiz; `v18` estruturou o relatório para uso humano e futura observabilidade.
+- Evidência final: 47 testes no container, Compose válido, banco evaluation saudável, 26 documentos compatíveis com o golden, retrieval real executado e hook estrutural aprovado.
+- Resultado real: Recall@1 `0.625`, Recall@5 `0.85`, MRR `0.877451`, nDCG@5 `0.767099`, isolamento `1.0`, ordenação `1.0` e abstinência `0.0`; a abstinência permanece uma pendência de qualidade, não de execução.
+- Pasta/próxima ação: `handoffs/026-modulo-evaluation-retrieval/`; `CURRENT.md` voltou a `idle`; próxima evolução deve ser iniciada como nova implementação.

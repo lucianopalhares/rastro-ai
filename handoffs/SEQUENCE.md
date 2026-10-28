@@ -104,3 +104,16 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 - Dependência: `024` verificada; stack Langfuse e tracing sanitizado já estão disponíveis.
 - Critério da etapa: embedding informa tokens e custo inferido pelo modelo, com fallback opcional de custo direto e testes sem rede; integração confirmada pelo usuário.
 - Encerramento: `025` verificada; `CURRENT.md` voltou a `idle`.
+
+## Fase 5 — Evaluation de retrieval
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 22 | `026-modulo-evaluation-retrieval` | `ia` | `verified` | `025` | evaluator separado calcula ranking, Recall@k, Precision@k, MRR, nDCG, isolamento, score e abstinência contra golden dataset |
+
+## Estado ativo da evaluation de retrieval
+
+- Implementação ativa: `idle`.
+- Última implementação: `026-modulo-evaluation-retrieval` verificada.
+- Dependência: `025` verificada; runtime PGVector existente permanece inalterado.
+- Critério da etapa: testes determinísticos, banco isolado, corpus compatível, execução real e validação estrutural aprovados.

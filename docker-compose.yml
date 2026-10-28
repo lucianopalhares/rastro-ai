@@ -17,6 +17,21 @@ services:
       timeout: 5s
       retries: 10
 
+  evaluation-vector-db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: rastro_evaluation
+      POSTGRES_USER: rastro
+      POSTGRES_PASSWORD: rastro
+    volumes:
+      - rastro_evaluation_vector_db:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U rastro -d rastro_evaluation']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   api:
     build:
       context: ./rastro-api
@@ -81,3 +96,4 @@ services:
 
 volumes:
   rastro_vector_db:
+  rastro_evaluation_vector_db:
