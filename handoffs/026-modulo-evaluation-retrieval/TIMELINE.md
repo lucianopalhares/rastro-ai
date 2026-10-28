@@ -130,7 +130,7 @@
 
 ## 2026-10-27 -03:00 — commit da implementação 026
 
-- Commit: `d89f068` — `Implementa evaluation de retrieval`.
+- Commit principal: `0d8217c` — `Implementa evaluation de retrieval`.
 - Conteúdo: evaluator desacoplado, golden único, banco PGVector isolado, scripts, relatório estruturado e handoffs versionados.
 - Verificação: 47 testes no container, script `test` com 6 testes e `OK`, Compose válido, `git diff --check` e 40 handoffs válidos.
 
