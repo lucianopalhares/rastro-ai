@@ -1059,7 +1059,7 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 ## 027 — Adaptação da evaluation de retrieval para ranx — commit
 
 - Data/hora: 2026-10-28 01:35 -03:00 | Status: `verified`
-- Commit: `06f96d7` — `Implementa avaliação de retrieval com ranx`.
+- Commit: `b33b7b9` — `Implementa avaliação de retrieval com ranx`.
 - Verificação: commit criado com lista explícita dos arquivos da tarefa; `CURRENT.md` está `idle`.
 - Limite: `docs/rag-evaluation-flow.md` permanece no workspace, fora do commit, por estar coberto pelo `.gitignore`.
 - Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`

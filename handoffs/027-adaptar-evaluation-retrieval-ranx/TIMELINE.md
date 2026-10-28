@@ -96,6 +96,6 @@
 ## 2026-10-28 01:35 -03:00 — commit da implementação
 
 - Status: `verified`.
-- Commit: `06f96d7` — `Implementa avaliação de retrieval com ranx`.
+- Commit: `b33b7b9` — `Implementa avaliação de retrieval com ranx`.
 - Arquivos: aplicação, testes, dependências e handoffs da tarefa; `docs/rag-evaluation-flow.md` permaneceu fora por estar ignorado pelo Git.
 - Verificação pós-commit: commit criado com lista explícita; `CURRENT.md` está `idle`.
