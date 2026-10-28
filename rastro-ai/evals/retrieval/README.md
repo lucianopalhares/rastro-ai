@@ -4,6 +4,11 @@ Este módulo verifica se a busca encontrou os chunks certos.
 
 Ele não cria uma resposta com LLM.
 
+Para a análise de maturidade, governança, thresholds, baseline, CI, reprodutibilidade,
+observabilidade e validação de ambiente, consulte
+[`PROFESSIONAL-EVALUATION.md`](PROFESSIONAL-EVALUATION.md). Este documento separa o
+fluxo já implementado das evoluções necessárias para uma operação profissional.
+
 ## O que é comparado
 
 O golden dataset diz:
@@ -261,6 +266,16 @@ Resultado esperado da execução: o comando termina sem traceback e imprime JSON
 
 ### Depurar a avaliação real no VS Code
 
+Para iniciar a evaluation já com `debugpy`, use o modo `--debug` do script:
+
+```bash
+docker compose stop ai-indexer
+./run_evaluation.sh real --debug
+```
+
+Quando o terminal ficar aguardando, execute no VS Code a configuração `Docker: Python AI service`.
+O script publica a porta `5678`, aguarda o attach e só então executa `evals.retrieval.evaluate`.
+
 O comando normal acima executa `evaluate.py`, mas não inicia um debugger. Por isso um breakpoint no arquivo não será acionado. Para depurar, substitua somente o segundo comando por este:
 
 ```bash
@@ -313,7 +328,7 @@ Se o `ai-indexer` normal já estiver ativo, ele já ocupa a porta `5678` publica
     --ks 1,3,5
   ```
 
-  A configuração `Docker: Python AI service` já está configurada para conectar na porta `5679`. A porta `5678` continua sendo usada dentro do container; `5679` é apenas a porta publicada no host.
+  A porta `5678` continua sendo usada dentro do container; `5679` é apenas a porta publicada no host. Nesse caso, use `EVAL_DEBUG_PORT=5679 ./run_evaluation.sh real --debug` e altere temporariamente o attach do VS Code para `5679`.
 
 A configuração de attach precisa mapear também os arquivos do evaluator:
 

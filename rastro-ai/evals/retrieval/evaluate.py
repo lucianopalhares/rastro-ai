@@ -293,16 +293,26 @@ def run_evaluation(
             item["chunk_id"]: item["relevance"]
             for item in case.get("relevant_chunks", [])
         }
-        # Busca os chunks mais parecidos com a pergunta e mede somente o tempo do retriever.
+        # Inicia o relógio imediatamente antes da busca para medir somente o retriever.
         started_at = perf_counter()
+        # Guarda o tipo do erro sem interromper a avaliação dos demais casos.
         retrieval_error: str | None = None
+        # Executa a busca, incluindo a geração do embedding, a consulta ao PGVector e
+        # a materialização da lista de chunks retornados; esse intervalo entra na latência.
         try:
             results = list(retriever(case["project_id"], case["query"], limit=max_k))
+        # Registra a falha e permite calcular as métricas operacionais do caso.
         except Exception as error:
+            # Guarda apenas o nome da classe do erro para o relatório de evaluation.
             retrieval_error = type(error).__name__
+            # Usa uma lista vazia para que o restante do fluxo consiga avaliar o caso.
             results = []
+        # Para o relógio depois que o retriever terminou ou falhou; o resultado é convertido
+        # de segundos para milissegundos e não inclui o cálculo posterior das métricas.
         latency_ms = (perf_counter() - started_at) * 1000
+        # Guarda a latência desta consulta para calcular a média e o P95 depois.
         latency_values.append(latency_ms)
+        # Soma a latência ao acumulador que será dividido pelo total de casos.
         metric_totals["retrieval_latency_ms"] += latency_ms
         if retrieval_error:
             metric_totals["retrieval_error_rate"] += 1.0

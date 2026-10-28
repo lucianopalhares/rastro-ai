@@ -13,6 +13,8 @@ PREPARE=false
 SUMMARY=false
 ONLY_FAILURES=false
 METRICS="all"
+DEBUG=false
+DEBUG_PORT="${EVAL_DEBUG_PORT:-5678}"
 MODE="${1:-}"
 
 if [[ "$MODE" == "test" || "$MODE" == "real" ]]; then
@@ -23,7 +25,7 @@ fi
 show_help() {
   cat <<'EOF'
 Uso: run_evaluation.sh test
-     run_evaluation.sh real [--prepare] [--ks VALORES] [--metrics SELEÇÃO]
+     run_evaluation.sh real [--prepare] [--debug] [--ks VALORES] [--metrics SELEÇÃO]
 
 Executa o teste automatizado ou a avaliação real do retriever.
 
@@ -33,6 +35,7 @@ Modos:
 
 Opções:
   --prepare       Reindexa o corpus do golden antes de avaliar.
+  --debug         Aguarda o VS Code conectar via debugpy antes de executar a avaliação.
   --ks VALORES    Valores de k separados por vírgula. Padrão: 1,3,5.
   --metrics VALOR all, ranking, invariants, operational ou nomes separados por vírgula.
   --summary       Imprime somente o resumo agregado, sem os casos detalhados.
@@ -46,6 +49,10 @@ while (($# > 0)); do
   case "$1" in
     --prepare)
       PREPARE=true
+      shift
+      ;;
+    --debug)
+      DEBUG=true
       shift
       ;;
     --ks)
@@ -121,8 +128,13 @@ COMMON_ARGS=(
   -e DATABASE_URL="$DATABASE_URL"
   -e PGVECTOR_COLLECTION="$PGVECTOR_COLLECTION"
   -v "$REPOSITORY_ROOT/rastro-ai/evals:/app/evals:ro"
-  ai-indexer
 )
+
+if [[ "$DEBUG" == true ]]; then
+  # Publica a porta do container temporário para o perfil de attach do VS Code.
+  COMMON_ARGS+=( -p "$DEBUG_PORT:5678" )
+fi
+COMMON_ARGS+=( ai-indexer )
 
 if [[ "$PREPARE" == true ]]; then
   # Só gera embeddings novamente quando o usuário pede explicitamente a preparação.
@@ -143,6 +155,15 @@ elif [[ "$ONLY_FAILURES" == true ]]; then
   REPORT_ARGS+=(--only-failures)
 fi
 
-"${COMPOSE[@]}" "${COMMON_ARGS[@]}" \
-  python -m evals.retrieval.evaluate \
-  "${REPORT_ARGS[@]}"
+if [[ "$DEBUG" == true ]]; then
+  # Mantém o processo parado até o VS Code anexar, para que breakpoints sejam respeitados.
+  echo "Evaluation aguardando o VS Code na porta ${DEBUG_PORT}; execute 'Docker: Python AI service' agora." >&2
+  "${COMPOSE[@]}" "${COMMON_ARGS[@]}" \
+    python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client \
+    -m evals.retrieval.evaluate \
+    "${REPORT_ARGS[@]}"
+else
+  "${COMPOSE[@]}" "${COMMON_ARGS[@]}" \
+    python -m evals.retrieval.evaluate \
+    "${REPORT_ARGS[@]}"
+fi

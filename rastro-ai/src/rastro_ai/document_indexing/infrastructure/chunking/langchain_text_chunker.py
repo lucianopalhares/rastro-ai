@@ -93,14 +93,20 @@ class LangChainTextChunker:
             if start_offset < 0:
                 raise ValueError("LangChain chunk offset could not be resolved")
             end_offset = start_offset + len(content)
-            # Guarda conteúdo, posição e identificação do projeto no formato do domínio.
+            # Converte o resultado do LangChain para o contrato de chunk da aplicação.
             chunks.append(
                 DocumentChunk(
+                    # Identifica o documento original ao qual este chunk pertence.
                     document_id=document_id,
+                    # Mantém a posição sequencial do chunk dentro do documento.
                     index=index,
+                    # Guarda o texto usado para gerar embeddings, buscar e exibir evidências.
                     content=content,
+                    # Marca o caractere inicial para permitir citações no texto original.
                     start_offset=start_offset,
+                    # Marca o caractere final para delimitar exatamente a citação.
                     end_offset=end_offset,
+                    # Mantém o isolamento entre projetos durante a busca vetorial.
                     project_id=project_id,
                 )
             )

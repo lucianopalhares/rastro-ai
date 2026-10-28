@@ -35,6 +35,13 @@ def evaluate_query_metrics(
     metric_names = [metrics] if isinstance(metrics, str) else list(metrics)
     if not metric_names:
         return {}
+    # /**
+    #  * Normaliza o gabarito para um dicionário que associa cada chunk esperado ao seu grau
+    #  * de relevância, permitindo que o ranx compare a resposta correta com o Run.
+    #  * Exemplo: ["chunk-a", "chunk-b"] vira {"chunk-a": 1, "chunk-b": 1}; já
+    #  * {"chunk-a": 3} preserva o grau explícito informado pelo dataset.
+    #  * Histórico: ajuste documental solicitado pelo usuário.
+    #  */
     relevance = _relevance_mapping(relevant_chunk_ids)
     # /**
     #  * Trata uma busca vazia antes de criar o `Run` do ranx.
@@ -45,11 +52,25 @@ def evaluate_query_metrics(
     if not relevance or not retrieved_chunk_ids:
         return {metric: 0.0 for metric in metric_names}
     query_id = "query"
+    # /**
+    #  * Representa o gabarito de relevância esperado para cada consulta, associando cada
+    #  * chunk correto ao seu grau de relevância para o ranx comparar com o Run.
+    #  * Exemplo: relevance={"chunk-a": 3, "chunk-b": 1} produz
+    #  * Qrels({"query": {"chunk-a": 3, "chunk-b": 1}}).
+    #  * Histórico: ajuste documental solicitado pelo usuário.
+    #  */
     qrels = Qrels({query_id: relevance})
     ranking_scores = scores or [
         float(len(retrieved_chunk_ids) - position)
         for position in range(len(retrieved_chunk_ids))
     ]
+    # /**
+    #  * Representa os resultados reais encontrados para cada consulta, associando cada
+    #  * chunk retornado ao seu score para o ranx comparar com o gabarito do Qrels.
+    #  * Exemplo: query_id="query" e chunks ["chunk-a", "chunk-b"] com scores [0.9, 0.6]
+    #  * produzem Run({"query": {"chunk-a": 0.9, "chunk-b": 0.6}}).
+    #  * Histórico: ajuste documental solicitado pelo usuário.
+    #  */
     run = Run(
         {
             query_id: {
@@ -58,6 +79,13 @@ def evaluate_query_metrics(
             }
         }
     )
+    # /**
+    #  * Compara o gabarito do Qrels com os resultados do Run e calcula as métricas
+    #  * solicitadas, como Recall, Precision, MRR e nDCG.
+    #  * Exemplo: Qrels identifica os chunks corretos e Run informa os chunks encontrados;
+    #  * o resultado pode ser {"recall@3": 1.0, "precision@3": 0.67}.
+    #  * Histórico: ajuste documental solicitado pelo usuário.
+    #  */
     evaluated = evaluate(qrels, run, metric_names)
     if len(metric_names) == 1:
         evaluated = {metric_names[0]: evaluated}
