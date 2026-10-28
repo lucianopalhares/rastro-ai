@@ -23,6 +23,31 @@ A busca retorna:
 
 O evaluator compara as duas listas e calcula as métricas.
 
+As métricas clássicas de ranking (`HitRate@k`, `Recall@k`, `Precision@k`, `MRR` e `nDCG@k`) são calculadas pelo `ranx` usando o contrato `Qrels`/`Run`. O adapter local mantém o contrato do relatório e os testes do projeto, enquanto `project_isolation`, `score_ordering` e `abstention` continuam regras específicas do Rastro AI. A avaliação também registra latência média/P95, taxa de erro e taxa de resultado vazio. A primeira execução do container pode ser mais lenta porque o `ranx` usa compilação JIT do Numba; execuções seguintes reaproveitam a imagem construída.
+
+O escopo desta integração não inclui ainda `MAP`, `R-Precision`, diversidade, robustez, Ragas ou DeepEval. Essas extensões devem ser adicionadas somente quando responderem a uma necessidade do projeto.
+
+A organização interna separa `metrics/ranking_metrics/`, com métricas padronizadas e o adapter `ranx`, de `metrics/invariants_metrics/`, com regras específicas do produto. Esses nomes descrevem avaliação e invariantes; não representam uma etapa de reranking do runtime. O arquivo `metrics/__init__.py` mantém os exports públicos para evitar mudança nos consumidores.
+
+### Como ler cada resultado
+
+| Grupo | Pergunta que responde | Melhor resultado | O que um resultado baixo indica |
+| --- | --- | --- | --- |
+| `Recall@k` | Encontramos tudo que era necessário? | `1.0` | Faltaram evidências no top-k. |
+| `Precision@k` | O top-k tem pouca informação inútil? | `1.0` | Há muito ruído junto das evidências. |
+| `HitRate@k` | Apareceu pelo menos uma evidência relevante? | `1.0` | Nenhuma evidência apareceu no top-k. |
+| `MRR` | A primeira evidência útil aparece cedo? | `1.0` | A evidência aparece tarde ou não aparece. |
+| `nDCG@k` | As evidências mais importantes estão no começo? | `1.0` | A ordem do ranking está ruim. |
+| `project_isolation` | Veio somente informação do projeto correto? | `1.0` | Houve possível vazamento entre projetos. |
+| `score_ordering` | A lista está ordenada do mais forte para o mais fraco? | `1.0` | Há score inválido ou resultados fora de ordem. |
+| `abstention` | A busca ficou vazia quando não havia evidência? | `1.0` | A busca trouxe um falso resultado. |
+
+As cinco primeiras mostram a qualidade do ranking. As três últimas verificam regras de segurança e consistência do produto; não devem ser interpretadas como novas formas de reranking.
+
+As métricas operacionais aparecem no resumo como `retrieval_latency_ms`, `retrieval_latency_p95_ms`, `retrieval_error_rate` e `empty_result_rate`. Elas respondem se a busca é utilizável, estável e disponível; não substituem as métricas de relevância.
+
+Exemplo conjunto: suponha que A e B sejam as duas evidências necessárias e que a busca retorne `[ruído, A, B]`. Nesse caso, Recall@1 é `0`, Recall@2 é `0,5`, Recall@3 é `1`, Precision@3 é `2/3` e MRR é `0,5`, porque o primeiro acerto está na segunda posição. Se A for mais importante que B, nDCG também ficará abaixo de `1` porque A não está em primeiro.
+
 ## Existem dois tipos de teste
 
 ### 1. Teste automatizado
@@ -101,6 +126,47 @@ O script abaixo encapsula os comandos Docker dos dois cenários:
 ```bash
 ./run_evaluation.sh test
 ```
+
+### Modos de saída e seleção de métricas
+
+Por padrão, `real` imprime o relatório completo, com resumo, falhas e todos os casos. Para uma leitura rápida, use:
+
+```bash
+./run_evaluation.sh real --summary
+```
+
+O `--summary` mantém somente os metadados, a contagem de casos e as métricas agregadas. Para investigar apenas os problemas:
+
+```bash
+./run_evaluation.sh real --only-failures
+```
+
+O `--only-failures` mantém o resumo e os casos cujo diagnóstico ficou `failed`. Ele não recalcula um conjunto diferente de casos.
+
+Para selecionar as métricas exibidas, use um grupo ou nomes separados por vírgula:
+
+```bash
+./run_evaluation.sh real --summary --metrics ranking
+./run_evaluation.sh real --summary --metrics invariants
+./run_evaluation.sh real --summary --metrics operational
+./run_evaluation.sh real --summary --metrics recall@3,precision@3,ndcg@3
+```
+
+Os grupos são:
+
+```text
+ranking
+→ hit_rate@k, recall@k, precision@k, mrr, ndcg@k
+
+invariants
+→ project_isolation, score_ordering, abstention
+
+operational
+→ retrieval_latency_ms, retrieval_latency_p95_ms,
+  retrieval_error_rate, empty_result_rate
+```
+
+Mesmo quando `--metrics ranking` ou `--metrics operational` é usado, as invariantes continuam sendo executadas internamente para detectar vazamento, score inválido e falhas de segurança. O filtro controla a saída, não desativa essas proteções. `--summary` e `--only-failures` são mutuamente exclusivos.
 
 O modo `test` executa os testes automatizados com resultados controlados. Ele não sobe banco, não chama OpenAI e não usa documentos indexados.
 
@@ -295,8 +361,9 @@ docker compose
             │   ├── filtra pelo projeto
             │   └── retorna chunks e scores
             ├── compara chunks retornados com `relevant_chunks`
-            ├── calcula Recall, Precision, MRR e nDCG
+            ├── calcula HitRate, Recall, Precision, MRR e nDCG via ranx
             ├── verifica isolamento, scores e abstinência
+            ├── mede latência média/P95, erros e resultados vazios
             └── imprime o JSON da avaliação
 ```
 
@@ -336,13 +403,19 @@ evals.retrieval.evaluate.main()
     │   │                   ├── OpenAIEmbeddingRepository.embed((query,))
     │   │                   └── PGVector.similarity_search_with_score_by_vector(...)
     │   ├── _chunk_id(result)
-    │   ├── project_isolation(...)
-    │   ├── score_ordering(...)
-    │   ├── abstention(...)
-    │   ├── recall_at_k(...)
-    │   ├── precision_at_k(...)
-    │   ├── reciprocal_rank(...)
-    │   └── ndcg_at_k(...)
+    │   ├── _evaluate_invariants(...)
+    │   │   ├── project_isolation(...)
+    │   │   ├── score_ordering(...)
+    │   │   └── abstention(...)
+    │   ├── _evaluate_ranking_metrics(...)
+    │   │   └── evaluate_query_metrics(...)
+    │   │       ├── hit_rate@k
+    │   │       ├── recall@k
+    │   │       ├── precision@k
+    │   │       ├── mrr
+    │   │       └── ndcg@k
+    │   └── mede latência, erros e resultados vazios
+    ├── _aggregate_metrics(...)
     ├── mean_reciprocal_rank(...)
     └── build_report(EvaluationResult, dataset, ks)
 ```
@@ -375,6 +448,8 @@ evals.retrieval.evaluate.main()
 ### Métricas
 
 - `abstention()`: verifica se uma consulta sem chunks relevantes retornou vazio.
+- `evaluate_query_metrics()`: calcula as métricas padronizadas de ranking com o `ranx`.
+- `hit_rate@k`: verifica se apareceu pelo menos um chunk relevante no top-k.
 - `recall_at_k()`: mede quantos chunks esperados apareceram no top-k.
 - `precision_at_k()`: mede quanto do top-k retornado é relevante.
 - `reciprocal_rank()`: mede a posição do primeiro chunk relevante.
@@ -395,8 +470,9 @@ Esta é a ordem de execução do fluxo real, sem agrupar etapas fora da sequênc
    ├── 3. import search_relevant_chunks
    └── 4. run_evaluation(dataset, search_relevant_chunks, ks)
        └── para cada caso:
-           ├── 5. cria `expected` e `relevant_ids` a partir do golden
-           ├── 6. search_relevant_chunks(project_id, query, limit=5)
+           ├── 5. cria `expected` a partir do golden
+           ├── 6. mede o tempo e chama `search_relevant_chunks(project_id, query, limit=5)`
+           │   └── em caso de erro, registra o tipo do erro e continua o relatório
            │   └── 7. build_semantic_search_container()
            │       ├── 8. OpenAIEmbeddingRepository.from_environment()
            │       ├── 9. PostgresChunkVectorStore.from_environment(repository)
@@ -408,16 +484,19 @@ Esta é a ordem de execução do fluxo real, sem agrupar etapas fora da sequênc
            │                   ├── 15. OpenAIEmbeddingRepository.embed((query,))
            │                   └── 16. PGVector.similarity_search_with_score_by_vector(...)
            ├── 17. `_chunk_id(result)` para cada resultado
-           ├── 18. `project_isolation(...)`
-           ├── 19. `score_ordering(...)`
-           ├── 20. `reciprocal_rank(...)` ou `abstention(...)`
+           ├── 18. `_evaluate_invariants(...)`
+           │   ├── `project_isolation(...)`
+           │   ├── `score_ordering(...)`
+           │   └── `abstention(...)`, quando aplicável
+           ├── 19. `_evaluate_ranking_metrics(...)` via ranx
            └── para cada k em 1, 3 e 5:
-               ├── 21. `recall_at_k(...)`
-               ├── 22. `precision_at_k(...)`
-               └── 23. `ndcg_at_k(...)`
-       ├── 24. `mean_reciprocal_rank(...)`
-       ├── 25. cria `EvaluationResult(...)`
-       └── 26. `build_report(result, dataset, ks)`
+               ├── `hit_rate@k`
+               ├── `recall@k`
+               ├── `precision@k`
+               └── `ndcg@k`
+       ├── 20. agrega MRR, latência, erros e resultados vazios
+       ├── 21. cria `EvaluationResult(...)`
+       └── 22. `build_report(result, dataset, ks)`
 ```
 
 ### O que cada chamada faz, na mesma ordem
@@ -426,8 +505,8 @@ Esta é a ordem de execução do fluxo real, sem agrupar etapas fora da sequênc
 2. `load_dataset()` abre e valida o golden dataset.
 3. `search_relevant_chunks` é a função pública que será injetada no evaluator.
 4. `run_evaluation()` controla todos os casos e agrega as métricas.
-5. `expected` e `relevant_ids` representam o gabarito de chunks relevantes daquele caso.
-6. `search_relevant_chunks()` inicia uma consulta real para a pergunta.
+5. `expected` representa o gabarito de chunks relevantes daquele caso.
+6. `search_relevant_chunks()` inicia uma consulta real e o evaluator mede sua latência.
 7. `build_semantic_search_container()` monta as dependências do retrieval.
 8. `OpenAIEmbeddingRepository.from_environment()` lê modelo, chave e dimensão do ambiente.
 9. `PostgresChunkVectorStore.from_environment()` monta o store persistente.
@@ -439,12 +518,8 @@ Esta é a ordem de execução do fluxo real, sem agrupar etapas fora da sequênc
 15. `embed()` transforma a pergunta em um vetor usando OpenAI.
 16. `similarity_search_with_score_by_vector()` busca os chunks mais próximos e seus scores no PGVector.
 17. `_chunk_id()` converte cada resultado para `document_id:index`.
-18. `project_isolation()` verifica vazamento entre projetos.
-19. `score_ordering()` verifica se os scores estão em ordem decrescente.
-20. `reciprocal_rank()` mede a posição do primeiro chunk relevante; `abstention()` é usado quando não há chunks esperados.
-21. `recall_at_k()` mede quantos chunks esperados apareceram no top-k.
-22. `precision_at_k()` mede quanto do top-k retornado é relevante.
-23. `ndcg_at_k()` mede se os chunks mais relevantes ficaram nas melhores posições.
-24. `mean_reciprocal_rank()` calcula a média do MRR entre os casos respondíveis.
-25. `EvaluationResult` reúne métricas agregadas e diagnósticos por caso.
-26. `build_report()` converte o resultado em relatório com resumo, scores, falhas e casos detalhados.
+18. `_evaluate_invariants()` verifica isolamento, ordenação e abstention.
+19. `_evaluate_ranking_metrics()` calcula HitRate, Recall, Precision, MRR e nDCG via ranx.
+20. `_aggregate_metrics()` calcula médias, P95 de latência, taxa de erro e taxa de resultados vazios.
+21. `EvaluationResult` reúne métricas agregadas e diagnósticos por caso.
+22. `build_report()` converte o resultado em relatório com resumo, scores, falhas e casos detalhados.

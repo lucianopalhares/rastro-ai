@@ -10,6 +10,9 @@ DATABASE_URL="postgresql://rastro:rastro@evaluation-vector-db:5432/rastro_evalua
 PGVECTOR_COLLECTION="rastro_document_chunks"
 KS="${EVAL_KS:-1,3,5}"
 PREPARE=false
+SUMMARY=false
+ONLY_FAILURES=false
+METRICS="all"
 MODE="${1:-}"
 
 if [[ "$MODE" == "test" || "$MODE" == "real" ]]; then
@@ -20,7 +23,7 @@ fi
 show_help() {
   cat <<'EOF'
 Uso: run_evaluation.sh test
-     run_evaluation.sh real [--prepare] [--ks VALORES]
+     run_evaluation.sh real [--prepare] [--ks VALORES] [--metrics SELEÇÃO]
 
 Executa o teste automatizado ou a avaliação real do retriever.
 
@@ -31,6 +34,9 @@ Modos:
 Opções:
   --prepare       Reindexa o corpus do golden antes de avaliar.
   --ks VALORES    Valores de k separados por vírgula. Padrão: 1,3,5.
+  --metrics VALOR all, ranking, invariants, operational ou nomes separados por vírgula.
+  --summary       Imprime somente o resumo agregado, sem os casos detalhados.
+  --only-failures Imprime o resumo e somente os casos com falha.
   -h, --help      Mostra esta ajuda.
 EOF
 }
@@ -50,6 +56,22 @@ while (($# > 0)); do
       KS="$2"
       shift 2
       ;;
+    --metrics)
+      if (($# < 2)); then
+        echo "--metrics exige um grupo ou nomes separados por vírgula" >&2
+        exit 2
+      fi
+      METRICS="$2"
+      shift 2
+      ;;
+    --summary)
+      SUMMARY=true
+      shift
+      ;;
+    --only-failures)
+      ONLY_FAILURES=true
+      shift
+      ;;
     -h|--help)
       show_help
       exit 0
@@ -61,6 +83,11 @@ while (($# > 0)); do
       ;;
   esac
 done
+
+if [[ "$SUMMARY" == true && "$ONLY_FAILURES" == true ]]; then
+  echo "--summary e --only-failures não podem ser usados juntos" >&2
+  exit 2
+fi
 
 if [[ "$MODE" != "test" && "$MODE" != "real" ]]; then
   echo "Informe o modo: test ou real" >&2
@@ -105,7 +132,17 @@ if [[ "$PREPARE" == true ]]; then
 fi
 
 # Consulta o retriever real e imprime o JSON detalhado da evaluation.
+REPORT_ARGS=(
+  --dataset "$DATASET_PATH"
+  --ks "$KS"
+  --metrics "$METRICS"
+)
+if [[ "$SUMMARY" == true ]]; then
+  REPORT_ARGS+=(--summary)
+elif [[ "$ONLY_FAILURES" == true ]]; then
+  REPORT_ARGS+=(--only-failures)
+fi
+
 "${COMPOSE[@]}" "${COMMON_ARGS[@]}" \
   python -m evals.retrieval.evaluate \
-  --dataset "$DATASET_PATH" \
-  --ks "$KS"
+  "${REPORT_ARGS[@]}"

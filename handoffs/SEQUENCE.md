@@ -111,9 +111,21 @@ Esta sequência organiza as capacidades entregues nas aplicações reais e na ra
 | --- | --- | --- | --- | --- | --- |
 | 22 | `026-modulo-evaluation-retrieval` | `ia` | `verified` | `025` | evaluator separado calcula ranking, Recall@k, Precision@k, MRR, nDCG, isolamento, score e abstinência contra golden dataset |
 
-## Estado ativo da evaluation de retrieval
+## Estado histórico da evaluation de retrieval
 
-- Implementação ativa: `idle`.
+- Implementação encerrada: `026-modulo-evaluation-retrieval`.
 - Última implementação: `026-modulo-evaluation-retrieval` verificada.
 - Dependência: `025` verificada; runtime PGVector existente permanece inalterado.
 - Critério da etapa: testes determinísticos, banco isolado, corpus compatível, execução real e validação estrutural aprovados.
+
+## Fase 6 — Padronização das métricas de retrieval
+
+| Ordem | Implementação | Aplicação | Status | Dependência | Critério de conclusão |
+| --- | --- | --- | --- | --- | --- |
+| 23 | `027-adaptar-evaluation-retrieval-ranx` | `ia` | `verified` | `026` verificada | métricas clássicas do evaluator usam `ranx`, testes controlados passam e regras específicas permanecem preservadas |
+
+## Estado da padronização das métricas
+
+- Implementação encerrada: `027-adaptar-evaluation-retrieval-ranx`.
+- Dependência: `026` verificada; apenas o evaluator e suas dependências estão em escopo.
+- Critério: testes controlados, build do container, CLI, documentação e hook estrutural aprovados; evaluation real PGVector e publicação Langfuse permanecem como próximos trabalhos.

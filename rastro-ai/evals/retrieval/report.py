@@ -10,6 +10,20 @@ from .evaluate import EvaluationResult
 
 REPORT_SCHEMA = "rastro-ai.retrieval-report.v1"
 
+RANKING_METRIC_PREFIXES = (
+    "hit_rate_at_",
+    "recall_at_",
+    "precision_at_",
+    "ndcg_at_",
+)
+INVARIANT_METRICS = {"project_isolation", "score_ordering", "abstention"}
+OPERATIONAL_METRICS = {
+    "retrieval_latency_ms",
+    "retrieval_latency_p95_ms",
+    "retrieval_error_rate",
+    "empty_result_rate",
+}
+
 
 # /**
 #  * Converte uma métrica agregada em score portátil para ferramentas futuras.
@@ -23,6 +37,51 @@ def _score_records(metrics: Mapping[str, float]) -> list[dict[str, Any]]:
         {"name": name, "value": value, "data_type": "NUMERIC"}
         for name, value in metrics.items()
     ]
+
+
+# /**
+#  * Seleciona as métricas que devem aparecer no relatório.
+#  * Existe para permitir uma visão resumida ou uma análise isolada sem alterar o cálculo
+#  * completo do evaluator nem deixar de executar as invariantes de segurança.
+#  * Histórico: 027-v8 — adiciona seleção por métrica e por grupo.
+#  */
+def _select_metric_names(
+    metrics: Mapping[str, float], selection: str,
+) -> list[str]:
+    """Retorna as métricas selecionadas e rejeita nomes desconhecidos."""
+
+    available = list(metrics)
+    tokens = [token.strip().lower() for token in selection.split(",") if token.strip()]
+    if not tokens or tokens == ["all"]:
+        return available
+
+    selected: set[str] = set()
+    unknown: list[str] = []
+    for token in tokens:
+        if token == "ranking":
+            selected.update(
+                name
+                for name in available
+                if name == "mrr" or name.startswith(RANKING_METRIC_PREFIXES)
+            )
+        elif token == "invariants":
+            selected.update(name for name in available if name in INVARIANT_METRICS)
+        elif token == "operational":
+            selected.update(name for name in available if name in OPERATIONAL_METRICS)
+        else:
+            normalized = token.replace("@", "_at_")
+            if normalized.startswith("hit_at_"):
+                normalized = normalized.replace("hit_at_", "hit_rate_at_", 1)
+            if normalized in metrics:
+                selected.add(normalized)
+            else:
+                unknown.append(token)
+    if unknown:
+        available_text = ", ".join(available)
+        raise ValueError(
+            f"unknown retrieval metric(s): {', '.join(unknown)}; available: {available_text}"
+        )
+    return [name for name in available if name in selected]
 
 
 # /**
@@ -52,6 +111,8 @@ def _failure_reasons(case: Mapping[str, Any]) -> list[str]:
         reasons.append("project_isolation_failed")
     if case["score_ordering"] != 1.0:
         reasons.append("score_ordering_failed")
+    if case.get("retrieval_error"):
+        reasons.append("retrieval_error")
     return reasons
 
 
@@ -59,14 +120,24 @@ def _failure_reasons(case: Mapping[str, Any]) -> list[str]:
 #  * Organiza uma execução em um contrato próprio para terminal, arquivo ou observabilidade.
 #  * Existe para separar o cálculo das métricas do formato de apresentação e de uma futura
 #  * integração com Langfuse, preservando o golden e os diagnósticos por caso.
-#  * Histórico: 026-v18 — cria relatório com resumo, scores, falhas e casos.
+#  * Histórico: 026-v18 — cria relatório com resumo, scores, falhas e casos; 027-v8 — adiciona modos de saída e seleção.
 #  */
 def build_report(
     result: EvaluationResult,
     dataset: Mapping[str, Any],
     ks: tuple[int, ...],
+    *,
+    metrics_filter: str = "all",
+    output_mode: str = "full",
 ) -> dict[str, Any]:
-    """Retorna o relatório completo sem enviar dados para nenhuma plataforma externa."""
+    """Retorna o relatório filtrado sem enviar dados para nenhuma plataforma externa."""
+
+    if output_mode not in {"full", "summary", "only_failures"}:
+        raise ValueError("output_mode must be full, summary or only_failures")
+    selected_names = set(_select_metric_names(result.metrics, metrics_filter))
+    selected_metrics = {
+        name: value for name, value in result.metrics.items() if name in selected_names
+    }
 
     case_inputs = {case["id"]: case for case in dataset["cases"]}
     report_cases: list[dict[str, Any]] = []
@@ -92,8 +163,16 @@ def build_report(
                 "returned_chunks": returned,
                 "project_isolation": case["project_isolation"],
                 "score_ordering": case["score_ordering"],
+                "retrieval_error": case.get("retrieval_error"),
+                "latency_ms": case.get("retrieval_latency_ms", 0.0),
             },
-            "scores": _score_records(case["metrics"]),
+            "scores": _score_records(
+                {
+                    name: value
+                    for name, value in case["metrics"].items()
+                    if name in selected_names
+                }
+            ),
             "diagnostics": {
                 "status": "failed" if reasons else "passed",
                 "failure_reasons": reasons,
@@ -123,7 +202,7 @@ def build_report(
             "embedding_model": environ.get("EMBEDDING_MODEL", "unknown"),
         },
     }
-    return {
+    report = {
         "schema": REPORT_SCHEMA,
         "run": run,
         "summary": {
@@ -132,14 +211,21 @@ def build_report(
             "answerable_case_count": result.answerable_case_count,
             "no_answer_case_count": result.no_answer_case_count,
             "failure_count": len(failures),
-            "metrics": result.metrics,
+            "metrics": selected_metrics,
         },
-        "scores": _score_records(result.metrics),
+        "scores": _score_records(selected_metrics),
         "quality": {
             "status": "not_evaluated",
             "thresholds": {},
             "checks": [],
         },
-        "failures": failures,
-        "cases": report_cases,
     }
+    if output_mode == "summary":
+        return report
+    report["failures"] = failures
+    report["cases"] = (
+        [case for case in report_cases if case["diagnostics"]["status"] == "failed"]
+        if output_mode == "only_failures"
+        else report_cases
+    )
+    return report

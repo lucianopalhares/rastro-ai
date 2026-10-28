@@ -9,3 +9,5 @@ Cada caso possui `query`, `documents`, `relevant_chunks` e `expected_answer`. O 
 A avaliação integrada prepara os `documents` do mesmo golden em um container PostgreSQL/PGVector separado, usando o mesmo schema e pipeline de chunking da aplicação, antes de consultar o retriever real. A diferença entre os testes automatizados com retriever fake e esse comando contra PGVector está documentada em [`retrieval/README.md`](./retrieval/README.md), incluindo comandos, pré-requisitos e critérios para interpretar uma execução bem-sucedida.
 
 Este baseline não mede faithfulness ou relevância semântica por LLM: a aplicação atual é lexical, extrativa e não possui DeepEval, modelo, prompt ou trace de custo.
+
+Na evaluation específica de retrieval, `ranx` fornece as métricas clássicas de ranking; regras de segurança e política de abstention permanecem no código do projeto. A avaliação contextual com Ragas ou DeepEval continua fora desta etapa.

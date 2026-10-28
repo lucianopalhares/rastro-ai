@@ -65,6 +65,34 @@ class RetrievalEvaluationTests(unittest.TestCase):
         self.assertEqual(report["cases"][0]["expected"]["answer"]["text"], "PostgreSQL")
 
     # /**
+    #  * Confirma que a saída pode ser reduzida sem perder o contrato das métricas selecionadas.
+    #  * Histórico: 027-v8 — cobre summary, only_failures e seleção do grupo ranking.
+    #  */
+    def test_report_supports_summary_failures_and_metric_selection(self) -> None:
+        dataset = {
+            "cases": [
+                {
+                    "id": "q-1",
+                    "project_id": "project-1",
+                    "query": "qual banco?",
+                    "relevant_chunks": [{"chunk_id": "doc:0", "relevance": 1}],
+                }
+            ]
+        }
+
+        def retriever(_project_id: str, _query: str, *, limit: int):
+            return [FakeResult("noise", 0, "project-1", 0.9)][:limit]
+
+        result = run_evaluation(dataset, retriever, ks=(1,))
+        summary = build_report(result, dataset, (1,), metrics_filter="ranking", output_mode="summary")
+        only_failures = build_report(result, dataset, (1,), output_mode="only_failures")
+
+        self.assertNotIn("cases", summary)
+        self.assertNotIn("project_isolation", summary["summary"]["metrics"])
+        self.assertIn("recall_at_1", summary["summary"]["metrics"])
+        self.assertEqual(len(only_failures["cases"]), 1)
+
+    # /**
     #  * Confirma que o corpus e a resposta esperada permanecem compatíveis no mesmo golden.
     #  * Histórico: 026-v15 — cobre a preparação do índice isolado de evaluation.
     #  */
@@ -146,9 +174,50 @@ class RetrievalEvaluationTests(unittest.TestCase):
         result = run_evaluation(dataset, retriever, ks=(1, 3))
 
         self.assertEqual(result.metrics["recall_at_3"], 1.0)
+        self.assertEqual(result.metrics["hit_rate_at_1"], 0.0)
+        self.assertEqual(result.metrics["hit_rate_at_3"], 1.0)
         self.assertAlmostEqual(result.metrics["precision_at_1"], 0.0)
         self.assertAlmostEqual(result.metrics["mrr"], 0.5)
         self.assertGreater(result.metrics["ndcg_at_3"], 0.0)
+        self.assertGreaterEqual(result.metrics["retrieval_latency_ms"], 0.0)
+        self.assertGreaterEqual(result.metrics["retrieval_latency_p95_ms"], 0.0)
+        self.assertEqual(result.metrics["retrieval_error_rate"], 0.0)
+        self.assertEqual(result.metrics["empty_result_rate"], 0.0)
+
+    # /**
+    #  * Confirma que a evaluation diferencia busca vazia de falha técnica do retriever.
+    #  * Histórico: 027-v7 — cobre HitRate e indicadores operacionais básicos.
+    #  */
+    def test_evaluation_reports_empty_results_and_retrieval_errors(self) -> None:
+        dataset = {
+            "cases": [
+                {
+                    "id": "empty",
+                    "project_id": "project-1",
+                    "query": "sem resultado",
+                    "relevant_chunks": [],
+                },
+                {
+                    "id": "error",
+                    "project_id": "project-1",
+                    "query": "falha",
+                    "relevant_chunks": [{"chunk_id": "doc:0", "relevance": 1}],
+                },
+            ]
+        }
+
+        def retriever(_project_id: str, query: str, *, limit: int):
+            if query == "falha":
+                raise RuntimeError("retriever unavailable")
+            return []
+
+        result = run_evaluation(dataset, retriever, ks=(1,))
+
+        self.assertEqual(result.metrics["hit_rate_at_1"], 0.0)
+        self.assertEqual(result.metrics["empty_result_rate"], 0.5)
+        self.assertEqual(result.metrics["retrieval_error_rate"], 0.5)
+        self.assertIsNone(result.cases[0]["retrieval_error"])
+        self.assertEqual(result.cases[1]["retrieval_error"], "RuntimeError")
 
     # /**
     #  * Confirma que o evaluator detecta vazamento de projeto, score fora de ordem e falta de abstinência.

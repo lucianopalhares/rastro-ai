@@ -768,6 +768,36 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Dependência: implementação `025` verificada.
 - Pasta: `handoffs/026-modulo-evaluation-retrieval/`
 
+## 027 — Adaptar evaluation de retrieval para ranx
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: substituir cálculos manuais de Recall, Precision, MRR e nDCG por `ranx`.
+- Resultado: dependência, adapter, métricas, Dockerfiles e documentação atualizados; regras específicas preservadas.
+- Verificação: build, compilação, sintaxe, 6 testes controlados e hook estrutural aprovados.
+- Pendência: evaluation real PGVector, status final e commit aguardam finalização explícita.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptar evaluation de retrieval para ranx — v2
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: separar métricas padronizadas de ranking das invariantes específicas do produto.
+- Resultado: `metrics/ranking` e `metrics/invariants` criados; exports públicos preservados.
+- Verificação: compilação, diff, hook estrutural e 6 testes controlados aprovados.
+- Pendência: evaluation real PGVector, finalização e commit explícito.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptar evaluation de retrieval para ranx — v3
+
+- Data/hora: 2026-10-27 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: evitar que `ranking/` seja confundido com uma etapa de reranking do runtime.
+- Resultado: diretórios renomeados para `ranking_metrics/` e `invariants_metrics`; imports públicos preservados.
+- Verificação: compilação, diff, suíte controlada e hook estrutural aprovados.
+- Pendência: evaluation real PGVector, finalização e commit explícito.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
 ## 026 — Módulo de evaluation de retrieval — v12
 
 - Data/hora: 2026-10-27 -03:00 | Status: `applied`
@@ -965,3 +995,71 @@ Cada registro tem no máximo 8 linhas; detalhes técnicos ficam na pasta numerad
 - Resultado: Docker, evaluator, PGVector, chunks e métricas aparecem em uma sequência única.
 - Pendência: avaliação integrada contra PGVector permanece pendente.
 - Pasta: `handoffs/026-modulo-evaluation-retrieval/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — v4
+
+- Data/hora: 2026-10-27 23:35 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: tornar a leitura das métricas mais simples, com perguntas, interpretação de valores e exemplos concretos.
+- Verificação: compilação, diff e suíte controlada concluídos; 6 testes terminaram com `OK`.
+- Resultado: comentários de `ranking_metrics`, `invariants_metrics`, adapter e README explicam o fluxo sem alterar runtime.
+- Pendência: evaluation real contra PGVector permanece fora desta tarefa; finalização aguarda comando explícito.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — v5
+
+- Data/hora: 2026-10-27 23:55 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai`.
+- Motivo: separar no código as etapas de retrieval, invariantes, ranking e agregação para facilitar manutenção e leitura.
+- Verificação: compilação, diff e suíte controlada concluídos; 6 testes terminaram com `OK`.
+- Resultado: imports e helpers explicitam a divisão sem alterar o contrato consumido pelo relatório.
+- Pendência: evaluation real contra PGVector permanece fora desta tarefa; finalização aguarda comando explícito.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — v6
+
+- Data/hora: 2026-10-28 00:15 -03:00 | Status: `applied`
+- Aplicação afetada: documentação em `docs/`.
+- Motivo: explicar com setas o fluxo completo e orientar a escolha de métricas conforme o projeto.
+- Verificação: conteúdo conferido com `rg`; `git diff --check` será repetido.
+- Resultado: ranking, invariantes, contexto, resposta, reranking e operação aparecem como camadas distintas.
+- Pendência: `docs/*` é ignorado pelo Git; o arquivo não será incluído em commit automático.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — v7
+
+- Data/hora: 2026-10-28 00:45 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai` e documentação do retrieval.
+- Motivo: adicionar HitRate e indicadores operacionais aprovados para avaliar sucesso mínimo e aplicabilidade da busca.
+- Verificação: compilação, diff e suíte controlada concluídos; 7 testes terminaram com `OK`.
+- Resultado: latência, erro e resultado vazio ficam separados das métricas de relevância e abstention.
+- Pendência: evaluation real contra PGVector e thresholds de produção permanecem fora desta tarefa.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — v8
+
+- Data/hora: 2026-10-28 01:15 -03:00 | Status: `applied`
+- Aplicação afetada: `rastro-ai` e documentação do retrieval.
+- Motivo: permitir leitura resumida, investigação de falhas e seleção de métricas no CLI.
+- Verificação: shell, compilação, ajuda, diff e suíte controlada concluídos; 8 testes terminaram com `OK`.
+- Resultado: relatório completo preservado; `--summary`, `--only-failures` e `--metrics` adicionados.
+- Pendência: publicação futura no Langfuse e evaluation real permanecem fora desta tarefa.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — finalização
+
+- Data/hora: 2026-10-28 01:30 -03:00 | Status: `verified`
+- Aplicação afetada: `rastro-ai`; controles da implementação atualizados.
+- Verificação: 8 testes `OK`, compilação, shell, ajuda, diff e hook estrutural com 18 arquivos.
+- Resultado: tarefa encerrada com ranx, métricas operacionais, filtros de saída e documentação aplicados.
+- Limite: evaluation real PGVector, thresholds e publicação Langfuse permanecem como trabalhos posteriores.
+- Controle: `CURRENT.md` está `idle`; `SEQUENCE.md` e README consolidado estão `verified`.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
+
+## 027 — Adaptação da evaluation de retrieval para ranx — commit
+
+- Data/hora: 2026-10-28 01:35 -03:00 | Status: `verified`
+- Commit: `06f96d7` — `Implementa avaliação de retrieval com ranx`.
+- Verificação: commit criado com lista explícita dos arquivos da tarefa; `CURRENT.md` está `idle`.
+- Limite: `docs/rag-evaluation-flow.md` permanece no workspace, fora do commit, por estar coberto pelo `.gitignore`.
+- Pasta: `handoffs/027-adaptar-evaluation-retrieval-ranx/`
